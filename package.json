@@ -9,9 +9,9 @@
     "fix": "pnpm run nx:run-many --target=lint --fix",
     "nx:affected": "nx affected --parallel=2 --nxBail",
     "affected:docker-build": "pnpm run nx:affected --target=docker-build --verbose --parallel=2 --nxBail",
-    "docker:start:dev": "docker compose -f docker-compose.dev.yaml up -d",
-    "docker:stop:dev": "docker compose -f docker-compose.dev.yaml down",
-    "build": " pnpm run affected:docker-build && pnpm run docker:start:dev",
+    "docker:start:provider": "docker compose -f docker/docker-compose.provider.yaml up -d",
+    "docker:start:dev": "docker compose -f docker/docker-compose.dev.yaml up -d",
+    "build": "pnpm run nx:run-many -t && pnpm run affected:docker-build && pnpm run docker:start:dev",
     "dev": "pnpm nx:reset && pnpm nx:run-many -t serve",
     "prepare": "husky"
   },
