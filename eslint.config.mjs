@@ -1,4 +1,5 @@
 import nx from '@nx/eslint-plugin';
+import parser from 'jsonc-eslint-parser';
 
 export default [
   ...nx.configs['flat/base'],
