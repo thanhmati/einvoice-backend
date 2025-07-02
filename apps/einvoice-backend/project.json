@@ -39,6 +39,15 @@
       "options": {
         "passWithNoTests": true
       }
+    },
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "commands": [
+          "docker build -f apps/einvoice-backend/Dockerfile . -t einvoice-backend:latest"
+        ]
+      }
     }
   }
 }

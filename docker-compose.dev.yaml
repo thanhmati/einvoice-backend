@@ -1,0 +1,15 @@
+name: einvoice-backend
+
+networks:
+  einvoice-nw:
+    driver: bridge
+    name: einvoice-nw
+
+services:
+  einvoice-backend:
+    container_name: einvoice-backend
+    image: einvoice-backend:latest
+    ports:
+      - 3000:3000
+    networks:
+      - einvoice-nw
