@@ -2,7 +2,11 @@
   "name": "@einvoice-backend/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "nx:reset": "nx reset",
+    "nx:run-many": "nx run-many",
+    "dev": "pnpm nx:reset && pnpm nx:run-many -t serve"
+  },
   "private": true,
   "dependencies": {
     "@nestjs/common": "^11.0.0",
