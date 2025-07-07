@@ -4,6 +4,7 @@ networks:
   einvoice-nw:
     driver: bridge
     name: einvoice-nw
+    external: true
 
 services:
   einvoice-backend:
@@ -11,40 +12,5 @@ services:
     image: einvoice-backend:latest
     ports:
       - 3000:3000
-    networks:
-      - einvoice-nw
-
-  grafana:
-    image: grafana/grafana:11.0.0
-    container_name: grafana
-    ports:
-      - 3001:3000
-    volumes:
-      - ./docker/docker-data/grafana-data:/var/lib/grafana
-
-    networks:
-      - einvoice-nw
-
-  loki:
-    image: grafana/loki
-    container_name: loki
-    ports:
-      - 3100:3100
-    volumes:
-      - ./docker/loki-config.yaml:/etc/loki/loki.yaml
-    networks:
-      - einvoice-nw
-
-  promtail:
-    image: grafana/promtail
-    container_name: promtail
-    volumes:
-      - ./docker/promtail-config.yaml:/etc/promtail/config.yml # ✅ bind mount đúng
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: -config.file=/etc/promtail/config.yml
-
-    depends_on:
-      - loki
     networks:
       - einvoice-nw
