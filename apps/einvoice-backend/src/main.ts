@@ -7,6 +7,7 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -17,12 +18,37 @@ async function bootstrap() {
     origin: '*',
   });
 
-  const globalPrefix = 'api';
+  const globalPrefix = 'api/v1';
   app.setGlobalPrefix(globalPrefix);
   const port = process.env.PORT || 3000;
+
+  const config = new DocumentBuilder()
+    .setTitle('E-invoice API')
+    .setDescription('The E-invoice API description')
+    .setVersion('1.0.0')
+    .addBearerAuth({
+      description: 'Default JWT Authorization',
+      type: 'http',
+      in: 'header',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      name: 'Authorization',
+    })
+    .build();
+
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup(`${globalPrefix}/docs`, app, documentFactory, {
+    swaggerOptions: {
+      filter: true,
+    },
+  });
+
   await app.listen(port);
   Logger.log(
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
+  );
+  Logger.log(
+    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}/docs`
   );
 }
 
