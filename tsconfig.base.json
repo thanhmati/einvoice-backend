@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@common/configuration": ["libs/configuration/src/index.ts"],
       "@common/interfaces": ["libs/interfaces/src/index.ts"]
     }
   },
