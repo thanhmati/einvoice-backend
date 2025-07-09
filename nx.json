@@ -37,7 +37,7 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/einvoice-backend-e2e/**/*"]
+      "exclude": ["apps/listing-e2e/**/*"]
     }
   ]
 }

@@ -1,4 +1,4 @@
-name: einvoice-backend
+name: listing
 
 networks:
   einvoice-nw:

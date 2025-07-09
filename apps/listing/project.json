@@ -1,7 +1,7 @@
 {
-  "name": "einvoice-backend",
+  "name": "listing",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/einvoice-backend/src",
+  "sourceRoot": "apps/listing/src",
   "projectType": "application",
   "tags": [],
   "targets": {
@@ -23,15 +23,15 @@
       "defaultConfiguration": "development",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "einvoice-backend:build",
+        "buildTarget": "listing:build",
         "runBuildTargetDependencies": false
       },
       "configurations": {
         "development": {
-          "buildTarget": "einvoice-backend:build:development"
+          "buildTarget": "listing:build:development"
         },
         "production": {
-          "buildTarget": "einvoice-backend:build:production"
+          "buildTarget": "listing:build:production"
         }
       }
     },
@@ -45,7 +45,7 @@
       "dependsOn": ["build"],
       "options": {
         "commands": [
-          "docker build -f apps/einvoice-backend/Dockerfile . -t einvoice-backend:latest"
+          "docker build -f apps/listing/Dockerfile . -t listing:latest"
         ]
       }
     }
