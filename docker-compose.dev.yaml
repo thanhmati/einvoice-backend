@@ -11,6 +11,13 @@ services:
     container_name: invoice
     image: invoice:latest
     ports:
+      - 3001:3001
+    networks:
+      - einvoice-nw
+  bff:
+    container_name: bff
+    image: bff:latest
+    ports:
       - 3000:3000
     networks:
       - einvoice-nw

@@ -20,7 +20,7 @@ async function bootstrap() {
 
   const globalPrefix = 'api/v1';
   app.setGlobalPrefix(globalPrefix);
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 3001;
 
   const config = new DocumentBuilder()
     .setTitle('E-invoice API')

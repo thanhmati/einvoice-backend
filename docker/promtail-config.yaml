@@ -28,3 +28,6 @@ scrape_configs:
       - source_labels: [__meta_docker_container_name]
         regex: /invoice.*
         action: keep
+      - source_labels: [__meta_docker_container_name]
+        regex: /bff.*
+        action: keep
