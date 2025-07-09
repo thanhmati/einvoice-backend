@@ -8,7 +8,7 @@ RUN corepack enable
 WORKDIR /app
 
 FROM base AS prod-deps
-COPY /dist/apps/einvoice-backend /app
+COPY /dist/apps/invoice /app
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod
 RUN pnpm install tslib
 EXPOSE 3000

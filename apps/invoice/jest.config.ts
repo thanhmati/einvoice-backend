@@ -1,10 +1,10 @@
 export default {
-  displayName: 'einvoice-backend',
+  displayName: 'invoice',
   preset: '../../jest.preset.js',
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/apps/einvoice-backend',
+  coverageDirectory: '../../coverage/apps/invoice',
 };

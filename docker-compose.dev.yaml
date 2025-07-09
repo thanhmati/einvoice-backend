@@ -1,4 +1,4 @@
-name: einvoice-backend
+name: invoice
 
 networks:
   einvoice-nw:
@@ -7,9 +7,9 @@ networks:
     external: true
 
 services:
-  einvoice-backend:
-    container_name: einvoice-backend
-    image: einvoice-backend:latest
+  invoice:
+    container_name: invoice
+    image: invoice:latest
     ports:
       - 3000:3000
     networks:
