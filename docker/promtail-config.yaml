@@ -26,5 +26,5 @@ scrape_configs:
 
       # Tùy chọn: lọc chỉ container có tên nhất định
       - source_labels: [__meta_docker_container_name]
-        regex: /listing.*
+        regex: /einvoice-backend.*
         action: keep
