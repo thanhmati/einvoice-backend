@@ -18,7 +18,8 @@
       "@common/configuration": ["libs/configuration/src/index.ts"],
       "@common/constants": ["libs/constants/src/index.ts"],
       "@common/interceptors": ["libs/interceptors/src/index.ts"],
-      "@common/interfaces": ["libs/interfaces/src/index.ts"]
+      "@common/interfaces": ["libs/interfaces/src/index.ts"],
+      "@common/middlewares": ["libs/middlewares/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
