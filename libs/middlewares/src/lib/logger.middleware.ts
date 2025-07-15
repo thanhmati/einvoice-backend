@@ -1,24 +1,19 @@
 import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
+import { getProcessId } from '@common/utils/string.utils';
+import { MetadataKeys } from '@common/constants/decorators.constant';
 
-import { randomUUID } from 'crypto';
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
-  pathPrefix: string;
-
-  constructor() {
-    this.pathPrefix = '/api';
-  }
-
   use(req: Request, res: Response, next: NextFunction) {
-    const processId = randomUUID();
-    (req as any)['processID'] = processId;
+    const processId = getProcessId();
+    (req as any)[MetadataKeys.PROCESS_ID] = processId;
     const startTime = Date.now();
     const { method, originalUrl, body } = req;
-    const url = originalUrl.replace(this.pathPrefix, '');
+    const url = originalUrl.replace('api/v1', '');
 
     const now = Date.now();
-    (req as any)['startTime'] = now;
+    (req as any)[MetadataKeys.START_TIME] = now;
 
     // Log thông tin request bắt đầu
     Logger.log(
