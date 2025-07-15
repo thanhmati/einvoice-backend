@@ -15,14 +15,14 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@common/configuration": ["libs/configuration/src/index.ts"],
-      "@common/constants": ["libs/constants/src/index.ts"],
-      "@common/decorators": ["libs/decorators/src/index.ts"],
-      "@common/interceptors": ["libs/interceptors/src/index.ts"],
-      "@common/interfaces": ["libs/interfaces/src/index.ts"],
-      "@common/middlewares": ["libs/middlewares/src/index.ts"],
-      "@common/schemas": ["libs/schemas/src/index.ts"],
-      "@common/utils": ["libs/utils/src/index.ts"]
+      "@common/configuration/*": ["libs/configuration/src/lib/*"],
+      "@common/constants/*": ["libs/constants/src/lib/*"],
+      "@common/decorators/*": ["libs/decorators/src/lib/*"],
+      "@common/interceptors/*": ["libs/interceptors/src/lib/*"],
+      "@common/interfaces/*": ["libs/interfaces/src/lib/*"],
+      "@common/middlewares/*": ["libs/middlewares/src/lib/*"],
+      "@common/schemas/*": ["libs/schemas/src/lib/*"],
+      "@common/utils/*": ["libs/utils/src/lib/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
