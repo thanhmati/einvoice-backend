@@ -8,6 +8,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { HttpExceptionFilter } from '@common/interceptors/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -20,6 +21,8 @@ async function bootstrap() {
 
   const globalPrefix = 'api/v1';
   app.setGlobalPrefix(globalPrefix);
+  app.useGlobalFilters(new HttpExceptionFilter());
+
   const port = process.env.PORT || 3000;
 
   const config = new DocumentBuilder()

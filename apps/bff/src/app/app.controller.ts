@@ -9,4 +9,9 @@ export class AppController {
   getData() {
     return this.appService.getData();
   }
+
+  @Get('error')
+  getError() {
+    return this.appService.getError();
+  }
 }

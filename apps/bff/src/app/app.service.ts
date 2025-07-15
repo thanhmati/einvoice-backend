@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
@@ -6,5 +6,9 @@ export class AppService {
   getData(): { message: string } {
     this.logger.debug('call api');
     return { message: 'Hello API' };
+  }
+
+  getError() {
+    throw new BadRequestException('error');
   }
 }
