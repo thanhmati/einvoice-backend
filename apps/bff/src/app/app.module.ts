@@ -4,10 +4,23 @@ import { LoggerMiddleware } from '@common/middlewares/logger.middleware';
 import { CONFIGURATION, TConfiguration } from '../configuration';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from '@common/interceptors/http-exception.filter';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { AppController } from './app.controller';
 
 @Module({
-  imports: [],
-  controllers: [],
+  imports: [
+    ClientsModule.register([
+      {
+        name: 'INVOICE_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: '127.0.0.1',
+          port: 4001,
+        },
+      },
+    ]),
+  ],
+  controllers: [AppController],
   providers: [
     {
       provide: APP_FILTER,

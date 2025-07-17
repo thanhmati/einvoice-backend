@@ -27,28 +27,26 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
   app.useGlobalPipes(new ValidationPipe());
 
-  if (isDev) {
-    const config = new DocumentBuilder()
-      .setTitle('E-bff API')
-      .setDescription('The E-bff API description')
-      .setVersion('1.0.0')
-      .addBearerAuth({
-        description: 'Default JWT Authorization',
-        type: 'http',
-        in: 'header',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'Authorization',
-      })
-      .build();
+  const config = new DocumentBuilder()
+    .setTitle('E-bff API')
+    .setDescription('The E-bff API description')
+    .setVersion('1.0.0')
+    .addBearerAuth({
+      description: 'Default JWT Authorization',
+      type: 'http',
+      in: 'header',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      name: 'Authorization',
+    })
+    .build();
 
-    const documentFactory = () => SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup(`${globalPrefix}/docs`, app, documentFactory, {
-      swaggerOptions: {
-        filter: true,
-      },
-    });
-  }
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup(`${globalPrefix}/docs`, app, documentFactory, {
+    swaggerOptions: {
+      filter: true,
+    },
+  });
 
   await app.listen(port);
   Logger.log(
