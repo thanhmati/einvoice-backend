@@ -8,16 +8,16 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { HttpExceptionFilter } from '@common/interceptors/http-exception.filter';
 
 async function bootstrap() {
-
   const isDev = AppModule.CONFIGURATION.IS_DEV;
   const globalPrefix = AppModule.CONFIGURATION.GLOBAL_PREFIX;
   const port = AppModule.CONFIGURATION.APP_CONFIG.PORT || 3000;
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: isDev ? ['error', 'warn', 'log', 'debug', 'verbose'] : ['error', 'warn', 'log'],
+    logger: isDev
+      ? ['error', 'warn', 'log', 'debug', 'verbose']
+      : ['error', 'warn', 'log'],
   });
 
   app.enableCors({
@@ -26,7 +26,6 @@ async function bootstrap() {
 
   app.setGlobalPrefix(globalPrefix);
   app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalFilters(new HttpExceptionFilter());
 
   if (isDev) {
     const config = new DocumentBuilder()
@@ -50,8 +49,6 @@ async function bootstrap() {
       },
     });
   }
-
-
 
   await app.listen(port);
   Logger.log(
