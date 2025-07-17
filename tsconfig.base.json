@@ -15,7 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@common/configuration/*": ["libs/configuration/src/lib/*"],
+      "@common/configuration": ["libs/configuration/src/index.ts"],
       "@common/constants/*": ["libs/constants/src/lib/*"],
       "@common/decorators/*": ["libs/decorators/src/lib/*"],
       "@common/interceptors/*": ["libs/interceptors/src/lib/*"],

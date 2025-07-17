@@ -1,0 +1,3 @@
+export enum TCP_SERVICES {
+  INVOICE_SERVICE = 'INVOICE_SERVICE',
+}

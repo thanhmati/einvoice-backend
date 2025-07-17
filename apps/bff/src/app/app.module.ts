@@ -2,13 +2,18 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 
 import { LoggerMiddleware } from '@common/middlewares/logger.middleware';
 import { CONFIGURATION, TConfiguration } from '../configuration';
-import { APP_FILTER } from '@nestjs/core';
-import { HttpExceptionFilter } from '@common/interceptors/http-exception.filter';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ExceptionInterceptor } from '@common/interceptors/exception.interceptor';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [() => ({ ...CONFIGURATION })],
+    }),
     ClientsModule.register([
       {
         name: 'INVOICE_SERVICE',
@@ -23,8 +28,8 @@ import { AppController } from './app.controller';
   controllers: [AppController],
   providers: [
     {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
+      provide: APP_INTERCEPTOR,
+      useClass: ExceptionInterceptor,
     },
   ],
 })
