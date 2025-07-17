@@ -8,10 +8,7 @@ import { map } from 'rxjs';
 @Controller('app')
 @ApiTags('App')
 export class AppController {
-  constructor(
-    @Inject(TCP_SERVICES.INVOICE_SERVICE)
-    private readonly invoiceService: TcpClient,
-  ) {}
+  constructor(@Inject(TCP_SERVICES.INVOICE_SERVICE) private readonly invoiceService: TcpClient) {}
 
   @Get()
   async get() {
