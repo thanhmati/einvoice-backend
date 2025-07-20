@@ -5,3 +5,6 @@ export enum MetadataKeys {
   PERMISSIONS = 'permissions',
   START_TIME = 'startTime',
 }
+
+
+export const EXECUTION_CONTEXT_REQ_INDEX = 0;
