@@ -44,5 +44,4 @@ Thumbs.db
 .github/instructions/nx.instructions.md
 
 # docker data
-docker/**/docker-data
 docker/**/docker_data
