@@ -10,7 +10,7 @@ services:
     image: grafana/grafana
     container_name: grafana
     ports:
-      - 3001:3000
+      - 3000:3000
     volumes:
       - ./docker/docker_data/grafana-data:/var/lib/grafana
 
@@ -42,6 +42,7 @@ services:
       - einvoice-nw
 
   kafka:
+    container_name: kafka
     image: bitnami/kafka:latest
     networks:
       - einvoice-nw
@@ -54,10 +55,13 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
     volumes:
       - ./docker/docker_data/kafka_data/bitnami_data:/bitnami/kafka
 
   kafka-ui:
+    container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
     ports:
       - 8080:8080
