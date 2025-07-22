@@ -5,16 +5,17 @@ import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { ResponseDto } from '@common/interfaces/gateway/common/response.interface';
 import { map } from 'rxjs';
 import { ProcessID } from '@common/decorators/processID.decorator';
+import { TCP_REQUEST_MESSAGE } from '@common/constants/enums/tcp-request-message.enum';
 
 @Controller('app')
 @ApiTags('App')
 export class AppController {
-  constructor(@Inject(TCP_SERVICES.INVOICE_SERVICE) private readonly invoiceService: TcpClient) { }
+  constructor(@Inject(TCP_SERVICES.INVOICE_SERVICE) private readonly invoiceService: TcpClient) {}
 
   @Get()
   async get(@ProcessID() processID: string) {
     return this.invoiceService
-      .send<string, number>('get_invoice_by_id', { data: 1, processID })
+      .send<string, number>(TCP_REQUEST_MESSAGE.INVOICE.GET_BY_ID, { data: 1, processID })
       .pipe(map((data) => new ResponseDto(data)));
   }
 }
