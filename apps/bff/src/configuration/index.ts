@@ -1,4 +1,4 @@
-import { BaseConfiguration, AppConfiguration, TcpConfiguration } from '@common/configuration';
+import { BaseConfiguration, AppConfiguration, TcpConfiguration, KafkaConfiguration } from '@common/configuration';
 import { ValidateNested } from 'class-validator';
 
 class Configuration extends BaseConfiguration {
@@ -7,6 +7,9 @@ class Configuration extends BaseConfiguration {
 
   @ValidateNested()
   TCP_SERV = new TcpConfiguration();
+
+  @ValidateNested()
+  KAFKA_CONFIG = new KafkaConfiguration();
 }
 
 export const CONFIGURATION = new Configuration();

@@ -8,6 +8,8 @@ import { ClientsModule } from '@nestjs/microservices';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
 import { TCP_SERVICES, TcpProvider } from '@common/configuration';
+import { KafkaModule } from '@common/queue/modules/kafka/kafka.module';
+import { KAFKA_SERVICES } from '@common/constants/enums/kafka.enum';
 
 @Module({
   imports: [
@@ -16,6 +18,7 @@ import { TCP_SERVICES, TcpProvider } from '@common/configuration';
       load: [() => ({ ...CONFIGURATION })],
     }),
     ClientsModule.registerAsync([TcpProvider(TCP_SERVICES.INVOICE_SERVICE)]),
+    KafkaModule.forProducerAsync({ serviceName: KAFKA_SERVICES.BFF }),
   ],
   controllers: [AppController],
   providers: [

@@ -1,4 +1,4 @@
-import { Controller, Get, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Logger, UseInterceptors } from '@nestjs/common';
 import { AppService } from './app.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { Response } from '@common/interfaces/tcp/common/response.interface';
@@ -8,6 +8,8 @@ import { TCP_REQUEST_MESSAGE } from '@common/constants/enums/tcp-request-message
 @Controller('app')
 @UseInterceptors(TcpLoggingInterceptor)
 export class AppController {
+  private readonly logger = new Logger(AppController.name);
+
   constructor(private readonly appService: AppService) {}
 
   @Get()

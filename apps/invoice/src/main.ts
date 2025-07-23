@@ -3,50 +3,40 @@
  * This is only a minimal backend to get started.
  */
 
-import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { KAFKA_SERVICES, KAFKA_GROUPS } from '@common/constants/enums/kafka.enum';
-import { hostname } from 'os';
+import { Logger } from '@nestjs/common';
+declare const module: any;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
-  });
+  try {
+    const app = await NestFactory.create(AppModule, {
+      logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+    });
 
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.TCP,
-    options: {
-      port: 3200,
-      host: '127.0.0.1',
-    },
-  });
-
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.KAFKA,
-    options: {
-      client: {
-        clientId: `${KAFKA_SERVICES.INVOICE}-${hostname()}`,
-        brokers: [AppModule.CONFIGURATION.KAFKA_CONFIG.URL],
+    app.connectMicroservice<MicroserviceOptions>({
+      transport: Transport.TCP,
+      options: {
+        port: 3200,
+        host: '127.0.0.1',
       },
-      consumer: {
-        groupId: KAFKA_GROUPS.INVOICE,
-        allowAutoTopicCreation: true,
-      },
-    },
-  });
+    });
 
-  app.enableCors({
-    origin: '*',
-  });
+    app.enableCors({
+      origin: '*',
+    });
 
-  const port = 3002;
+    if (module.hot) {
+      module.hot.accept();
+      module.hot.dispose(() => app.close());
+    }
 
-  await app.startAllMicroservices();
-  await app.listen(port);
-
-  Logger.log(`🚀 Application is running on: http://localhost:${port}}`);
+    await app.startAllMicroservices();
+    await app.listen(3001);
+  } catch (error) {
+    Logger.error(`❌ Application failed to start: ${error}`, '', 'Bootstrap', false);
+  }
 }
 
 bootstrap();
