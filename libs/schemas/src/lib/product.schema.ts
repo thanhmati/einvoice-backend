@@ -14,6 +14,9 @@ export class Product extends BaseSchema {
   @Prop({ type: String })
   name: string;
 
+  @Prop({ type: String, required: false })
+  description?: string;
+
   @Prop({ type: String })
   sku: string;
 

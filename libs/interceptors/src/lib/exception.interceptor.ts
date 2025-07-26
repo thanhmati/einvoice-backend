@@ -43,7 +43,7 @@ export class ExceptionInterceptor implements NestInterceptor {
 
         const code =
           error?.code || error?.statusCode || error?.response?.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
-        const message = error?.response?.message || error?.message || HTTP_MESSAGE.INTERNAL_SERVER_ERROR;
+        const message = error?.response?.message || error?.message || error || HTTP_MESSAGE.INTERNAL_SERVER_ERROR;
 
         throw new HttpException(
           new ResponseDto({
