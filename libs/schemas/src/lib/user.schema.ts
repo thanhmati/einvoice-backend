@@ -1,15 +1,11 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { BaseSchema } from './base.schema';
+import { Prop, Schema } from '@nestjs/mongoose';
+import { BaseSchema, createSchema } from './base.schema';
 import { ObjectId } from 'mongodb';
 import { Model } from 'mongoose';
 
 @Schema({
   timestamps: true,
-  versionKey: false,
   collection: 'user',
-  toJSON: {
-    virtuals: true,
-  },
 })
 export class User extends BaseSchema {
   @Prop({ type: String })
@@ -27,7 +23,7 @@ export class User extends BaseSchema {
 
 export const UserModelName = User.name;
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const UserSchema = createSchema(User);
 
 export type UserModel = Model<User>;
 

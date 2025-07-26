@@ -1,15 +1,11 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { BaseSchema } from './base.schema';
+import { Prop, Schema } from '@nestjs/mongoose';
+import { BaseSchema, createSchema } from './base.schema';
 import { MAIL_STATUS } from '@common/constants/mail.constant';
 import { Model } from 'mongoose';
 
 @Schema({
   timestamps: true,
-  versionKey: false,
   collection: 'mail_log',
-  toJSON: {
-    virtuals: true,
-  },
 })
 export class MailLog extends BaseSchema {
   @Prop({ type: String })
@@ -24,7 +20,7 @@ export class MailLog extends BaseSchema {
 
 export const MailLogModelName = MailLog.name;
 
-export const MailLogSchema = SchemaFactory.createForClass(MailLog);
+export const MailLogSchema = createSchema(MailLog);
 
 export type MailLogModel = Model<MailLog>;
 

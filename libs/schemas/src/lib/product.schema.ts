@@ -1,14 +1,10 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { BaseSchema } from './base.schema';
+import { Prop, Schema } from '@nestjs/mongoose';
+import { BaseSchema, createSchema } from './base.schema';
 import { Model } from 'mongoose';
 
 @Schema({
   timestamps: true,
-  versionKey: false,
   collection: 'product',
-  toJSON: {
-    virtuals: true,
-  },
 })
 export class Product extends BaseSchema {
   @Prop({ type: String })
@@ -32,7 +28,7 @@ export class Product extends BaseSchema {
 
 export const ProductModelName = Product.name;
 
-export const ProductSchema = SchemaFactory.createForClass(Product);
+export const ProductSchema = createSchema(Product);
 
 export type ProductModel = Model<Product>;
 
