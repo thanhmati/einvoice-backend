@@ -30,7 +30,13 @@ async function bootstrap() {
     }
 
     app.setGlobalPrefix(globalPrefix);
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true, // (tùy chọn) bỏ các field không khai báo trong DTO
+        forbidNonWhitelisted: true, // (tùy chọn) báo lỗi nếu có field lạ
+      }),
+    );
 
     const config = new DocumentBuilder()
       .setTitle('E-bff API')

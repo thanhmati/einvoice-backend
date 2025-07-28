@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
-import { KafkaModule } from '@common/queue/modules/kafka/kafka.module';
-import { KAFKA_GROUPS, KAFKA_SERVICES } from '@common/constants/enums/kafka.enum';
+import { InvoiceController } from './controllers/invoice.controller';
+import { InvoiceService } from './services/invoice.service';
+import { InvoiceRepository } from './repositories/invoice.repository';
+import { MongoProvider } from '@common/configuration';
+import { MongooseModule } from '@nestjs/mongoose';
+import { InvoiceDestination } from '@common/schemas/invoice/invoice.schema';
 
 @Module({
-  imports: [KafkaModule.forConsumerAsync({ serviceName: KAFKA_SERVICES.INVOICE, groupId: KAFKA_GROUPS.INVOICE })],
-  controllers: [],
-  providers: [],
+  imports: [MongoProvider, MongooseModule.forFeature([InvoiceDestination])],
+  controllers: [InvoiceController],
+  providers: [InvoiceService, InvoiceRepository],
 })
 export class InvoiceModule {}

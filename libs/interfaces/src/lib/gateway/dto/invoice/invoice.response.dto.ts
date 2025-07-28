@@ -1,0 +1,54 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { ObjectId } from 'mongodb';
+import { INVOICE_STATUS } from '@common/constants/invoice.constant';
+
+class ClientResponseDto {
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  address: string;
+}
+
+class ItemResponseDto {
+  @ApiProperty({ type: String })
+  productId: ObjectId;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  quantity: number;
+
+  @ApiProperty()
+  unitPrice: number;
+
+  @ApiProperty()
+  vatRate: number;
+
+  @ApiProperty()
+  total: number;
+}
+
+export class InvoiceResponseDto {
+  @ApiProperty({ type: ClientResponseDto })
+  client: ClientResponseDto;
+
+  @ApiProperty()
+  totalAmount: number;
+
+  @ApiProperty()
+  vatAmount: number;
+
+  @ApiProperty({ type: String, enum: INVOICE_STATUS })
+  status: INVOICE_STATUS;
+
+  @ApiProperty({ type: [ItemResponseDto] })
+  items: ItemResponseDto[];
+
+  @ApiProperty({ type: String })
+  supervisorId?: ObjectId;
+}

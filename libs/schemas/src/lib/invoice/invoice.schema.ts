@@ -29,8 +29,8 @@ export class Invoice extends BaseSchema {
   @Prop({ type: [Item] })
   items: Item[];
 
-  @Prop({ type: ObjectId, ref: 'User' })
-  supervisorId: ObjectId;
+  @Prop({ type: ObjectId, ref: 'User', required: false })
+  supervisorId?: ObjectId;
 }
 
 export const InvoiceModelName = Invoice.name;
