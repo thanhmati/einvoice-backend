@@ -1,6 +1,7 @@
 enum INVOICE {
   GET_BY_ID = 'invoice.get_by_id',
   CREATE = 'invoice.create',
+  PAGINATE = 'invoice.paginate',
 }
 
 enum PRODUCT {

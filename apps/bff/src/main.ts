@@ -29,14 +29,9 @@ async function bootstrap() {
       module.hot.dispose(() => app.close());
     }
 
+    app.useBodyParser('json', { limit: '20mb' });
     app.setGlobalPrefix(globalPrefix);
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        whitelist: true, // (tùy chọn) bỏ các field không khai báo trong DTO
-        forbidNonWhitelisted: true, // (tùy chọn) báo lỗi nếu có field lạ
-      }),
-    );
+    app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
     const config = new DocumentBuilder()
       .setTitle('E-bff API')

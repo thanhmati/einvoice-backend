@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { BaseSchema } from '../base.schema';
+import { BaseSchema, createSchema } from '../base.schema';
 import { Client, Item } from './common.schema';
 import { INVOICE_STATUS } from '@common/constants/invoice.constant';
 import { ObjectId } from 'mongodb';
-import { Model } from 'mongoose';
+import { Model, PaginateModel } from 'mongoose';
+import paginate from 'mongoose-paginate-v2';
 
 @Schema({
   timestamps: true,
@@ -35,9 +36,11 @@ export class Invoice extends BaseSchema {
 
 export const InvoiceModelName = Invoice.name;
 
-export const InvoiceSchema = SchemaFactory.createForClass(Invoice);
+export const InvoiceSchema = createSchema(Invoice);
 
-export type InvoiceModel = Model<Invoice>;
+InvoiceSchema.plugin(paginate);
+
+export type InvoiceModel = Model<Invoice> & PaginateModel<Invoice>;
 
 export const InvoiceDestination = {
   name: InvoiceModelName,

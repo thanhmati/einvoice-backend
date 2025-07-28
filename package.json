@@ -31,6 +31,7 @@
     "kafkajs": "^2.2.4",
     "mongodb": "^6.18.0",
     "mongoose": "^8.16.4",
+    "mongoose-paginate-v2": "^1.9.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "uuid": "^11.1.0"

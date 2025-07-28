@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ObjectId } from 'mongodb';
 import { INVOICE_STATUS } from '@common/constants/invoice.constant';
+import { BaseResponseDto } from '../../common/base.response.dto';
 
 class ClientResponseDto {
   @ApiProperty()
@@ -33,7 +34,7 @@ class ItemResponseDto {
   total: number;
 }
 
-export class InvoiceResponseDto {
+export class InvoiceResponseDto extends BaseResponseDto {
   @ApiProperty({ type: ClientResponseDto })
   client: ClientResponseDto;
 

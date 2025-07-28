@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ArrayNotEmpty, IsArray, IsEmail, IsNotEmpty, IsNumber, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PaginateRequestDto } from '../../common/pagination.request.dto';
 
 class ClientRequestDto {
   @ApiProperty()
@@ -61,3 +62,5 @@ export class CreateInvoiceRequestDto {
   @Type(() => ItemRequestDto)
   items: ItemRequestDto[];
 }
+
+export class PaginateInvoiceRequestDto extends PaginateRequestDto { }
