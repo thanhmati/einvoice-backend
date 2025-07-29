@@ -8,7 +8,7 @@ import { SortDirection } from '@common/constants/common.constant';
 @Injectable()
 export class InvoiceRepository {
   private readonly logger = new Logger(InvoiceRepository.name);
-  constructor(@InjectModel(InvoiceModelName) private readonly invoiceModel: InvoiceModel) { }
+  constructor(@InjectModel(InvoiceModelName) private readonly invoiceModel: InvoiceModel) {}
 
   create(data: Partial<Invoice>) {
     return this.invoiceModel.create({
@@ -22,14 +22,26 @@ export class InvoiceRepository {
 
     const sort = sortOrder && sortBy ? { [sortBy]: sortOrder === SortDirection.DESC ? -1 : 1 } : { createdAt: -1 };
 
-    return this.invoiceModel.paginate({}, {
-      page,
-      limit,
-      pagination: !skipPagination,
-      sort,
-    })
-
+    return this.invoiceModel.paginate(
+      {},
+      {
+        page,
+        limit,
+        pagination: !skipPagination,
+        sort,
+      },
+    );
   }
 
+  getById(id: string) {
+    return this.invoiceModel.findById(id);
+  }
 
+  updateById(id: string, data: Partial<Invoice>) {
+    return this.invoiceModel.findByIdAndUpdate(id, data, { new: true });
+  }
+
+  deleteById(id: string) {
+    return this.invoiceModel.findByIdAndDelete(id);
+  }
 }

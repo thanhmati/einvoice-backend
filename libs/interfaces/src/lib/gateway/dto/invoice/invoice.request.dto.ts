@@ -63,4 +63,6 @@ export class CreateInvoiceRequestDto {
   items: ItemRequestDto[];
 }
 
-export class PaginateInvoiceRequestDto extends PaginateRequestDto { }
+export class UpdateInvoiceRequestDto extends CreateInvoiceRequestDto {}
+
+export class PaginateInvoiceRequestDto extends PaginateRequestDto {}
