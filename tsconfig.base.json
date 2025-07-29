@@ -10,47 +10,23 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
+    "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "strictPropertyInitialization": false,
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "@common/configuration": [
-        "libs/configuration/src/index.ts"
-      ],
-      "@common/constants/*": [
-        "libs/constants/src/lib/*"
-      ],
-      "@common/decorators/*": [
-        "libs/decorators/src/lib/*"
-      ],
-      "@common/interceptors/*": [
-        "libs/interceptors/src/lib/*"
-      ],
-      "@common/interfaces/*": [
-        "libs/interfaces/src/lib/*"
-      ],
-      "@common/middlewares/*": [
-        "libs/middlewares/src/lib/*"
-      ],
-      "@common/queue/*": [
-        "libs/queue/src/lib/*"
-      ],
-      "@common/schemas/*": [
-        "libs/schemas/src/lib/*"
-      ],
-      "@common/utils/*": [
-        "libs/utils/src/lib/*"
-      ]
+      "@common/configuration": ["libs/configuration/src/index.ts"],
+      "@common/constants/*": ["libs/constants/src/lib/*"],
+      "@common/decorators/*": ["libs/decorators/src/lib/*"],
+      "@common/interceptors/*": ["libs/interceptors/src/lib/*"],
+      "@common/interfaces/*": ["libs/interfaces/src/lib/*"],
+      "@common/middlewares/*": ["libs/middlewares/src/lib/*"],
+      "@common/queue/*": ["libs/queue/src/lib/*"],
+      "@common/schemas/*": ["libs/schemas/src/lib/*"],
+      "@common/utils/*": ["libs/utils/src/lib/*"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "tmp"
-  ]
+  "exclude": ["node_modules", "tmp"]
 }

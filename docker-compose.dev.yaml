@@ -10,10 +10,15 @@ services:
   invoice:
     container_name: invoice
     image: invoice:latest
-    ports:
-      - 3002:3001
     networks:
       - einvoice-nw
+
+  pdf-generator:
+    container_name: pdf-generator
+    image: pdf-generator:latest
+    networks:
+      - einvoice-nw
+
   bff:
     container_name: bff
     image: bff:latest
