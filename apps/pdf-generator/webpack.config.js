@@ -15,6 +15,13 @@ module.exports = {
       optimization: false,
       outputHashing: 'none',
       generatePackageJson: true,
+      assets: [
+        {
+          glob: '**/*',
+          input: 'apps/pdf-generator/src/app/templates',
+          output: './templates',
+        },
+      ],
     }),
   ],
 };

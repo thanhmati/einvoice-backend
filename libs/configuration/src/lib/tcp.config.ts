@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 export enum TCP_SERVICES {
   INVOICE_SERVICE = 'TCP_INVOICE_SERVICE',
+  PDF_GENERATOR_SERVICE = 'TCP_PDF_GENERATOR_SERVICE',
 }
 
 export class TcpConfiguration {
@@ -11,8 +12,13 @@ export class TcpConfiguration {
   @IsNotEmpty()
   TCP_INVOICE_SERVICE: TcpClientOptions;
 
+  @IsObject()
+  @IsNotEmpty()
+  TCP_PDF_GENERATOR_SERVICE: TcpClientOptions;
+
   constructor() {
-    this.TCP_INVOICE_SERVICE = TcpConfiguration.setValue();
+    this.TCP_INVOICE_SERVICE = TcpConfiguration.setValue(3200);
+    this.TCP_PDF_GENERATOR_SERVICE = TcpConfiguration.setValue(3201);
   }
 
   private static setValue(port?: number): TcpClientOptions {

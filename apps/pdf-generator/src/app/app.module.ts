@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CONFIGURATION } from '../configuration';
 import { InvoiceModule } from './modules/invoice/invoice.module';
+import { PdfModule } from './modules/pdf/pdf.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { InvoiceModule } from './modules/invoice/invoice.module';
       load: [() => ({ ...CONFIGURATION })],
     }),
     InvoiceModule,
+    PdfModule,
   ],
 
   providers: [],
