@@ -1,7 +1,7 @@
 import { SortDirection } from '@common/constants/common.constant';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsOptional, IsNumberString, IsString, IsEnum, IsBoolean, IsNumber } from 'class-validator';
+import { IsOptional, IsString, IsEnum, IsBoolean, IsNumber } from 'class-validator';
 
 export class PaginateRequestDto {
   @ApiProperty()
@@ -32,5 +32,5 @@ export class PaginateRequestDto {
   })
   @Transform(({ value }) => JSON.parse(`${value}`))
   @IsBoolean()
-  skipPagination?: boolean
+  skipPagination?: boolean;
 }

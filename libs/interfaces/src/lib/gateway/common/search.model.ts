@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsString } from 'class-validator';
-import { BaseResponseDto } from './base.response.dto';
 
 export class SearchState<T> {
   @ApiProperty({
