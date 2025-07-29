@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ObjectId } from 'mongodb';
 import { INVOICE_STATUS } from '@common/constants/invoice.constant';
 import { BaseResponseDto } from '../../common/base.response.dto';
@@ -50,6 +50,9 @@ export class InvoiceResponseDto extends BaseResponseDto {
   @ApiProperty({ type: [ItemResponseDto] })
   items: ItemResponseDto[];
 
-  @ApiProperty({ type: String })
+  @ApiPropertyOptional({ type: String })
   supervisorId?: ObjectId;
+
+  @ApiPropertyOptional()
+  fileUrl?: string;
 }

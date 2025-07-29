@@ -4,6 +4,7 @@ enum INVOICE {
   PAGINATE = 'invoice.paginate',
   UPDATE = 'invoice.update',
   DELETE = 'invoice.delete',
+  SEND = 'invoice.send',
 }
 
 enum PRODUCT {

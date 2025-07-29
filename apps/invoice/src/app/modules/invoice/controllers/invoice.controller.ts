@@ -48,4 +48,10 @@ export class InvoiceController {
     await this.invoiceService.deleteById(id);
     return Response.success<string>(HTTP_MESSAGE.DELETED);
   }
+
+  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.SEND)
+  async sendById(@RequestParams() id: string): Promise<Response<string>> {
+    await this.invoiceService.sendById(id);
+    return Response.success<string>(HTTP_MESSAGE.SENT);
+  }
 }

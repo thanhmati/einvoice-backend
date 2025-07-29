@@ -100,4 +100,18 @@ export class InvoiceController {
       })
       .pipe(map((data) => new ResponseDto(data)));
   }
+
+  @Post(':id/send')
+  @ApiOkResponse({ type: ResponseDto<string> })
+  @ApiOperation({
+    summary: 'Send invoice by id',
+  })
+  send(@Param('id') id: string, @ProcessID() processID: string) {
+    return this.invoiceClient
+      .send<string, string>(TCP_REQUEST_MESSAGE.INVOICE.SEND, {
+        data: id,
+        processID,
+      })
+      .pipe(map((data) => new ResponseDto(data)));
+  }
 }

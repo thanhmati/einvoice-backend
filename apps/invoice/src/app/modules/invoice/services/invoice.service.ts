@@ -52,4 +52,16 @@ export class InvoiceService {
 
     return this.invoiceRepository.deleteById(id);
   }
+
+  async sendById(id: string) {
+    const invoice = await this.getById(id);
+
+    if (invoice.status !== INVOICE_STATUS.CREATED) {
+      throw new BadRequestException(ERROR_CODE.INVOICE_CAN_NOT_BE_SENT);
+    }
+
+    const invoiceSent = await this.invoiceRepository.updateById(id, { status: INVOICE_STATUS.SENT });
+
+    return invoiceSent;
+  }
 }

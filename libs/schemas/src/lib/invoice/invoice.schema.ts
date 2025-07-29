@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema } from '@nestjs/mongoose';
 import { BaseSchema, createSchema } from '../base.schema';
 import { Client, Item } from './common.schema';
 import { INVOICE_STATUS } from '@common/constants/invoice.constant';
@@ -32,6 +32,9 @@ export class Invoice extends BaseSchema {
 
   @Prop({ type: ObjectId, ref: 'User', required: false })
   supervisorId?: ObjectId;
+
+  @Prop({ type: String, required: false })
+  fileUrl?: string;
 }
 
 export const InvoiceModelName = Invoice.name;
