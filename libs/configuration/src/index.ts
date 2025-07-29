@@ -3,3 +3,4 @@ export * from './lib/base.config';
 export * from './lib/tcp.config';
 export * from './lib/kafka.config';
 export * from './lib/mongo.config';
+export * from './lib/cloudinary.config';

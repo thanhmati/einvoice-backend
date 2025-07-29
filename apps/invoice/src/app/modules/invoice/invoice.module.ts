@@ -11,7 +11,10 @@ import { ClientsModule } from '@nestjs/microservices';
   imports: [
     MongoProvider,
     MongooseModule.forFeature([InvoiceDestination]),
-    ClientsModule.registerAsync([TcpProvider(TCP_SERVICES.PDF_GENERATOR_SERVICE)]),
+    ClientsModule.registerAsync([
+      TcpProvider(TCP_SERVICES.PDF_GENERATOR_SERVICE),
+      TcpProvider(TCP_SERVICES.MEDIA_SERVICE),
+    ]),
   ],
   controllers: [InvoiceController],
   providers: [InvoiceService, InvoiceRepository],

@@ -1,8 +1,18 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { CONFIGURATION } from '../configuration';
+import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
+import { MediaModule } from './modules/media/media.module';
 
 @Module({
-  imports: [],
-  controllers: [],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [() => ({ ...CONFIGURATION })],
+    }),
+    CloudinaryModule,
+    MediaModule,
+  ],
   providers: [],
 })
 export class AppModule {}

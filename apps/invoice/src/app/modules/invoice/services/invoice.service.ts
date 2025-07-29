@@ -13,12 +13,14 @@ import { TCP_SERVICES } from '@common/configuration';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enums/tcp-request-message.enum';
 import { firstValueFrom, map } from 'rxjs';
+import { UploadFileTcpReq } from '@common/interfaces/tcp/media';
 
 @Injectable()
 export class InvoiceService {
   constructor(
     private readonly invoiceRepository: InvoiceRepository,
     @Inject(TCP_SERVICES.PDF_GENERATOR_SERVICE) private readonly pdfGeneratorClient: TcpClient,
+    @Inject(TCP_SERVICES.MEDIA_SERVICE) private readonly mediaClient: TcpClient,
   ) {}
 
   create(params: CreateInvoiceTcpReq) {
@@ -73,10 +75,11 @@ export class InvoiceService {
     }
 
     const pdfBase64 = await this.generatorInvoicePdf({ ...invoice.toObject(), status: INVOICE_STATUS.SENT }, id);
+    const pdfUrl = await this.uploadFile({ fileBase64: pdfBase64, fileName: `invoice-${id}` });
 
     const invoiceSent = await this.invoiceRepository.updateById(id, {
       status: INVOICE_STATUS.SENT,
-      fileUrl: pdfBase64,
+      fileUrl: pdfUrl,
     });
 
     return invoiceSent;
@@ -88,6 +91,16 @@ export class InvoiceService {
         .send<string, InvoiceTcpResponse>(TCP_REQUEST_MESSAGE.PDF_GENERATOR.CREATE_INVOICE_PDF, {
           data,
           processID,
+        })
+        .pipe(map((data) => data.data)),
+    );
+  }
+
+  uploadFile(data: UploadFileTcpReq) {
+    return firstValueFrom(
+      this.mediaClient
+        .send<string, UploadFileTcpReq>(TCP_REQUEST_MESSAGE.MEDIA.UPLOAD_FILE, {
+          data,
         })
         .pipe(map((data) => data.data)),
     );
