@@ -19,6 +19,12 @@ services:
     networks:
       - einvoice-nw
 
+  media:
+    container_name: media
+    image: media:latest
+    networks:
+      - einvoice-nw
+
   bff:
     container_name: bff
     image: bff:latest

@@ -36,7 +36,7 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/invoice-e2e/**/*", "apps/pdf-generator-e2e/**/*"]
+      "exclude": ["apps/invoice-e2e/**/*", "apps/pdf-generator-e2e/**/*", "apps/media-e2e/**/*"]
     }
   ]
 }
