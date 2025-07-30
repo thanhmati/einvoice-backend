@@ -25,6 +25,12 @@ services:
     networks:
       - einvoice-nw
 
+  mail:
+    container_name: mail
+    image: mail:latest
+    networks:
+      - einvoice-nw
+
   bff:
     container_name: bff
     image: bff:latest
