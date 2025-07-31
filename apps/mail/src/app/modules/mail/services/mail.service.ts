@@ -1,7 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
 import { SendMailOptions } from '@common/interfaces/common/email.interface';
+import axios from 'axios';
 
 @Injectable()
 export class MailService {
@@ -40,6 +41,28 @@ export class MailService {
     } catch (error) {
       this.logger.error(`❌ Failed to send mail to ${to}:`, error);
       throw error;
+    }
+  }
+
+  /**
+   * Lấy attachment từ URL, trả về buffer để đính kèm mail
+   */
+  async getAttachmentFromUrl(
+    fileUrl: string,
+    filename: string,
+    contentType: string,
+  ): Promise<{ filename: string; content: Buffer; contentType: string }> {
+    try {
+      const response = await axios.get(fileUrl, { responseType: 'arraybuffer' });
+
+      return {
+        filename,
+        content: Buffer.from(response.data),
+        contentType,
+      };
+    } catch (error) {
+      this.logger.error(`Failed to fetch attachment from URL: ${fileUrl}`, error);
+      throw new InternalServerErrorException(`Could not fetch file from ${fileUrl}`);
     }
   }
 }

@@ -14,6 +14,9 @@ import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enums/tcp-request-message.enum';
 import { firstValueFrom, map } from 'rxjs';
 import { UploadFileTcpReq } from '@common/interfaces/tcp/media';
+import { KafkaClient } from '@common/queue/modules/kafka/services/kafka-client.service';
+import { InvoiceCreatedPayload } from '@common/interfaces/queue/invoice';
+import { KAFKA_TOPICS } from '@common/constants/kafka.constant';
 
 @Injectable()
 export class InvoiceService {
@@ -21,6 +24,7 @@ export class InvoiceService {
     private readonly invoiceRepository: InvoiceRepository,
     @Inject(TCP_SERVICES.PDF_GENERATOR_SERVICE) private readonly pdfGeneratorClient: TcpClient,
     @Inject(TCP_SERVICES.MEDIA_SERVICE) private readonly mediaClient: TcpClient,
+    private readonly KafkaClient: KafkaClient,
   ) {}
 
   create(params: CreateInvoiceTcpReq) {
@@ -67,7 +71,7 @@ export class InvoiceService {
     return this.invoiceRepository.deleteById(id);
   }
 
-  async sendById(id: string) {
+  async sendById(id: string, processID: string) {
     const invoice = await this.getById(id);
 
     if (invoice.status !== INVOICE_STATUS.CREATED) {
@@ -75,12 +79,14 @@ export class InvoiceService {
     }
 
     const pdfBase64 = await this.generatorInvoicePdf({ ...invoice.toObject(), status: INVOICE_STATUS.SENT }, id);
-    const pdfUrl = await this.uploadFile({ fileBase64: pdfBase64, fileName: `invoice-${id}` });
+    const pdfUrl = await this.uploadFile({ fileBase64: pdfBase64, fileName: `invoice-${id}` }, processID);
 
     const invoiceSent = await this.invoiceRepository.updateById(id, {
       status: INVOICE_STATUS.SENT,
       fileUrl: pdfUrl,
     });
+
+    this.KafkaClient.send<InvoiceCreatedPayload>(KAFKA_TOPICS.INVOICE.CREATED, { id });
 
     return invoiceSent;
   }
@@ -96,11 +102,12 @@ export class InvoiceService {
     );
   }
 
-  uploadFile(data: UploadFileTcpReq) {
+  uploadFile(data: UploadFileTcpReq, processID: string) {
     return firstValueFrom(
       this.mediaClient
         .send<string, UploadFileTcpReq>(TCP_REQUEST_MESSAGE.MEDIA.UPLOAD_FILE, {
           data,
+          processID,
         })
         .pipe(map((data) => data.data)),
     );

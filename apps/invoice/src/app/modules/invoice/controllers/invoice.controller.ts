@@ -13,6 +13,7 @@ import {
 import { Response } from '@common/interfaces/tcp/common/response.interface';
 import { HTTP_MESSAGE } from '@common/constants/enums/http-message.enum';
 import { InvoiceService } from '../services/invoice.service';
+import { ProcessID } from '@common/decorators/processID.decorator';
 
 @UseInterceptors(TcpLoggingInterceptor)
 @Controller()
@@ -50,8 +51,8 @@ export class InvoiceController {
   }
 
   @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.SEND)
-  async sendById(@RequestParams() id: string): Promise<Response<string>> {
-    await this.invoiceService.sendById(id);
+  async sendById(@RequestParams() id: string, @ProcessID() processID: string): Promise<Response<string>> {
+    await this.invoiceService.sendById(id, processID);
     return Response.success<string>(HTTP_MESSAGE.SENT);
   }
 }

@@ -15,6 +15,13 @@ module.exports = {
       optimization: false,
       outputHashing: 'none',
       generatePackageJson: true,
+      assets: [
+        {
+          glob: '**/*',
+          input: 'apps/mail/src/app/modules/mail-template/templates',
+          output: './templates',
+        },
+      ],
     }),
   ],
 };
