@@ -59,6 +59,9 @@ importers:
       mongoose-paginate-v2:
         specifier: ^1.9.1
         version: 1.9.1(mongoose@8.16.4(socks@2.8.6))
+      nodemailer:
+        specifier: ^7.0.5
+        version: 7.0.5
       puppeteer:
         specifier: ^24.15.0
         version: 24.15.0(typescript@5.8.3)
@@ -4613,6 +4616,10 @@ packages:
 
   node-releases@2.0.19:
     resolution: {integrity: sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==}
+
+  nodemailer@7.0.5:
+    resolution: {integrity: sha512-nsrh2lO3j4GkLLXoeEksAMgAOqxOv6QumNRVQTJwKH4nuiww6iC2y7GyANs9kRAxCexg3+lTWM3PZ91iLlVjfg==}
+    engines: {node: '>=6.0.0'}
 
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
@@ -11636,6 +11643,8 @@ snapshots:
   node-machine-id@1.1.12: {}
 
   node-releases@2.0.19: {}
+
+  nodemailer@7.0.5: {}
 
   normalize-path@3.0.0: {}
 
