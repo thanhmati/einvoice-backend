@@ -6,6 +6,7 @@ export enum TCP_SERVICES {
   INVOICE_SERVICE = 'TCP_INVOICE_SERVICE',
   PDF_GENERATOR_SERVICE = 'TCP_PDF_GENERATOR_SERVICE',
   MEDIA_SERVICE = 'TCP_MEDIA_SERVICE',
+  USER_SERVICE = 'TCP_USER_SERVICE',
 }
 
 export class TcpConfiguration {
@@ -21,10 +22,15 @@ export class TcpConfiguration {
   @IsNotEmpty()
   TCP_MEDIA_SERVICE: TcpClientOptions;
 
+  @IsObject()
+  @IsNotEmpty()
+  TCP_USER_SERVICE: TcpClientOptions;
+
   constructor() {
     this.TCP_INVOICE_SERVICE = TcpConfiguration.setValue(3201);
     this.TCP_PDF_GENERATOR_SERVICE = TcpConfiguration.setValue(3202);
     this.TCP_MEDIA_SERVICE = TcpConfiguration.setValue(3203);
+    this.TCP_USER_SERVICE = TcpConfiguration.setValue(3205);
   }
 
   private static setValue(port?: number): TcpClientOptions {

@@ -21,6 +21,10 @@ enum MEDIA {
   UPLOAD_FILE = 'media.upload_file',
 }
 
+enum USER {
+  CREATE = 'user.create',
+}
+
 export const TCP_REQUEST_MESSAGE = {
   /* Invoice */
   INVOICE,
@@ -33,4 +37,7 @@ export const TCP_REQUEST_MESSAGE = {
 
   /* MEDIA */
   MEDIA,
+
+  /* USER */
+  USER,
 };
