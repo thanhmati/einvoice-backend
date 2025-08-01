@@ -31,6 +31,12 @@ services:
     networks:
       - einvoice-nw
 
+  user-access:
+    container_name: user-access
+    image: user-access:latest
+    networks:
+      - einvoice-nw
+
   bff:
     container_name: bff
     image: bff:latest
