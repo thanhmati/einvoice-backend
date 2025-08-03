@@ -5,3 +5,4 @@ export * from './lib/kafka.config';
 export * from './lib/mongo.config';
 export * from './lib/cloudinary.config';
 export * from './lib/mail.config';
+export * from './lib/keycloak.config';
