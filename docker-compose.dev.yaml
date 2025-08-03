@@ -37,6 +37,12 @@ services:
     networks:
       - einvoice-nw
 
+  authorizer:
+    container_name: authorizer
+    image: authorizer:latest
+    networks:
+      - einvoice-nw
+
   bff:
     container_name: bff
     image: bff:latest
