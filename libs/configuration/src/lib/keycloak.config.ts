@@ -19,7 +19,7 @@ export class KeycloakConfiguration {
 
   constructor() {
     this.HOST = process.env['KEYCLOAK_HOST'] || '';
-    this.REALM = process.env['KEYCLOAK_PREALM'] || '';
+    this.REALM = process.env['KEYCLOAK_REALM'] || '';
     this.CLIENT_ID = process.env['KEYCLOAK_CLIENT_ID'] || '';
     this.CLIENT_SECRET = process.env['KEYCLOAK_CLIENT_SECRET'] || '';
   }
