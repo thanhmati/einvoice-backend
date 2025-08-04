@@ -12,8 +12,8 @@ export class KeycloakService {
   private realm: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.host = this.configService.get('KEYCLOAK_CONFIG_HOST');
-    this.realm = this.configService.get('KEYCLOAK_CONFIG_REALM');
+    this.host = this.configService.get('KEYCLOAK_CONFIG.HOST');
+    this.realm = this.configService.get('KEYCLOAK_CONFIG.REALM');
 
     this.jwksClient = jwksRsa({
       jwksUri: `${this.host}/realms/${this.realm}/protocol/openid-connect/certs`,
