@@ -26,22 +26,12 @@
    - Sơ đồ Mermaid chi tiết
    - Best practices
 
-3. **Phân tích kỹ thuật**: `ARCHITECTURE_ANALYSIS.md`
-   - Phân tích kiến trúc sâu
-   - Business flows
-   - Design patterns
-
 ### Cho Học Viên 🎓
 
 1. **Tài liệu chính**: `TEACHING_GUIDE.md`
    - Đọc tuần tự từ Phần 1 → Phần 11
    - Thực hành theo bài tập
    - Tham khảo sơ đồ để hiểu flow
-
-2. **Tài liệu bổ sung**: `ARCHITECTURE_ANALYSIS.md`
-   - Đọc sau khi hoàn thành TEACHING_GUIDE
-   - Hiểu sâu hơn về design decisions
-
 ---
 
 ## 🔍 Highlights của Tài Liệu
