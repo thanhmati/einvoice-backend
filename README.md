@@ -6,8 +6,7 @@
 |------|----------|-----------|
 | **TEACHING_GUIDE.md** | Tài liệu chi tiết cho học viên | 🎓 Học viên |
 | **INSTRUCTOR_SUMMARY.md** | Hướng dẫn ngắn gọn cho giảng viên | 👨‍🏫 Giảng viên |
-| **ARCHITECTURE_ANALYSIS.md** | Phân tích kiến trúc có sẵn | 🔍 Tham khảo |
-| **DOCUMENTATION_README.md** | File này - hướng dẫn sử dụng | 📖 Tất cả |
+| **README.md** | File này - hướng dẫn sử dụng | 📖 Tất cả |
 
 ---
 
