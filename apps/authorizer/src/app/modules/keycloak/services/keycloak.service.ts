@@ -1,0 +1,41 @@
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import jwksRsa, { JwksClient } from 'jwks-rsa';
+import jwt, { Jwt, JwtPayload } from 'jsonwebtoken';
+
+@Injectable()
+export class KeycloakService {
+  private readonly logger = new Logger(KeycloakService.name);
+  private jwksClient: JwksClient;
+  private host: string;
+  private realm: string;
+
+  constructor(private readonly configService: ConfigService) {
+    this.host = this.configService.get('KEYCLOAK_CONFIG_HOST');
+    this.realm = this.configService.get('KEYCLOAK_CONFIG_REALM');
+
+    this.jwksClient = jwksRsa({
+      jwksUri: `${this.host}/realms/${this.realm}/protocol/openid-connect/certs`,
+      cache: true,
+      rateLimit: true,
+    });
+  }
+
+  async verifyToken(token: string): Promise<JwtPayload> {
+    const decoded = jwt.decode(token, { complete: true }) as Jwt;
+    if (!decoded || !decoded.header || !decoded.header.kid) {
+      throw new UnauthorizedException('Invalid token structure');
+    }
+
+    const key = await this.jwksClient.getSigningKey(decoded.header.kid);
+    const publicKey = key.getPublicKey();
+
+    try {
+      const payload = jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as JwtPayload;
+      return payload;
+    } catch (error) {
+      this.logger.error({ error });
+      throw new UnauthorizedException('Token is invalid');
+    }
+  }
+}
