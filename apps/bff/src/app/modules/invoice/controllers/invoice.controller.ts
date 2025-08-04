@@ -21,6 +21,7 @@ import { TCP_REQUEST_MESSAGE } from '@common/constants/enums/tcp-request-message
 import { map } from 'rxjs';
 import { PaginationResponse } from '@common/interfaces/gateway/common/pagination.response.dto';
 import { Invoice } from '@common/schemas/invoice/invoice.schema';
+import { Authorization } from '@common/decorators/authorizer.decorator';
 
 @ApiTags('Invoice')
 @Controller('invoice')
@@ -50,6 +51,7 @@ export class InvoiceController {
   @ApiOperation({
     summary: 'Get list invoice with pagination',
   })
+  @Authorization({ secured: true })
   paginate(@Query() query: PaginateInvoiceRequestDto, @ProcessID() processID: string) {
     return this.invoiceClient
       .send<PaginateInvoiceTcpRes, PaginateInvoiceTcpReq>(TCP_REQUEST_MESSAGE.INVOICE.PAGINATE, {

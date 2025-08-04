@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { LoggerMiddleware } from '@common/middlewares/logger.middleware';
 import { CONFIGURATION, TConfiguration } from '../configuration';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ExceptionInterceptor } from '@common/interceptors/exception.interceptor';
 import { ConfigModule } from '@nestjs/config';
 import { ProductModule } from './modules/product/product.module';
@@ -9,6 +9,7 @@ import { InvoiceModule } from './modules/invoice/invoice.module';
 import { UserModule } from './modules/user/user.module';
 import { ClientsModule } from '@nestjs/microservices';
 import { GRPC_SERVICES, GrpcProvider } from '@common/configuration';
+import { UserGuard } from '@common/guard/user.guard';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { GRPC_SERVICES, GrpcProvider } from '@common/configuration';
       provide: APP_INTERCEPTOR,
       useClass: ExceptionInterceptor,
     },
+    { provide: APP_GUARD, useClass: UserGuard },
   ],
 })
 export class AppModule implements NestModule {

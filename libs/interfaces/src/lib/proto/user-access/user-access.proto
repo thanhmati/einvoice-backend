@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package GRPC_USER_ACCESS_SERVICE;
+
+
+message Role {
+  string name = 1;
+  string description = 2;
+  repeated string permissions = 3;
+}
+
+message User {
+  string _id = 1;
+  string id = 2;
+  string firstName = 3;
+  string lastName = 4;
+  string email = 5;
+  repeated Role roles = 6; 
+}

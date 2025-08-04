@@ -20,6 +20,8 @@
       "@common/configuration": ["libs/configuration/src/index.ts"],
       "@common/constants/*": ["libs/constants/src/lib/*"],
       "@common/decorators/*": ["libs/decorators/src/lib/*"],
+      "@common/gRPC/*": ["libs/gRPC/src/lib/*"],
+      "@common/guard/*": ["libs/guard/src/lib/*"],
       "@common/interceptors/*": ["libs/interceptors/src/lib/*"],
       "@common/interfaces/*": ["libs/interfaces/src/lib/*"],
       "@common/middlewares/*": ["libs/middlewares/src/lib/*"],

@@ -12,11 +12,12 @@
     "docker:start:provider": "docker compose -f docker-compose.provider.yaml up -d",
     "docker:start:dev": "docker compose -f docker-compose.dev.yaml up -d",
     "build": "pnpm nx:run-many -t build && pnpm docker-build && pnpm docker:start:provider && pnpm docker:start:dev",
-    "dev": "pnpm nx:reset && pnpm nx:run-many -t serve",
+    "dev": "pnpm nx:reset && pnpm nx:run-many -t serve  --projects=bff,invoice,authorizer",
     "prepare": "husky"
   },
   "private": true,
   "dependencies": {
+    "@grpc/grpc-js": "^1.13.4",
     "@nestjs/common": "^11.1.4",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.4",

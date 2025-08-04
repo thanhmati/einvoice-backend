@@ -28,10 +28,11 @@ export class KeycloakService {
       throw new UnauthorizedException('Invalid token structure');
     }
 
-    const key = await this.jwksClient.getSigningKey(decoded.header.kid);
-    const publicKey = key.getPublicKey();
-
     try {
+      const key = await this.jwksClient.getSigningKey(decoded.header.kid);
+
+      const publicKey = key.getPublicKey();
+
       const payload = jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as JwtPayload;
       return {
         valid: true,

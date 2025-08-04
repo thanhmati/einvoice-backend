@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { KeyCloakModule } from './modules/keycloak/keycloak.module';
-import { CONFIGURATION } from '../configuration';
+import { CONFIGURATION, TConfiguration } from '../configuration';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -14,4 +14,6 @@ import { ConfigModule } from '@nestjs/config';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  static CONFIGURATION: TConfiguration = CONFIGURATION;
+}

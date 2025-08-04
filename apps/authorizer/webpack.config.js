@@ -15,7 +15,12 @@ module.exports = {
         './src/assets',
         {
           glob: '**/*',
-          input: 'libs/gRPC/src/lib/proto/authorizer',
+          input: 'libs/interfaces/src/lib/proto/authorizer',
+          output: './proto',
+        },
+        {
+          glob: '**/*',
+          input: 'libs/interfaces/src/lib/proto/user-access',
           output: './proto',
         },
       ],
