@@ -40,32 +40,182 @@ Hệ thống được thiết kế theo mô hình **Microservices Architecture**
 └── 📨 Kafka - Port 9092
 ```
 
-### 1.2 Mô Hình Giao Tiếp
+### 1.2 Sơ Đồ Tổng Thể Hệ Thống
 
 ```mermaid
 graph TB
-    Client[Client/Frontend] --> BFF[BFF Service :3000]
+    %% External Layer
+    Client[🌐 Client/Frontend] --> BFF[🚪 BFF Service<br/>:3000]
     
-    BFF --> |TCP| Invoice[Invoice Service :3001]
-    BFF --> |TCP| UserAccess[User Access :3005]
-    BFF --> |TCP| Auth[Authorizer :3006]
+    %% BFF Synchronous TCP Calls
+    BFF -->|TCP: CRUD Invoice| Invoice[📄 Invoice Service<br/>:3001]
+    BFF -->|TCP: User Management| UserAccess[👤 User Access<br/>:3005]
+    BFF -->|TCP: Authentication| Auth[🔐 Authorizer<br/>:3006]
+    BFF -->|TCP: Product Info| ProductSvc[📦 Product Service<br/>(Future)]
     
-    Invoice --> |TCP| PDF[PDF Generator :3003]
-    Invoice --> |TCP| Media[Media Service :3002]
-    Invoice --> |Kafka Event| Mail[Mail Service :3004]
+    %% Invoice Service Synchronous TCP Calls
+    Invoice -->|TCP: Generate PDF| PDF[📄 PDF Generator<br/>:3003]
+    Invoice -->|TCP: Upload File| Media[📁 Media Service<br/>:3002]
     
-    Invoice --> MongoDB[(MongoDB)]
-    UserAccess --> MongoDB
+    %% Mail Service TCP Calls (for data retrieval)
+    Mail -->|TCP: Get Invoice Details| Invoice
     
-    Mail --> |TCP| Invoice
-    PDF --> |HTML to PDF| Puppeteer
-    Media --> |Upload| Cloudinary
+    %% Kafka Asynchronous Events
+    Invoice -.->|📨 Event: invoice.created| Kafka((🔄 Kafka<br/>:9092))
+    Kafka -.->|📨 Consume Events| Mail[📧 Mail Service<br/>:3004]
     
-    Invoice -.-> |Event: invoice.created| Kafka((Kafka))
-    Kafka -.-> Mail
+    %% Database Connections
+    Invoice -->|Read/Write| MongoDB[(🗄️ MongoDB<br/>:27017)]
+    UserAccess -->|Read/Write| MongoDB
+    Auth -->|Read/Write| MongoDB
+    
+    %% External Services
+    Media -->|Upload Files| Cloudinary[☁️ Cloudinary]
+    PDF -->|HTML to PDF| Puppeteer[🎭 Puppeteer Engine]
+    Mail -->|Send Email| SMTP[📮 SMTP Server]
+    
+    %% Styling
+    classDef serviceBox fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef dbBox fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef externalBox fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef eventBox fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    
+    class BFF,Invoice,UserAccess,Auth,PDF,Media,Mail,ProductSvc serviceBox
+    class MongoDB dbBox
+    class Client,Cloudinary,Puppeteer,SMTP externalBox
+    class Kafka eventBox
 ```
 
-### 1.3 Technology Stack
+### 1.3 Chi Tiết Flow Dữ Liệu Chính
+
+```mermaid
+sequenceDiagram
+    participant C as 🌐 Client
+    participant B as 🚪 BFF
+    participant I as 📄 Invoice Service
+    participant P as 📄 PDF Generator
+    participant M as 📁 Media Service
+    participant K as 🔄 Kafka
+    participant Mail as 📧 Mail Service
+    participant DB as 🗄️ MongoDB
+    participant Cloud as ☁️ Cloudinary
+    participant SMTP as 📮 SMTP
+
+    Note over C,SMTP: 🔄 COMPLETE INVOICE WORKFLOW
+
+    %% 1. Create Invoice
+    rect rgb(240, 248, 255)
+        Note over C,DB: 📝 Phase 1: Create Invoice
+        C->>B: POST /api/v1/invoice
+        B->>I: TCP: CREATE_INVOICE
+        I->>DB: INSERT invoice (status: CREATED)
+        DB-->>I: Invoice saved with ID
+        I-->>B: Invoice ID
+        B-->>C: ✅ Invoice created successfully
+    end
+
+    %% 2. Send Invoice (Complex Flow)
+    rect rgb(255, 248, 240)
+        Note over C,SMTP: 📤 Phase 2: Send Invoice (Trigger PDF & Email)
+        C->>B: POST /api/v1/invoice/:id/send
+        B->>I: TCP: SEND_INVOICE
+        
+        %% PDF Generation
+        Note over I,P: 🎨 PDF Generation Sub-flow
+        I->>P: TCP: CREATE_INVOICE_PDF
+        P->>P: Render EJS template with invoice data
+        P->>P: Convert HTML → PDF (Puppeteer)
+        P-->>I: PDF Base64 string
+        
+        %% File Upload
+        Note over I,Cloud: ☁️ File Upload Sub-flow
+        I->>M: TCP: UPLOAD_FILE (PDF Base64)
+        M->>Cloud: Upload PDF to Cloudinary
+        Cloud-->>M: Public URL
+        M-->>I: File URL
+        
+        %% Update Database
+        I->>DB: UPDATE invoice SET status='SENT', fileUrl='...'
+        DB-->>I: Invoice updated
+        
+        %% Kafka Event
+        Note over I,Mail: 📨 Async Event Processing
+        I->>K: PUBLISH: invoice.created event
+        I-->>B: ✅ Invoice sent successfully
+        B-->>C: ✅ Success response
+    end
+
+    %% 3. Email Processing (Async)
+    rect rgb(248, 255, 248)
+        Note over K,SMTP: 📧 Phase 3: Email Processing (Async)
+        K->>Mail: CONSUME: invoice.created event
+        Mail->>I: TCP: GET_INVOICE_BY_ID
+        I->>DB: SELECT invoice details
+        DB-->>I: Invoice with fileUrl
+        I-->>Mail: Complete invoice data
+        
+        Mail->>Mail: Render email template
+        Mail->>Cloud: Download PDF from URL
+        Cloud-->>Mail: PDF file
+        Mail->>SMTP: Send email with PDF attachment
+        SMTP-->>Mail: ✅ Email sent
+    end
+```
+
+### 1.4 Service Communication Matrix
+
+| From Service | To Service | Protocol | Purpose | Response Time |
+|--------------|------------|----------|---------|---------------|
+| **BFF** → Invoice | TCP | CRUD operations | Synchronous |
+| **BFF** → User Access | TCP | User management | Synchronous |
+| **BFF** → Authorizer | TCP | Authentication | Synchronous |
+| **Invoice** → PDF Generator | TCP | Generate PDF | Synchronous |
+| **Invoice** → Media | TCP | Upload files | Synchronous |
+| **Invoice** → Kafka | Event | Async notifications | Fire & Forget |
+| **Mail** → Invoice | TCP | Get invoice data | Synchronous |
+| **Mail** ← Kafka | Event | Consume events | Async |
+
+### 1.5 Data Flow Architecture
+
+```mermaid
+flowchart TD
+    %% Input Layer
+    API[🌐 REST API Requests] --> BFF[🚪 BFF Gateway]
+    
+    %% Business Logic Layer
+    BFF --> InvoiceLogic{📄 Invoice Operations}
+    
+    %% Synchronous Operations
+    InvoiceLogic -->|Create/Read/Update/Delete| InvoiceDB[(🗄️ Invoice Data)]
+    InvoiceLogic -->|Generate PDF| PDFGen[📄 PDF Generator]
+    InvoiceLogic -->|Store Files| FileStorage[📁 File Storage]
+    
+    %% Asynchronous Operations
+    InvoiceLogic -->|Send Event| EventBus[📨 Event Bus]
+    EventBus -->|invoice.created| EmailProcessor[📧 Email Processor]
+    
+    %% External Integrations
+    PDFGen -->|HTML→PDF| PDFEngine[🎭 Puppeteer]
+    FileStorage -->|Upload| CloudStorage[☁️ Cloudinary]
+    EmailProcessor -->|Send| EmailService[📮 SMTP]
+    
+    %% Data Persistence
+    InvoiceDB --> MongoDB[(🗄️ MongoDB)]
+    EmailProcessor -->|Get Invoice| InvoiceDB
+    
+    %% Styling
+    classDef syncFlow fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef asyncFlow fill:#f1f8e9,stroke:#388e3c,stroke-width:2px
+    classDef dataStore fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    classDef external fill:#fff8e1,stroke:#f57c00,stroke-width:2px
+    
+    class BFF,InvoiceLogic,PDFGen,FileStorage syncFlow
+    class EventBus,EmailProcessor asyncFlow
+    class InvoiceDB,MongoDB dataStore
+    class PDFEngine,CloudStorage,EmailService external
+```
+
+### 1.6 Technology Stack
 
 | Layer | Technology | Purpose |
 |-------|------------|---------|
@@ -610,7 +760,43 @@ this.KafkaClient.send<InvoiceCreatedPayload>(
 
 ## 📈 PHẦN 5: BUSINESS FLOW ANALYSIS
 
-### 5.1 Complete Invoice Flow
+### 5.1 Kafka Event-Driven Flow
+
+```mermaid
+graph LR
+    %% Event Producers
+    InvoiceService[📄 Invoice Service] -->|Publish| Topic1[📨 invoice.created]
+    InvoiceService -->|Publish| Topic2[📨 invoice.updated]
+    InvoiceService -->|Publish| Topic3[📨 invoice.cancelled]
+    
+    %% Kafka Broker
+    Topic1 --> KafkaBroker((🔄 Kafka Broker))
+    Topic2 --> KafkaBroker
+    Topic3 --> KafkaBroker
+    
+    %% Event Consumers
+    KafkaBroker --> MailConsumer[📧 Mail Service<br/>Group: mail]
+    KafkaBroker --> NotificationConsumer[🔔 Notification Service<br/>Group: notification]
+    KafkaBroker --> AuditConsumer[📋 Audit Service<br/>Group: audit]
+    
+    %% Consumer Actions
+    MailConsumer -->|Send Email| EmailAction[📮 Email with PDF]
+    NotificationConsumer -->|Push Notification| PushAction[📱 Mobile/Web Push]
+    AuditConsumer -->|Log Event| AuditAction[📊 Audit Trail]
+    
+    %% Styling
+    classDef producer fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef topic fill:#f1f8e9,stroke:#388e3c,stroke-width:2px
+    classDef consumer fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef action fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    
+    class InvoiceService producer
+    class Topic1,Topic2,Topic3,KafkaBroker topic
+    class MailConsumer,NotificationConsumer,AuditConsumer consumer
+    class EmailAction,PushAction,AuditAction action
+```
+
+### 5.2 Complete Invoice Flow
 
 ```mermaid
 sequenceDiagram
@@ -661,7 +847,7 @@ sequenceDiagram
     Mail->>Mail: Send email via SMTP
 ```
 
-### 5.2 Error Handling Flow
+### 5.3 Error Handling Flow
 
 ```mermaid
 graph TD
@@ -961,6 +1147,190 @@ Hệ thống E-Invoice này là một ví dụ tuyệt vời về **Production-R
 - **Event-Driven Architecture** giúp decouple services nhưng tăng complexity
 - **Proper error handling** và **logging** rất quan trọng trong distributed systems
 - **Configuration management** cần được centralized và environment-specific
+
+---
+
+## 🐳 PHẦN 11: DEPLOYMENT ARCHITECTURE
+
+### 11.1 Docker Container Architecture
+
+```mermaid
+graph TB
+    %% Docker Network
+    subgraph DockerNetwork["🌐 einvoice-nw (Docker Network)"]
+        
+        %% Application Services
+        subgraph AppServices["📦 Application Services"]
+            BFF[🚪 BFF Container<br/>:3000]
+            Invoice[📄 Invoice Container<br/>:3001]
+            Media[📁 Media Container<br/>:3002]
+            PDF[📄 PDF Generator<br/>:3003]
+            Mail[📧 Mail Container<br/>:3004]
+            UserAccess[👤 User Access<br/>:3005]
+            Auth[🔐 Authorizer<br/>:3006]
+        end
+        
+        %% Infrastructure Services
+        subgraph Infrastructure["🔧 Infrastructure Services"]
+            MongoDB[🗄️ MongoDB<br/>:27017]
+            Kafka[🔄 Kafka<br/>:9092]
+        end
+        
+        %% External Services
+        subgraph External["☁️ External Services"]
+            Cloudinary[☁️ Cloudinary API]
+            SMTP[📮 SMTP Server]
+        end
+    end
+    
+    %% External Access
+    Client[🌐 Client/Browser] -->|Port 3000| BFF
+    
+    %% Internal Communication
+    BFF -.->|TCP| Invoice
+    BFF -.->|TCP| UserAccess
+    BFF -.->|TCP| Auth
+    
+    Invoice -.->|TCP| PDF
+    Invoice -.->|TCP| Media
+    Invoice -.->|Events| Kafka
+    Invoice -->|Data| MongoDB
+    
+    Kafka -.->|Events| Mail
+    Mail -.->|TCP| Invoice
+    Mail -->|Email| SMTP
+    
+    UserAccess -->|Data| MongoDB
+    Auth -->|Data| MongoDB
+    Media -->|Upload| Cloudinary
+    
+    %% Styling
+    classDef appService fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef infrastructure fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef external fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    
+    class BFF,Invoice,Media,PDF,Mail,UserAccess,Auth appService
+    class MongoDB,Kafka infrastructure
+    class Client,Cloudinary,SMTP external
+```
+
+### 11.2 Production Deployment Strategy
+
+```mermaid
+graph TB
+    %% Load Balancer
+    LB[🔄 Load Balancer<br/>nginx/HAProxy]
+    
+    %% Multiple BFF Instances
+    subgraph BFFCluster["🚪 BFF Cluster"]
+        BFF1[BFF Instance 1<br/>:3000]
+        BFF2[BFF Instance 2<br/>:3001]
+        BFF3[BFF Instance 3<br/>:3002]
+    end
+    
+    %% Microservices Cluster
+    subgraph ServiceMesh["🕸️ Service Mesh"]
+        subgraph InvoiceCluster["📄 Invoice Cluster"]
+            I1[Invoice-1<br/>:3101]
+            I2[Invoice-2<br/>:3102]
+        end
+        
+        subgraph MailCluster["📧 Mail Cluster"]
+            M1[Mail-1<br/>:3201]
+            M2[Mail-2<br/>:3202]
+        end
+        
+        subgraph MediaCluster["📁 Media Cluster"]
+            Med1[Media-1<br/>:3301]
+            Med2[Media-2<br/>:3302]
+        end
+    end
+    
+    %% Database Cluster
+    subgraph DBCluster["🗄️ Database Cluster"]
+        MongoPrimary[MongoDB Primary]
+        MongoSecondary1[MongoDB Secondary 1]
+        MongoSecondary2[MongoDB Secondary 2]
+    end
+    
+    %% Message Queue Cluster
+    subgraph KafkaCluster["📨 Kafka Cluster"]
+        Kafka1[Kafka Broker 1]
+        Kafka2[Kafka Broker 2]
+        Kafka3[Kafka Broker 3]
+        Zookeeper[Zookeeper Ensemble]
+    end
+    
+    %% External Services
+    subgraph ExternalServices["☁️ External Services"]
+        CloudinaryProd[Cloudinary Production]
+        SMTPProd[SMTP Service]
+        Monitoring[Grafana + Prometheus]
+    end
+    
+    %% Connections
+    Client[🌐 Clients] --> LB
+    LB --> BFFCluster
+    BFFCluster -.-> ServiceMesh
+    ServiceMesh --> DBCluster
+    ServiceMesh --> KafkaCluster
+    ServiceMesh --> ExternalServices
+    
+    %% Styling
+    classDef loadBalancer fill:#ffebee,stroke:#c62828,stroke-width:3px
+    classDef cluster fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef database fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef external fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    
+    class LB loadBalancer
+    class BFFCluster,ServiceMesh,InvoiceCluster,MailCluster,MediaCluster cluster
+    class DBCluster,KafkaCluster database
+    class ExternalServices,CloudinaryProd,SMTPProd,Monitoring external
+```
+
+### 11.3 Environment Configuration
+
+| Environment | BFF Instances | Service Instances | Database | Message Queue |
+|-------------|---------------|-------------------|----------|---------------|
+| **Development** | 1 | 1 each | Single MongoDB | Single Kafka |
+| **Staging** | 2 | 1-2 each | MongoDB Replica Set | Kafka Cluster (3 nodes) |
+| **Production** | 3+ | 2-3 each | MongoDB Sharded Cluster | Kafka Cluster (3+ nodes) |
+
+### 11.4 Scaling Strategy
+
+```mermaid
+graph LR
+    %% Traffic Growth
+    Traffic[📈 Traffic Growth] --> Decision{Scale Decision}
+    
+    %% Horizontal Scaling
+    Decision -->|High CPU/Memory| HorizontalScale[🔄 Horizontal Scaling]
+    HorizontalScale --> AddInstances[➕ Add Service Instances]
+    AddInstances --> LoadBalance[⚖️ Load Balance Traffic]
+    
+    %% Vertical Scaling
+    Decision -->|Resource Intensive| VerticalScale[📊 Vertical Scaling]
+    VerticalScale --> UpgradeResources[⬆️ Upgrade CPU/RAM]
+    
+    %% Database Scaling
+    Decision -->|Database Bottleneck| DBScale[🗄️ Database Scaling]
+    DBScale --> Sharding[🔀 MongoDB Sharding]
+    DBScale --> ReadReplicas[📖 Read Replicas]
+    
+    %% Message Queue Scaling
+    Decision -->|High Event Volume| QueueScale[📨 Queue Scaling]
+    QueueScale --> MorePartitions[🔢 More Kafka Partitions]
+    QueueScale --> ConsumerGroups[👥 More Consumer Groups]
+    
+    %% Styling
+    classDef decision fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef scaling fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+    classDef action fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    
+    class Decision decision
+    class HorizontalScale,VerticalScale,DBScale,QueueScale scaling
+    class AddInstances,LoadBalance,UpgradeResources,Sharding,ReadReplicas,MorePartitions,ConsumerGroups action
+```
 
 ---
 
