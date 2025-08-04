@@ -2,6 +2,7 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import jwksRsa, { JwksClient } from 'jwks-rsa';
 import jwt, { Jwt, JwtPayload } from 'jsonwebtoken';
+import { AuthorizeResponse } from '@common/interfaces/grpc/authorizer';
 
 @Injectable()
 export class KeycloakService {
@@ -21,7 +22,7 @@ export class KeycloakService {
     });
   }
 
-  async verifyToken(token: string): Promise<JwtPayload> {
+  async verifyToken(token: string): Promise<AuthorizeResponse> {
     const decoded = jwt.decode(token, { complete: true }) as Jwt;
     if (!decoded || !decoded.header || !decoded.header.kid) {
       throw new UnauthorizedException('Invalid token structure');
@@ -32,7 +33,15 @@ export class KeycloakService {
 
     try {
       const payload = jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as JwtPayload;
-      return payload;
+      return {
+        valid: true,
+        metadata: {
+          jwt: payload,
+          permissions: [],
+          userId: payload.sub,
+          user: null,
+        },
+      };
     } catch (error) {
       this.logger.error({ error });
       throw new UnauthorizedException('Token is invalid');

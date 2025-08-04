@@ -7,6 +7,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ProductModule } from './modules/product/product.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { UserModule } from './modules/user/user.module';
+import { ClientsModule } from '@nestjs/microservices';
+import { GRPC_SERVICES, GrpcProvider } from '@common/configuration';
 
 @Module({
   imports: [
@@ -14,6 +16,7 @@ import { UserModule } from './modules/user/user.module';
       isGlobal: true,
       load: [() => ({ ...CONFIGURATION })],
     }),
+    ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)]),
     ProductModule,
     InvoiceModule,
     UserModule,
