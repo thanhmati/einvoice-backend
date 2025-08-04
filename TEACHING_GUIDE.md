@@ -45,34 +45,34 @@ Hệ thống được thiết kế theo mô hình **Microservices Architecture**
 ```mermaid
 graph TB
     %% External Layer
-    Client[🌐 Client/Frontend] --> BFF[🚪 BFF Service<br/>:3000]
+    Client["🌐 Client/Frontend"] --> BFF["🚪 BFF Service<br/>:3000"]
     
     %% BFF Synchronous TCP Calls
-    BFF -->|TCP: CRUD Invoice| Invoice[📄 Invoice Service<br/>:3001]
-    BFF -->|TCP: User Management| UserAccess[👤 User Access<br/>:3005]
-    BFF -->|TCP: Authentication| Auth[🔐 Authorizer<br/>:3006]
-    BFF -->|TCP: Product Info| ProductSvc[📦 Product Service<br/>(Future)]
+    BFF -->|"TCP: CRUD Invoice"| Invoice["📄 Invoice Service<br/>:3001"]
+    BFF -->|"TCP: User Management"| UserAccess["👤 User Access<br/>:3005"]
+    BFF -->|"TCP: Authentication"| Auth["🔐 Authorizer<br/>:3006"]
+    BFF -->|"TCP: Product Info"| ProductSvc["📦 Product Service<br/>(Future)"]
     
     %% Invoice Service Synchronous TCP Calls
-    Invoice -->|TCP: Generate PDF| PDF[📄 PDF Generator<br/>:3003]
-    Invoice -->|TCP: Upload File| Media[📁 Media Service<br/>:3002]
+    Invoice -->|"TCP: Generate PDF"| PDF["📄 PDF Generator<br/>:3003"]
+    Invoice -->|"TCP: Upload File"| Media["📁 Media Service<br/>:3002"]
     
     %% Mail Service TCP Calls (for data retrieval)
-    Mail -->|TCP: Get Invoice Details| Invoice
+    Mail -->|"TCP: Get Invoice Details"| Invoice
     
     %% Kafka Asynchronous Events
-    Invoice -.->|📨 Event: invoice.created| Kafka((🔄 Kafka<br/>:9092))
-    Kafka -.->|📨 Consume Events| Mail[📧 Mail Service<br/>:3004]
+    Invoice -.->|"📨 Event: invoice.created"| Kafka(("🔄 Kafka<br/>:9092"))
+    Kafka -.->|"📨 Consume Events"| Mail["📧 Mail Service<br/>:3004"]
     
     %% Database Connections
-    Invoice -->|Read/Write| MongoDB[(🗄️ MongoDB<br/>:27017)]
-    UserAccess -->|Read/Write| MongoDB
-    Auth -->|Read/Write| MongoDB
+    Invoice -->|"Read/Write"| MongoDB[("🗄️ MongoDB<br/>:27017")]
+    UserAccess -->|"Read/Write"| MongoDB
+    Auth -->|"Read/Write"| MongoDB
     
     %% External Services
-    Media -->|Upload Files| Cloudinary[☁️ Cloudinary]
-    PDF -->|HTML to PDF| Puppeteer[🎭 Puppeteer Engine]
-    Mail -->|Send Email| SMTP[📮 SMTP Server]
+    Media -->|"Upload Files"| Cloudinary["☁️ Cloudinary"]
+    PDF -->|"HTML to PDF"| Puppeteer["🎭 Puppeteer Engine"]
+    Mail -->|"Send Email"| SMTP["📮 SMTP Server"]
     
     %% Styling
     classDef serviceBox fill:#e1f5fe,stroke:#01579b,stroke-width:2px
