@@ -39,6 +39,7 @@ export class ProductController {
   @ApiOperation({
     summary: 'Get all products',
   })
+  @Authorization({ secured: true })
   getAll(@ProcessID() processID: string) {
     return this.invoiceClient
       .send<ProductTcpRes[]>(TCP_REQUEST_MESSAGE.PRODUCT.GET_ALL, {
@@ -54,6 +55,7 @@ export class ProductController {
   @ApiOperation({
     summary: 'Get a product by id',
   })
+  @Authorization({ secured: true })
   getById(@Param('id') id: string, @ProcessID() processID: string) {
     return this.invoiceClient
       .send<ProductTcpRes, string>(TCP_REQUEST_MESSAGE.PRODUCT.GET_BY_ID, {
