@@ -8,6 +8,7 @@ import {
   GetDetailInvoiceTcpRes,
   PaginateInvoiceTcpReq,
   PaginateInvoiceTcpRes,
+  SendInvoiceTcpReq,
   UpdateInvoiceTcpReq,
 } from '@common/interfaces/tcp/invoice';
 import { Response } from '@common/interfaces/tcp/common/response.interface';
@@ -51,8 +52,11 @@ export class InvoiceController {
   }
 
   @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.SEND)
-  async sendById(@RequestParams() id: string, @ProcessID() processID: string): Promise<Response<string>> {
-    await this.invoiceService.sendById(id, processID);
+  async sendById(
+    @RequestParams() params: SendInvoiceTcpReq,
+    @ProcessID() processID: string,
+  ): Promise<Response<string>> {
+    await this.invoiceService.sendById(params, processID);
     return Response.success<string>(HTTP_MESSAGE.SENT);
   }
 }

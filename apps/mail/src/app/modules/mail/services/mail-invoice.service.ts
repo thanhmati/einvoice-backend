@@ -1,5 +1,5 @@
 import { TCP_SERVICES } from '@common/configuration';
-import { InvoiceCreatedPayload } from '@common/interfaces/queue/invoice';
+import { InvoiceSentPayload } from '@common/interfaces/queue/invoice';
 import { Inject, Injectable } from '@nestjs/common';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { MailService } from './mail.service';
@@ -16,7 +16,7 @@ export class MailInvoiceService {
     private readonly mailTemplateService: MailTemplateService,
   ) {}
 
-  async sendInvoiceCreated(payload: InvoiceCreatedPayload) {
+  async sendInvoiceCreated(payload: InvoiceSentPayload) {
     const { id: invoiceId } = payload;
 
     const invoice = await this.getInvoiceById(invoiceId);

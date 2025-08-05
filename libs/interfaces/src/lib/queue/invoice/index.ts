@@ -1,3 +1,3 @@
-export type InvoiceCreatedPayload = {
+export type InvoiceSentPayload = {
   id: string;
 };

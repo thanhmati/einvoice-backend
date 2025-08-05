@@ -4,6 +4,7 @@ import {
   CreateInvoiceTcpReq,
   InvoiceTcpResponse,
   PaginateInvoiceTcpReq,
+  SendInvoiceTcpReq,
   UpdateInvoiceTcpReq,
 } from '@common/interfaces/tcp/invoice';
 import { invoiceRequestMapping } from '../mappers';
@@ -15,8 +16,9 @@ import { TCP_REQUEST_MESSAGE } from '@common/constants/enums/tcp-request-message
 import { firstValueFrom, map } from 'rxjs';
 import { UploadFileTcpReq } from '@common/interfaces/tcp/media';
 import { KafkaClient } from '@common/queue/modules/kafka/services/kafka-client.service';
-import { InvoiceCreatedPayload } from '@common/interfaces/queue/invoice';
+import { InvoiceSentPayload } from '@common/interfaces/queue/invoice';
 import { KAFKA_TOPICS } from '@common/constants/kafka.constant';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class InvoiceService {
@@ -71,22 +73,25 @@ export class InvoiceService {
     return this.invoiceRepository.deleteById(id);
   }
 
-  async sendById(id: string, processID: string) {
-    const invoice = await this.getById(id);
+  async sendById(params: SendInvoiceTcpReq, processID: string) {
+    const { invoiceId, userId } = params;
+
+    const invoice = await this.getById(invoiceId);
 
     if (invoice.status !== INVOICE_STATUS.CREATED) {
       throw new BadRequestException(ERROR_CODE.INVOICE_CAN_NOT_BE_SENT);
     }
 
-    const pdfBase64 = await this.generatorInvoicePdf({ ...invoice.toObject(), status: INVOICE_STATUS.SENT }, id);
-    const pdfUrl = await this.uploadFile({ fileBase64: pdfBase64, fileName: `invoice-${id}` }, processID);
+    const pdfBase64 = await this.generatorInvoicePdf({ ...invoice.toObject(), status: INVOICE_STATUS.SENT }, invoiceId);
+    const pdfUrl = await this.uploadFile({ fileBase64: pdfBase64, fileName: `invoice-${invoiceId}` }, processID);
 
-    const invoiceSent = await this.invoiceRepository.updateById(id, {
+    const invoiceSent = await this.invoiceRepository.updateById(invoiceId, {
       status: INVOICE_STATUS.SENT,
       fileUrl: pdfUrl,
+      supervisorId: new ObjectId(userId),
     });
 
-    this.KafkaClient.send<InvoiceCreatedPayload>(KAFKA_TOPICS.INVOICE.CREATED, { id });
+    this.KafkaClient.send<InvoiceSentPayload>(KAFKA_TOPICS.INVOICE.SENT, { id: invoiceId });
 
     return invoiceSent;
   }

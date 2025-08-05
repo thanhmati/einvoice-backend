@@ -5,3 +5,8 @@ export type CreateInvoiceTcpReq = CreateInvoiceRequestDto;
 export type PaginateInvoiceTcpReq = PaginateInvoiceRequestDto;
 
 export type UpdateInvoiceTcpReq = UpdateInvoiceRequestDto & { id: string };
+
+export type SendInvoiceTcpReq = {
+  invoiceId: string;
+  userId: string;
+};

@@ -8,11 +8,12 @@ import { CreateProductRequestDto, ProductResponseDto } from '@common/interfaces/
 import { ProcessID } from '@common/decorators/processID.decorator';
 import { map } from 'rxjs';
 import { ResponseDto } from '@common/interfaces/gateway/common/response.interface';
+import { Authorization } from '@common/decorators/authorizer.decorator';
 
 @ApiTags('Product')
 @Controller('product')
 export class ProductController {
-  constructor(@Inject(TCP_SERVICES.INVOICE_SERVICE) private readonly invoiceClient: TcpClient) { }
+  constructor(@Inject(TCP_SERVICES.INVOICE_SERVICE) private readonly invoiceClient: TcpClient) {}
 
   @Post()
   @ApiOkResponse({
@@ -21,6 +22,7 @@ export class ProductController {
   @ApiOperation({
     summary: 'Create new a product',
   })
+  @Authorization({ secured: true })
   create(@Body() body: CreateProductRequestDto, @ProcessID() processID: string) {
     return this.invoiceClient
       .send<string, CreateProductTcpReq>(TCP_REQUEST_MESSAGE.PRODUCT.CREATE, {

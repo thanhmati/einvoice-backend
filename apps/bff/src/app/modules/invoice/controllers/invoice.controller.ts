@@ -15,6 +15,7 @@ import {
   GetDetailInvoiceTcpRes,
   PaginateInvoiceTcpReq,
   PaginateInvoiceTcpRes,
+  SendInvoiceTcpReq,
   UpdateInvoiceTcpReq,
 } from '@common/interfaces/tcp/invoice';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enums/tcp-request-message.enum';
@@ -22,6 +23,8 @@ import { map } from 'rxjs';
 import { PaginationResponse } from '@common/interfaces/gateway/common/pagination.response.dto';
 import { Invoice } from '@common/schemas/invoice/invoice.schema';
 import { Authorization } from '@common/decorators/authorizer.decorator';
+import { AuthorizedMetadata } from '@common/interfaces/grpc/authorizer';
+import { UserData } from '@common/decorators/user-data.decorator';
 
 @ApiTags('Invoice')
 @Controller('invoice')
@@ -35,6 +38,7 @@ export class InvoiceController {
   @ApiOperation({
     summary: 'Create new a invoice',
   })
+  @Authorization({ secured: true })
   create(@Body() body: CreateInvoiceRequestDto, @ProcessID() processID: string) {
     return this.invoiceClient
       .send<string, CreateInvoiceTcpReq>(TCP_REQUEST_MESSAGE.INVOICE.CREATE, {
@@ -66,6 +70,7 @@ export class InvoiceController {
   @ApiOperation({
     summary: 'Get detail invoice by id',
   })
+  @Authorization({ secured: true })
   getById(@Param('id') id: string, @ProcessID() processID: string) {
     return this.invoiceClient
       .send<GetDetailInvoiceTcpRes, string>(TCP_REQUEST_MESSAGE.INVOICE.GET_BY_ID, {
@@ -80,6 +85,7 @@ export class InvoiceController {
   @ApiOperation({
     summary: 'Update invoice by id',
   })
+  @Authorization({ secured: true })
   update(@Param('id') id: string, @Body() body: UpdateInvoiceRequestDto, @ProcessID() processID: string) {
     return this.invoiceClient
       .send<string, UpdateInvoiceTcpReq>(TCP_REQUEST_MESSAGE.INVOICE.UPDATE, {
@@ -94,6 +100,7 @@ export class InvoiceController {
   @ApiOperation({
     summary: 'Delete invoice by id',
   })
+  @Authorization({ secured: true })
   delete(@Param('id') id: string, @ProcessID() processID: string) {
     return this.invoiceClient
       .send<string, string>(TCP_REQUEST_MESSAGE.INVOICE.DELETE, {
@@ -108,10 +115,11 @@ export class InvoiceController {
   @ApiOperation({
     summary: 'Send invoice by id',
   })
-  send(@Param('id') id: string, @ProcessID() processID: string) {
+  @Authorization({ secured: true })
+  send(@Param('id') id: string, @ProcessID() processID: string, @UserData() userData: AuthorizedMetadata) {
     return this.invoiceClient
-      .send<string, string>(TCP_REQUEST_MESSAGE.INVOICE.SEND, {
-        data: id,
+      .send<string, SendInvoiceTcpReq>(TCP_REQUEST_MESSAGE.INVOICE.SEND, {
+        data: { invoiceId: id, userId: userData.userId },
         processID,
       })
       .pipe(map((data) => new ResponseDto(data)));
