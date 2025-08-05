@@ -2,7 +2,7 @@
 
 ## 🎯 Giới Thiệu Khóa Học
 
-Chào mừng các bạn đến với khóa học **"Xây Dựng Hệ Thống E-Invoice với Microservices Architecture"**. Khóa học này sẽ hướng dẫn các bạn phân tích và hiểu sâu một hệ thống thực tế được xây dựng bằng **NestJS**, **MongoDB**, **Kafka**, và **Docker**.
+Chào mừng các bạn đến với khóa học **"Xây Dựng Hệ Thống E-Invoice với Microservices Architecture"**. Khóa học này sẽ hướng dẫn các bạn phân tích và hiểu sâu một hệ thống thực tế được xây dựng bằng **NestJS**, **MongoDB**, **Kafka**, **Keycloak** và **Docker**.
 
 ### 🎓 Đối Tượng Học Viên
 - Đã có kiến thức cơ bản về **NestJS**, **MongoDB**, **TypeScript**
@@ -18,6 +18,7 @@ Sau khóa học, học viên sẽ:
 4. Áp dụng được các **Design Patterns**: Repository, DI, Factory
 5. Implement được **Error Handling**, **Logging**, **Validation** trong microservices
 6. Thiết kế database schema với **MongoDB** và **Mongoose**
+7. Tích hợp **Keycloak** cho authentication và authorization
 
 ---
 
@@ -28,16 +29,17 @@ Sau khóa học, học viên sẽ:
 Hệ thống được thiết kế theo mô hình **Microservices Architecture** với **Nx Monorepo**, bao gồm:
 
 ```
-📦 E-Invoice System
-├── 🌐 BFF (Backend for Frontend) - Port 3000
-├── 📄 Invoice Service - Port 3001  
-├── 📁 Media Service - Port 3002
-├── 📄 PDF Generator Service - Port 3003
-├── 📧 Mail Service - Port 3004
-├── 👤 User Access Service - Port 3005
-├── 🔐 Authorizer Service - Port 3006
+📦 E-Invoice System (Nx Monorepo)
+├── 🌐 BFF (Backend for Frontend) - Port 3000 (HTTP REST API)
+├── 📄 Invoice Service - TCP Microservice
+├── 📁 Media Service - TCP Microservice
+├── 📄 PDF Generator Service - TCP Microservice
+├── 📧 Mail Service - Kafka Consumer + TCP Client
+├── 👤 User Access Service - TCP Microservice
+├── 🔐 Authorizer Service - gRPC Microservice
 ├── 🗄️ MongoDB - Port 27017
-└── 📨 Kafka - Port 9092
+├── 📨 Kafka - Port 9092
+└── 🔑 Keycloak - Port 8180 (Authentication Server)
 ```
 
 ### 1.2 Sơ Đồ Tổng Thể Hệ Thống
@@ -45,34 +47,33 @@ Hệ thống được thiết kế theo mô hình **Microservices Architecture**
 ```mermaid
 graph TB
     %% External Layer
-    Client["🌐 Client/Frontend"] --> BFF["🚪 BFF Service<br/>:3000"]
+    Client["🌐 Client/Frontend"] --> BFF["🚪 BFF Service<br/>:3000 (HTTP)"]
     
-    %% BFF Synchronous TCP Calls
-    BFF -->|"TCP: CRUD Invoice"| Invoice["📄 Invoice Service<br/>:3001"]
-    BFF -->|"TCP: User Management"| UserAccess["👤 User Access<br/>:3005"]
-    BFF -->|"TCP: Authentication"| Auth["🔐 Authorizer<br/>:3006"]
-    BFF -->|"TCP: Product Info"| ProductSvc["📦 Product Service<br/>(Future)"]
+    %% BFF TCP Connections
+    BFF -->|"TCP: CRUD Invoice"| Invoice["📄 Invoice Service<br/>(TCP Microservice)"]
+    BFF -->|"TCP: User Management"| UserAccess["👤 User Access<br/>(TCP Microservice)"]
+    BFF -->|"gRPC: Authentication"| Auth["🔐 Authorizer<br/>(gRPC Service)"]
     
-    %% Invoice Service Synchronous TCP Calls
-    Invoice -->|"TCP: Generate PDF"| PDF["📄 PDF Generator<br/>:3003"]
-    Invoice -->|"TCP: Upload File"| Media["📁 Media Service<br/>:3002"]
+    %% Invoice Service TCP Connections
+    Invoice -->|"TCP: Generate PDF"| PDF["📄 PDF Generator<br/>(TCP Microservice)"]
+    Invoice -->|"TCP: Upload File"| Media["📁 Media Service<br/>(TCP Microservice)"]
     
-    %% Mail Service TCP Calls (for data retrieval)
+    %% Mail Service Connections
     Mail -->|"TCP: Get Invoice Details"| Invoice
     
     %% Kafka Asynchronous Events
-    Invoice -.->|"📨 Event: invoice.created"| Kafka(("🔄 Kafka<br/>:9092"))
-    Kafka -.->|"📨 Consume Events"| Mail["📧 Mail Service<br/>:3004"]
+    Invoice -.->|"📨 Event: invoice.sent"| Kafka(("🔄 Kafka<br/>:9092"))
+    Kafka -.->|"📨 Consume Events"| Mail["📧 Mail Service<br/>(Kafka Consumer)"]
     
     %% Database Connections
     Invoice -->|"Read/Write"| MongoDB[("🗄️ MongoDB<br/>:27017")]
     UserAccess -->|"Read/Write"| MongoDB
-    Auth -->|"Read/Write"| MongoDB
     
     %% External Services
     Media -->|"Upload Files"| Cloudinary["☁️ Cloudinary"]
     PDF -->|"HTML to PDF"| Puppeteer["🎭 Puppeteer Engine"]
     Mail -->|"Send Email"| SMTP["📮 SMTP Server"]
+    Auth -->|"User Management"| Keycloak["🔑 Keycloak<br/>:8180"]
     
     %% Styling
     classDef serviceBox fill:#e1f5fe,stroke:#01579b,stroke-width:2px
@@ -80,9 +81,9 @@ graph TB
     classDef externalBox fill:#fff3e0,stroke:#e65100,stroke-width:2px
     classDef eventBox fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
     
-    class BFF,Invoice,UserAccess,Auth,PDF,Media,Mail,ProductSvc serviceBox
+    class BFF,Invoice,UserAccess,Auth,PDF,Media,Mail serviceBox
     class MongoDB dbBox
-    class Client,Cloudinary,Puppeteer,SMTP externalBox
+    class Client,Cloudinary,Puppeteer,SMTP,Keycloak externalBox
     class Kafka eventBox
 ```
 
@@ -135,12 +136,12 @@ sequenceDiagram
         M-->>I: File URL
         
         %% Update Database
-        I->>DB: UPDATE invoice SET status='SENT', fileUrl='...'
+        I->>DB: UPDATE invoice SET status='SENT', fileUrl='...', supervisorId
         DB-->>I: Invoice updated
         
         %% Kafka Event
         Note over I,Mail: 📨 Async Event Processing
-        I->>K: PUBLISH: invoice.created event
+        I->>K: PUBLISH: invoice.sent event
         I-->>B: ✅ Invoice sent successfully
         B-->>C: ✅ Success response
     end
@@ -148,7 +149,7 @@ sequenceDiagram
     %% 3. Email Processing (Async)
     rect rgb(248, 255, 248)
         Note over K,SMTP: 📧 Phase 3: Email Processing (Async)
-        K->>Mail: CONSUME: invoice.created event
+        K->>Mail: CONSUME: invoice.sent event
         Mail->>I: TCP: GET_INVOICE_BY_ID
         I->>DB: SELECT invoice details
         DB-->>I: Invoice with fileUrl
@@ -168,54 +169,14 @@ sequenceDiagram
 |--------------|------------|----------|---------|---------------|
 | **BFF** → Invoice | TCP | CRUD operations | Synchronous |
 | **BFF** → User Access | TCP | User management | Synchronous |
-| **BFF** → Authorizer | TCP | Authentication | Synchronous |
+| **BFF** → Authorizer | gRPC | Authentication | Synchronous |
 | **Invoice** → PDF Generator | TCP | Generate PDF | Synchronous |
 | **Invoice** → Media | TCP | Upload files | Synchronous |
 | **Invoice** → Kafka | Event | Async notifications | Fire & Forget |
 | **Mail** → Invoice | TCP | Get invoice data | Synchronous |
 | **Mail** ← Kafka | Event | Consume events | Async |
 
-### 1.5 Data Flow Architecture
-
-```mermaid
-flowchart TD
-    %% Input Layer
-    API[🌐 REST API Requests] --> BFF[🚪 BFF Gateway]
-    
-    %% Business Logic Layer
-    BFF --> InvoiceLogic{📄 Invoice Operations}
-    
-    %% Synchronous Operations
-    InvoiceLogic -->|Create/Read/Update/Delete| InvoiceDB[(🗄️ Invoice Data)]
-    InvoiceLogic -->|Generate PDF| PDFGen[📄 PDF Generator]
-    InvoiceLogic -->|Store Files| FileStorage[📁 File Storage]
-    
-    %% Asynchronous Operations
-    InvoiceLogic -->|Send Event| EventBus[📨 Event Bus]
-    EventBus -->|invoice.created| EmailProcessor[📧 Email Processor]
-    
-    %% External Integrations
-    PDFGen -->|HTML→PDF| PDFEngine[🎭 Puppeteer]
-    FileStorage -->|Upload| CloudStorage[☁️ Cloudinary]
-    EmailProcessor -->|Send| EmailService[📮 SMTP]
-    
-    %% Data Persistence
-    InvoiceDB --> MongoDB[(🗄️ MongoDB)]
-    EmailProcessor -->|Get Invoice| InvoiceDB
-    
-    %% Styling
-    classDef syncFlow fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
-    classDef asyncFlow fill:#f1f8e9,stroke:#388e3c,stroke-width:2px
-    classDef dataStore fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-    classDef external fill:#fff8e1,stroke:#f57c00,stroke-width:2px
-    
-    class BFF,InvoiceLogic,PDFGen,FileStorage syncFlow
-    class EventBus,EmailProcessor asyncFlow
-    class InvoiceDB,MongoDB dataStore
-    class PDFEngine,CloudStorage,EmailService external
-```
-
-### 1.6 Technology Stack
+### 1.5 Technology Stack
 
 | Layer | Technology | Purpose |
 |-------|------------|---------|
@@ -223,6 +184,7 @@ flowchart TD
 | **Language** | TypeScript | Type-safe development |
 | **Database** | MongoDB + Mongoose | Document database |
 | **Message Queue** | Kafka | Event-driven communication |
+| **Authentication** | Keycloak | Identity & Access Management |
 | **File Storage** | Cloudinary | Media file storage |
 | **PDF Generation** | Puppeteer + EJS | PDF creation |
 | **Email** | Nodemailer | Email delivery |
@@ -247,95 +209,95 @@ apps/bff/
 │   │   └── modules/
 │   │       ├── invoice/     # Invoice endpoints
 │   │       ├── product/     # Product endpoints  
-│   │       └── user/        # User endpoints
+│   │       ├── user/        # User endpoints
+│   │       └── authorizer/  # Auth endpoints
 │   └── configuration/       # BFF-specific config
 ```
 
-#### 2.1.2 Điểm Nổi Bật
+#### 2.1.2 Main.ts Configuration (Thực tế)
 
-**🔧 Main.ts Configuration:**
 ```typescript
 // apps/bff/src/main.ts
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  
-  // Global Configuration
-  app.enableCors({ origin: '*' });
-  app.useBodyParser('json', { limit: '20mb' });
-  app.setGlobalPrefix(globalPrefix);
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
-  
-  // Swagger Documentation
-  const config = new DocumentBuilder()
-    .setTitle('E-bff API')
-    .addBearerAuth() // JWT Authentication
-    .build();
-  SwaggerModule.setup(`${globalPrefix}/docs`, app, documentFactory);
+  try {
+    const isDev = AppModule.CONFIGURATION.IS_DEV;
+    const globalPrefix = AppModule.CONFIGURATION.GLOBAL_PREFIX;
+    const port = AppModule.CONFIGURATION.APP_CONFIG.PORT || 3000;
+
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+      logger: isDev ? ['error', 'warn', 'log', 'debug', 'verbose'] : ['error', 'warn', 'log'],
+    });
+
+    // Global Configuration
+    app.enableCors({ origin: '*' });
+    app.useBodyParser('json', { limit: '20mb' });
+    app.setGlobalPrefix(globalPrefix);
+    app.useGlobalPipes(new ValidationPipe({ transform: true }));
+
+    // Swagger Documentation
+    const config = new DocumentBuilder()
+      .setTitle('E-bff API')
+      .setDescription('The E-bff API description')
+      .setVersion('1.0.0')
+      .addBearerAuth({
+        description: 'Default JWT Authorization',
+        type: 'http',
+        in: 'header',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+      })
+      .build();
+
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup(`${globalPrefix}/docs`, app, documentFactory);
+
+    await app.listen(port);
+  } catch (error) {
+    Logger.error(`❌ Application failed to start: ${error}`);
+  }
 }
 ```
 
-**🎯 Học viên cần chú ý:**
-- **Hot Module Replacement** cho development
-- **Global Validation Pipe** cho input validation
-- **Swagger Integration** cho API documentation
-- **CORS Configuration** cho cross-origin requests
+#### 2.1.3 App Module Structure (Thực tế)
 
-#### 2.1.3 Module Structure
-
-**App Module:**
 ```typescript
 // apps/bff/src/app/app.module.ts
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [() => ({ ...CONFIGURATION })],
+    }),
+    ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)]),
     ProductModule,
     InvoiceModule, 
     UserModule,
+    AuthorizerModule,
   ],
   providers: [
     {
       provide: APP_INTERCEPTOR,
       useClass: ExceptionInterceptor, // Global error handling
     },
+    { provide: APP_GUARD, useClass: UserGuard }, // Global authentication guard
   ],
 })
 export class AppModule implements NestModule {
+  static CONFIGURATION: TConfiguration = CONFIGURATION;
+
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*'); // Global logging
   }
 }
 ```
 
-**Invoice Controller Example:**
-```typescript
-// apps/bff/src/app/modules/invoice/controllers/invoice.controller.ts
-@ApiTags('Invoice')
-@Controller('invoice')
-export class InvoiceController {
-  constructor(
-    @Inject(TCP_SERVICES.INVOICE_SERVICE) 
-    private readonly invoiceClient: TcpClient
-  ) {}
-
-  @Post()
-  @ApiOkResponse({ type: ResponseDto<string> })
-  create(@Body() body: CreateInvoiceRequestDto, @ProcessID() processID: string) {
-    return this.invoiceClient
-      .send<string, CreateInvoiceTcpReq>(TCP_REQUEST_MESSAGE.INVOICE.CREATE, {
-        data: body,
-        processID,
-      })
-      .pipe(map((data) => new ResponseDto(data)));
-  }
-}
-```
-
-**💡 Best Practices được áp dụng:**
-1. **API Gateway Pattern**: Tập trung tất cả API endpoints
-2. **TCP Communication**: Giao tiếp đồng bộ với microservices
-3. **Process ID Tracking**: Theo dõi request flow
-4. **DTO Validation**: Input validation với class-validator
-5. **Swagger Documentation**: Auto-generated API docs
+**💡 Key Features:**
+1. **Global Guards**: UserGuard cho authentication
+2. **Global Interceptors**: ExceptionInterceptor cho error handling
+3. **Global Middleware**: LoggerMiddleware cho request logging
+4. **gRPC Integration**: Authorizer service sử dụng gRPC
+5. **TCP Clients**: Các service khác sử dụng TCP
 
 ---
 
@@ -343,7 +305,7 @@ export class InvoiceController {
 
 **📍 Vai trò**: Xử lý logic nghiệp vụ chính của hóa đơn
 
-#### 2.2.1 Cấu Trúc Module
+#### 2.2.1 Service Structure (Thực tế)
 ```
 apps/invoice/src/app/modules/invoice/
 ├── controllers/
@@ -352,17 +314,43 @@ apps/invoice/src/app/modules/invoice/
 │   └── invoice.service.ts       # Business logic
 ├── repositories/
 │   └── invoice.repository.ts    # Data access layer
-└── mappers/
-    └── index.ts                 # Data transformation
+├── mappers/
+│   └── index.ts                 # Data transformation
+└── invoice.module.ts            # Module configuration
 ```
 
-#### 2.2.2 Business Logic Flow
+#### 2.2.2 Invoice Module Configuration
 
-**🔄 Invoice Lifecycle:**
+```typescript
+// apps/invoice/src/app/modules/invoice/invoice.module.ts
+@Module({
+  imports: [
+    MongoProvider,
+    MongooseModule.forFeature([InvoiceDestination]),
+    ClientsModule.registerAsync([
+      TcpProvider(TCP_SERVICES.PDF_GENERATOR_SERVICE),
+      TcpProvider(TCP_SERVICES.MEDIA_SERVICE),
+    ]),
+  ],
+  controllers: [InvoiceController],
+  providers: [InvoiceService, InvoiceRepository],
+})
+export class InvoiceModule {}
+```
+
+#### 2.2.3 Business Logic Implementation (Thực tế)
+
 ```typescript
 // apps/invoice/src/app/modules/invoice/services/invoice.service.ts
-
+@Injectable()
 export class InvoiceService {
+  constructor(
+    private readonly invoiceRepository: InvoiceRepository,
+    @Inject(TCP_SERVICES.PDF_GENERATOR_SERVICE) private readonly pdfGeneratorClient: TcpClient,
+    @Inject(TCP_SERVICES.MEDIA_SERVICE) private readonly mediaClient: TcpClient,
+    private readonly KafkaClient: KafkaClient,
+  ) {}
+
   // 1. Create Invoice (status: CREATED)
   create(params: CreateInvoiceTcpReq) {
     const input = invoiceRequestMapping(params);
@@ -370,8 +358,9 @@ export class InvoiceService {
   }
 
   // 2. Send Invoice (Complex business flow)
-  async sendById(id: string, processID: string) {
-    const invoice = await this.getById(id);
+  async sendById(params: SendInvoiceTcpReq, processID: string) {
+    const { invoiceId, userId } = params;
+    const invoice = await this.getById(invoiceId);
     
     // Business rule validation
     if (invoice.status !== INVOICE_STATUS.CREATED) {
@@ -381,25 +370,26 @@ export class InvoiceService {
     // Generate PDF via PDF Generator Service
     const pdfBase64 = await this.generatorInvoicePdf(
       { ...invoice.toObject(), status: INVOICE_STATUS.SENT }, 
-      id
+      invoiceId
     );
     
     // Upload file via Media Service
     const pdfUrl = await this.uploadFile(
-      { fileBase64: pdfBase64, fileName: `invoice-${id}` }, 
+      { fileBase64: pdfBase64, fileName: `invoice-${invoiceId}` }, 
       processID
     );
 
-    // Update invoice status
-    const invoiceSent = await this.invoiceRepository.updateById(id, {
+    // Update invoice status and add supervisor
+    const invoiceSent = await this.invoiceRepository.updateById(invoiceId, {
       status: INVOICE_STATUS.SENT,
       fileUrl: pdfUrl,
+      supervisorId: new ObjectId(userId),
     });
 
     // Emit Kafka event for async processing
-    this.KafkaClient.send<InvoiceCreatedPayload>(
-      KAFKA_TOPICS.INVOICE.CREATED, 
-      { id }
+    this.KafkaClient.send<InvoiceSentPayload>(
+      KAFKA_TOPICS.INVOICE.SENT, 
+      { id: invoiceId }
     );
 
     return invoiceSent;
@@ -407,39 +397,32 @@ export class InvoiceService {
 }
 ```
 
-#### 2.2.3 Repository Pattern Implementation
+#### 2.2.4 TCP Controller (Thực tế)
 
 ```typescript
-// apps/invoice/src/app/modules/invoice/repositories/invoice.repository.ts
-@Injectable()
-export class InvoiceRepository {
-  constructor(
-    @InjectModel(InvoiceModelName) private model: InvoiceModel
-  ) {}
+// apps/invoice/src/app/modules/invoice/controllers/invoice.controller.ts
+@Controller()
+export class InvoiceController {
+  constructor(private readonly invoiceService: InvoiceService) {}
 
-  create(input: CreateInvoiceInput) {
-    return this.model.create(input);
+  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.CREATE)
+  create(params: TcpRequest<CreateInvoiceTcpReq>) {
+    return this.invoiceService.create(params.data);
   }
 
-  paginate(params: PaginateInvoiceTcpReq) {
-    return this.model.paginate({}, params);
+  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.SEND)
+  send(params: TcpRequest<SendInvoiceTcpReq>) {
+    return this.invoiceService.sendById(params.data, params.processID);
   }
 
-  async getById(id: string) {
-    return this.model.findById(id);
+  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.GET_BY_ID)
+  getById(params: TcpRequest<string>) {
+    return this.invoiceService.getById(params.data);
   }
 
-  updateById(id: string, input: Partial<Invoice>) {
-    return this.model.findByIdAndUpdate(id, input, { new: true });
-  }
+  // ... other CRUD operations
 }
 ```
-
-**💡 Design Patterns được áp dụng:**
-1. **Repository Pattern**: Tách biệt data access logic
-2. **Service Layer Pattern**: Business logic tập trung
-3. **Factory Pattern**: Dynamic service creation
-4. **Command Pattern**: TCP message handling
 
 ---
 
@@ -447,12 +430,16 @@ export class InvoiceRepository {
 
 **📍 Vai trò**: Xử lý gửi email và consume Kafka events
 
-#### 2.3.1 Kafka Consumer Setup
+#### 2.3.1 Kafka Consumer Setup (Thực tế)
 
 ```typescript
 // apps/mail/src/app/app.module.ts
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [() => ({ ...CONFIGURATION })],
+    }),
     MailModule,
     MailTemplateModule,
     // Kafka Consumer configuration
@@ -465,23 +452,38 @@ export class InvoiceRepository {
 export class AppModule {}
 ```
 
-#### 2.3.2 Event-Driven Processing
+#### 2.3.2 Event Handler (Thực tế)
+
+```typescript
+// apps/mail/src/app/modules/mail/services/mail-queue.service.ts
+@Injectable()
+export class MailQueueService {
+  constructor(private readonly mailInvoiceService: MailInvoiceService) {}
+
+  @KafkaHandler(KAFKA_TOPICS.INVOICE.SENT)
+  async eventInvoiceCreated(payload: KafkaPayload<InvoiceSentPayload>) {
+    const { message } = payload;
+    await this.mailInvoiceService.sendInvoiceCreated(message);
+  }
+}
+```
+
+#### 2.3.3 Mail Business Logic (Thực tế)
 
 ```typescript
 // apps/mail/src/app/modules/mail/services/mail-invoice.service.ts
 @Injectable()
 export class MailInvoiceService {
   constructor(
-    @Inject(TCP_SERVICES.INVOICE_SERVICE) 
-    private readonly invoiceClient: TcpClient,
+    @Inject(TCP_SERVICES.INVOICE_SERVICE) private readonly invoiceClient: TcpClient,
     private readonly mailService: MailService,
     private readonly mailTemplateService: MailTemplateService,
   ) {}
 
-  async sendInvoiceCreated(payload: InvoiceCreatedPayload) {
+  async sendInvoiceCreated(payload: InvoiceSentPayload) {
     const { id: invoiceId } = payload;
 
-    // 1. Get invoice details from Invoice Service
+    // 1. Get invoice details from Invoice Service via TCP
     const invoice = await this.getInvoiceById(invoiceId);
     
     // 2. Render email template
@@ -491,7 +493,7 @@ export class MailInvoiceService {
       invoiceCode: `#${invoice.id}`,
     });
 
-    // 3. Download PDF attachment
+    // 3. Download PDF attachment from Cloudinary
     const attachment = await this.mailService.getAttachmentFromUrl(
       invoice.fileUrl,
       `invoice-${invoice.id}.pdf`,
@@ -506,38 +508,24 @@ export class MailInvoiceService {
       attachments: [attachment],
     });
   }
+
+  private getInvoiceById(id: string) {
+    return firstValueFrom(
+      this.invoiceClient
+        .send<GetDetailInvoiceTcpRes, string>(TCP_REQUEST_MESSAGE.INVOICE.GET_BY_ID, {
+          data: id,
+        })
+        .pipe(map((data) => data.data)),
+    );
+  }
 }
-```
-
-**🎯 Event-Driven Architecture Benefits:**
-1. **Loose Coupling**: Mail service không phụ thuộc trực tiếp Invoice service
-2. **Scalability**: Có thể scale Mail service độc lập
-3. **Resilience**: Lỗi trong Mail service không ảnh hưởng Invoice flow
-4. **Async Processing**: Không block main business flow
-
----
-
-### 2.4 📁 Media Service & 📄 PDF Generator Service
-
-#### 2.4.1 Media Service
-**Chức năng**: Upload file lên Cloudinary và trả về public URL
-```typescript
-// Workflow
-Base64 File → Cloudinary Upload → Public URL → Return to caller
-```
-
-#### 2.4.2 PDF Generator Service  
-**Chức năng**: Tạo PDF từ HTML template
-```typescript
-// Workflow
-Invoice Data → EJS Template → HTML → Puppeteer → PDF Base64
 ```
 
 ---
 
 ## 🔧 PHẦN 3: SHARED LIBRARIES ANALYSIS
 
-### 3.1 📊 Database Schema Design
+### 3.1 📊 Database Schema Design (Thực tế)
 
 ```typescript
 // libs/schemas/src/lib/invoice/invoice.schema.ts
@@ -574,74 +562,95 @@ export class Invoice extends BaseSchema {
   fileUrl?: string;
 }
 
-// Base Schema với common fields
-export class BaseSchema {
-  _id: ObjectId;
-  id: string; // Virtual field từ _id
-  createdAt: Date;
-  updatedAt: Date;
+// Invoice Status Enum (Thực tế)
+export enum INVOICE_STATUS {
+  CREATED = 'created',
+  SENT = 'sent',
+  VERIFIED = 'verified',
+  CANCELLED = 'cancelled', // TODO: Add this
 }
 ```
 
-**💡 MongoDB Best Practices:**
-1. **Virtual Fields**: `id` field từ `_id` cho frontend-friendly
-2. **Timestamps**: Auto-generated `createdAt`, `updatedAt`
-3. **Embedded Documents**: `Client`, `Item` cho performance
-4. **Enum Validation**: `INVOICE_STATUS` enum
-5. **Pagination Support**: mongoose-paginate-v2 plugin
+### 3.2 🔄 Kafka Integration (Thực tế)
 
-### 3.2 🔄 Kafka Integration
+#### 3.2.1 Kafka Topics
 
 ```typescript
-// libs/queue/src/lib/modules/kafka/kafka.module.ts
-@Global()
-@Module({})
-export class KafkaModule {
-  // Producer configuration
-  static forProducerAsync(options: KafkaProducerOptions): DynamicModule {
-    return {
-      module: KafkaModule,
-      global: true,
-      providers: [
-        KafkaClient,
-        {
-          provide: KAFKA_PRODUCER_OPTIONS,
-          useFactory: (configService: ConfigService) => ({
-            url: configService.get<string>('KAFKA_CONFIG.URL')?.split(',') || [],
-            serviceName: options.serviceName,
-          }),
-          inject: [ConfigService],
-        },
-      ],
-      exports: [KafkaClient],
-    };
+// libs/constants/src/lib/kafka.constant.ts
+export const KAFKA_TOPICS = {
+  INVOICE: {
+    SENT: 'invoice.sent', // Chỉ có 1 topic hiện tại
+  },
+};
+```
+
+#### 3.2.2 Kafka Consumer Service
+
+```typescript
+// libs/queue/src/lib/modules/kafka/services/kafka-consumer.service.ts
+@Injectable()
+export class KafkaConsumerService implements OnModuleInit, OnModuleDestroy {
+  constructor(
+    private readonly discoveryService: DiscoveryService,
+    private readonly reflector: Reflector,
+    @Inject(KAFKA_CONSUMER_OPTIONS) private readonly options: KafkaConsumerOptions,
+  ) {
+    this.kafka = new Kafka({
+      clientId: this.options.serviceName + '-' + hostname(),
+      brokers: this.options.url,
+    });
+
+    this.consumer = this.kafka.consumer({
+      groupId: this.options.groupId,
+      allowAutoTopicCreation: true,
+    });
   }
 
-  // Consumer configuration  
-  static forConsumerAsync(options: KafkaConsumerOptions): DynamicModule {
-    return {
-      module: KafkaModule,
-      providers: [
-        KafkaConsumerService,
-        {
-          provide: KAFKA_CONSUMER_OPTIONS,
-          useFactory: (configService: ConfigService) => ({
-            url: [configService.get<string>('KAFKA_CONFIG.URL') || ''],
-            serviceName: options?.serviceName || hostname(),
-            groupId: options?.groupId || KAFKA_GROUPS.DEFAULT,
-          }),
-          inject: [ConfigService],
-        },
-      ],
-      exports: [KafkaConsumerService],
-    };
+  async onModuleInit() {
+    await this.consumer.connect();
+
+    // Auto-discover handlers with @KafkaHandler decorator
+    const providers = this.discoveryService.getProviders()
+      .filter((wrapper) => wrapper.instance && typeof wrapper.instance === 'object');
+
+    for (const wrapper of providers) {
+      const { instance } = wrapper;
+      const prototype = Object.getPrototypeOf(instance);
+      const methodNames = Object.getOwnPropertyNames(prototype)
+        .filter((method) => typeof instance[method] === 'function' && method !== 'constructor');
+
+      for (const methodName of methodNames) {
+        const handler = instance[methodName];
+        const metaData = this.reflector.get<KafkaHandlerMetadata>(KAFKA_HANDLER_METADATA, handler);
+
+        if (metaData?.topic) {
+          await this.consumer.subscribe({ topic: metaData.topic, fromBeginning: false });
+          await this.consumer.run({
+            eachMessage: async (context: EachMessagePayload) => {
+              const { topic: msgTopic, message } = context;
+              if (msgTopic !== metaData.topic) return;
+
+              try {
+                const value = message.value?.toString();
+                const parsed = value ? JSON.parse(value) : null;
+                const payload: KafkaPayload<any> = { context, message: parsed };
+                await handler.call(instance, payload);
+              } catch (error) {
+                this.logger.error(`Error handling message for topic ${msgTopic}:`, error);
+              }
+            },
+          });
+        }
+      }
+    }
   }
 }
 ```
 
-### 3.3 🛡️ Error Handling & Logging
+### 3.3 🛡️ Error Handling & Logging (Thực tế)
 
 #### 3.3.1 Global Exception Interceptor
+
 ```typescript
 // libs/interceptors/src/lib/exception.interceptor.ts
 @Injectable()
@@ -679,7 +688,8 @@ export class ExceptionInterceptor implements NestInterceptor {
 }
 ```
 
-#### 3.3.2 Request Logging Middleware
+#### 3.3.2 Logger Middleware
+
 ```typescript
 // libs/middlewares/src/lib/logger.middleware.ts
 @Injectable()
@@ -688,12 +698,15 @@ export class LoggerMiddleware implements NestMiddleware {
     const processId = getProcessId();
     const startTime = Date.now();
     
-    // Log request start
+    // Set metadata for tracking
+    req[MetadataKeys.PROCESS_ID] = processId;
+    req[MetadataKeys.START_TIME] = startTime;
+    
     Logger.log(
       `HTTP » Start process '${processId}' » path: '${req.originalUrl}' » method: '${req.method}'`
     );
 
-    // Override response methods để log khi hoàn thành
+    // Override response để log completion
     const originalSend = res.send.bind(res);
     res.send = (body: any): Response => {
       const durationMs = Date.now() - startTime;
@@ -707,12 +720,6 @@ export class LoggerMiddleware implements NestMiddleware {
   }
 }
 ```
-
-**💡 Observability Best Practices:**
-1. **Process ID Tracking**: Unique ID cho mỗi request
-2. **Duration Measurement**: Track response time
-3. **Structured Logging**: Consistent log format
-4. **Error Context**: Full error information với stack trace
 
 ---
 
@@ -734,69 +741,34 @@ this.pdfGeneratorClient.send<string, InvoiceTcpResponse>(
 )
 ```
 
-**🎯 Khi nào dùng TCP:**
-- Cần response ngay lập tức
-- Critical business operations
-- Data consistency requirements
+### 4.2 gRPC Communication (Authorizer Service)
 
-### 4.2 Asynchronous Communication (Kafka)
+```typescript
+// BFF → Authorizer Service (gRPC)
+ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)])
+```
+
+### 4.3 Asynchronous Communication (Kafka)
 
 ```typescript
 // Producer (Invoice Service)
-this.KafkaClient.send<InvoiceCreatedPayload>(
-  KAFKA_TOPICS.INVOICE.CREATED, 
-  { id }
+this.KafkaClient.send<InvoiceSentPayload>(
+  KAFKA_TOPICS.INVOICE.SENT, 
+  { id: invoiceId }
 )
 
-// Consumer (Mail Service) - Auto-handled by KafkaModule
+// Consumer (Mail Service)
+@KafkaHandler(KAFKA_TOPICS.INVOICE.SENT)
+async eventInvoiceCreated(payload: KafkaPayload<InvoiceSentPayload>) {
+  await this.mailInvoiceService.sendInvoiceCreated(payload.message);
+}
 ```
-
-**🎯 Khi nào dùng Kafka:**
-- Non-critical operations (email, notifications)
-- Event-driven workflows
-- Decoupling services
 
 ---
 
 ## 📈 PHẦN 5: BUSINESS FLOW ANALYSIS
 
-### 5.1 Kafka Event-Driven Flow
-
-```mermaid
-graph LR
-    %% Event Producers
-    InvoiceService[📄 Invoice Service] -->|Publish| Topic1[📨 invoice.created]
-    InvoiceService -->|Publish| Topic2[📨 invoice.updated]
-    InvoiceService -->|Publish| Topic3[📨 invoice.cancelled]
-    
-    %% Kafka Broker
-    Topic1 --> KafkaBroker((🔄 Kafka Broker))
-    Topic2 --> KafkaBroker
-    Topic3 --> KafkaBroker
-    
-    %% Event Consumers
-    KafkaBroker --> MailConsumer[📧 Mail Service<br/>Group: mail]
-    KafkaBroker --> NotificationConsumer[🔔 Notification Service<br/>Group: notification]
-    KafkaBroker --> AuditConsumer[📋 Audit Service<br/>Group: audit]
-    
-    %% Consumer Actions
-    MailConsumer -->|Send Email| EmailAction[📮 Email with PDF]
-    NotificationConsumer -->|Push Notification| PushAction[📱 Mobile/Web Push]
-    AuditConsumer -->|Log Event| AuditAction[📊 Audit Trail]
-    
-    %% Styling
-    classDef producer fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
-    classDef topic fill:#f1f8e9,stroke:#388e3c,stroke-width:2px
-    classDef consumer fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    classDef action fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-    
-    class InvoiceService producer
-    class Topic1,Topic2,Topic3,KafkaBroker topic
-    class MailConsumer,NotificationConsumer,AuditConsumer consumer
-    class EmailAction,PushAction,AuditAction action
-```
-
-### 5.2 Complete Invoice Flow
+### 5.1 Complete Invoice Workflow
 
 ```mermaid
 sequenceDiagram
@@ -821,242 +793,270 @@ sequenceDiagram
     F->>B: POST /api/v1/invoice/:id/send
     B->>I: TCP: SEND_INVOICE
     
-    Note over I,C: PDF Generation Flow
+    Note over I,C: PDF Generation & Upload Flow
     I->>P: TCP: CREATE_INVOICE_PDF
-    P->>P: Generate HTML from template
+    P->>P: Generate HTML from EJS template
     P->>P: Convert HTML to PDF with Puppeteer
     P-->>I: PDF Base64
     
-    Note over I,C: File Upload Flow
     I->>M: TCP: UPLOAD_FILE
     M->>C: Upload PDF to Cloudinary
     C-->>M: Public URL
     M-->>I: File URL
     
-    Note over I,Mail: Database & Event Flow
-    I->>DB: Update status to SENT + fileUrl
-    I->>K: Publish: invoice.created event
+    Note over I,Mail: Database Update & Event Flow
+    I->>DB: Update status to SENT + fileUrl + supervisorId
+    I->>K: Publish: invoice.sent event
     I-->>B: Success
     B-->>F: Success Response
     
     Note over K,Mail: Async Email Flow
-    K->>Mail: Event: invoice.created
+    K->>Mail: Event: invoice.sent
     Mail->>I: TCP: GET_INVOICE_BY_ID
     Mail->>Mail: Render email template
-    Mail->>Mail: Download PDF attachment
+    Mail->>C: Download PDF attachment
     Mail->>Mail: Send email via SMTP
 ```
 
-### 5.3 Error Handling Flow
+### 5.2 Event-Driven Architecture
 
 ```mermaid
-graph TD
-    A[Request Start] --> B{Validation OK?}
-    B -->|No| C[ValidationPipe Error]
-    B -->|Yes| D{Business Logic OK?}
-    D -->|No| E[Business Exception]
-    D -->|Yes| F{External Service OK?}
-    F -->|No| G[Service Unavailable]
-    F -->|Yes| H[Success Response]
+graph LR
+    %% Event Producer
+    InvoiceService[📄 Invoice Service] -->|Publish| Topic[📨 invoice.sent]
     
-    C --> I[ExceptionInterceptor]
-    E --> I
-    G --> I
-    I --> J[Standardized Error Response]
-    J --> K[Client receives error]
+    %% Kafka Broker
+    Topic --> KafkaBroker((🔄 Kafka Broker))
     
-    H --> L[Success Interceptor]
-    L --> M[Add processID & duration]
-    M --> N[Client receives success]
+    %% Event Consumer
+    KafkaBroker --> MailConsumer[📧 Mail Service<br/>Group: mail]
+    
+    %% Consumer Actions
+    MailConsumer -->|Send Email| EmailAction[📮 Email with PDF Attachment]
+    
+    %% Styling
+    classDef producer fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef topic fill:#f1f8e8,stroke:#388e3c,stroke-width:2px
+    classDef consumer fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef action fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    
+    class InvoiceService producer
+    class Topic,KafkaBroker topic
+    class MailConsumer consumer
+    class EmailAction action
 ```
 
 ---
 
 ## 🏛️ PHẦN 6: ARCHITECTURAL PATTERNS
 
-### 6.1 Microservices Architecture
-
-**✅ Advantages được thể hiện:**
-1. **Service Independence**: Mỗi service có database riêng
-2. **Technology Diversity**: Có thể dùng tech khác nhau cho từng service
-3. **Scalability**: Scale từng service theo nhu cầu
-4. **Fault Isolation**: Lỗi một service không ảnh hưởng toàn hệ thống
-
-**⚠️ Challenges được giải quyết:**
-1. **Service Discovery**: TCP configuration với host:port
-2. **Data Consistency**: Event-driven eventual consistency
-3. **Monitoring**: Process ID tracking across services
-4. **Configuration Management**: Centralized config với NestJS ConfigModule
-
-### 6.2 Event-Driven Architecture
+### 6.1 Repository Pattern Implementation
 
 ```typescript
-// Event Flow Example
-Invoice.send() → 
-  PDF Generated → 
-  File Uploaded → 
-  Status Updated → 
-  Event Published → 
-  Email Sent
+// apps/invoice/src/app/modules/invoice/repositories/invoice.repository.ts
+@Injectable()
+export class InvoiceRepository {
+  constructor(
+    @InjectModel(InvoiceModelName) private model: InvoiceModel
+  ) {}
+
+  create(input: CreateInvoiceInput) {
+    return this.model.create(input);
+  }
+
+  async getById(id: string) {
+    const invoice = await this.model.findById(id);
+    if (!invoice) {
+      throw new NotFoundException(ERROR_CODE.INVOICE_NOT_FOUND);
+    }
+    return invoice;
+  }
+
+  updateById(id: string, input: Partial<Invoice>) {
+    return this.model.findByIdAndUpdate(id, input, { new: true });
+  }
+
+  paginate(params: PaginateInvoiceTcpReq) {
+    return this.model.paginate({}, params);
+  }
+}
 ```
 
-**💡 Benefits:**
-- **Loose Coupling**: Services communicate via events
-- **Scalability**: Add new event consumers easily
-- **Resilience**: Async processing doesn't block main flow
+### 6.2 Dependency Injection Pattern
+
+```typescript
+// Constructor injection trong InvoiceService
+constructor(
+  private readonly invoiceRepository: InvoiceRepository,
+  @Inject(TCP_SERVICES.PDF_GENERATOR_SERVICE) private readonly pdfGeneratorClient: TcpClient,
+  @Inject(TCP_SERVICES.MEDIA_SERVICE) private readonly mediaClient: TcpClient,
+  private readonly KafkaClient: KafkaClient,
+) {}
+```
 
 ### 6.3 API Gateway Pattern (BFF)
 
 ```typescript
 // BFF acts as single entry point
 Frontend → BFF → {
-  Invoice Service,
-  User Service,
-  Product Service,
-  etc.
+  Invoice Service (TCP),
+  User Service (TCP),
+  Authorizer Service (gRPC),
 }
 ```
-
-**🎯 Responsibilities:**
-- Request routing
-- Authentication/Authorization
-- Rate limiting
-- Request/Response transformation
-- API documentation
 
 ---
 
-## 🛠️ PHẦN 7: BEST PRACTICES IMPLEMENTATION
+## 🛠️ PHẦN 7: DEPLOYMENT & DOCKER
 
-### 7.1 Configuration Management
+### 7.1 Docker Compose Structure
 
-```typescript
-// Centralized configuration
-export class KafkaConfiguration {
-  @IsString()
-  @IsNotEmpty()
-  HOST: string;
+#### Infrastructure Services (docker-compose.provider.yaml)
+```yaml
+services:
+  kafka:
+    container_name: kafka
+    image: bitnami/kafka:latest
+    ports:
+      - 9092:9092
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
 
-  @IsNumber()
-  PORT: number;
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
 
-  constructor(data?: Partial<KafkaConfiguration>) {
-    this.HOST = data?.HOST || process.env['KAFKA_HOST'] || 'kafka';
-    this.PORT = data?.PORT || Number(process.env['KAFKA_PORT']) || 9092;
-  }
-}
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.0
+    container_name: keycloak-25.0.0
+    ports:
+      - '8180:8080'
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
 ```
 
-### 7.2 Validation & DTOs
+#### Application Services (docker-compose.dev.yaml)
+```yaml
+services:
+  bff:
+    container_name: bff
+    image: bff:latest
+    ports:
+      - 3000:3000
+    networks:
+      - einvoice-nw
 
-```typescript
-export class CreateInvoiceRequestDto {
-  @IsNotEmpty()
-  @ValidateNested()
-  @Type(() => ClientRequestDto)
-  client: ClientRequestDto;
+  invoice:
+    container_name: invoice
+    image: invoice:latest
+    networks:
+      - einvoice-nw
 
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ItemRequestDto)
-  items: ItemRequestDto[];
-
-  @IsNumber()
-  @Min(0)
-  totalAmount: number;
-}
+  # ... other services
 ```
 
-### 7.3 Dependency Injection
+### 7.2 Build & Deployment Commands
 
-```typescript
-// Service injection
-constructor(
-  private readonly invoiceRepository: InvoiceRepository,
-  @Inject(TCP_SERVICES.PDF_GENERATOR_SERVICE) 
-  private readonly pdfGeneratorClient: TcpClient,
-  private readonly KafkaClient: KafkaClient,
-) {}
+```bash
+# Build all services
+pnpm nx:run-many -t build
+
+# Build Docker images
+pnpm docker-build
+
+# Start infrastructure
+pnpm docker:start:provider
+
+# Start application services
+pnpm docker:start:dev
+
+# Complete deployment
+pnpm build
 ```
 
 ---
 
 ## 🧪 PHẦN 8: BÀI TẬP THỰC HÀNH
 
-### Bài 1: Implement Notification Service
-**Mục tiêu**: Tạo service mới để handle notifications
+### Bài 1: Thêm Invoice Status Mới
+**Mục tiêu**: Thêm status `CANCELLED` cho invoice
 
 **Yêu cầu**:
-1. Tạo Notification Service (port 3008)
-2. Subscribe Kafka event `invoice.created`
-3. Gửi push notification cho supervisor
-4. Lưu notification history vào database
+1. Update `INVOICE_STATUS` enum
+2. Implement `cancelById` method
+3. Add business validation
+4. Test với Swagger UI
 
 **Code Template**:
 ```typescript
-// apps/notification/src/app/modules/notification/services/notification.service.ts
-@Injectable()
-export class NotificationService {
-  async handleInvoiceCreated(payload: InvoiceCreatedPayload) {
-    // TODO: Implement notification logic
+// libs/constants/src/lib/invoice.constant.ts
+export enum INVOICE_STATUS {
+  CREATED = 'created',
+  SENT = 'sent',
+  VERIFIED = 'verified',
+  CANCELLED = 'cancelled', // TODO: Add this
+}
+
+// apps/invoice/src/app/modules/invoice/services/invoice.service.ts
+async cancelById(id: string) {
+  const invoice = await this.getById(id);
+  
+  // TODO: Add business validation
+  if (invoice.status === INVOICE_STATUS.SENT) {
+    throw new BadRequestException('Cannot cancel sent invoice');
   }
+  
+  return this.invoiceRepository.updateById(id, {
+    status: INVOICE_STATUS.CANCELLED
+  });
 }
 ```
 
-### Bài 2: Add Invoice Approval Workflow
-**Mục tiêu**: Thêm workflow phê duyệt hóa đơn
+### Bài 2: Implement Notification Service
+**Mục tiêu**: Tạo service mới để handle notifications
 
 **Yêu cầu**:
-1. Thêm status `PENDING_APPROVAL`, `APPROVED`, `REJECTED`
-2. Implement approval endpoints
-3. Add role-based authorization
-4. Send email notification khi approval
+1. Tạo Notification Service
+2. Subscribe Kafka event `invoice.sent`
+3. Gửi notification cho supervisor
+4. Lưu notification history
 
-### Bài 3: Implement Audit Log
-**Mục tiêu**: Track tất cả thay đổi trong hệ thống
-
-**Yêu cầu**:
-1. Tạo AuditLog schema
-2. Implement audit interceptor
-3. Log tất cả CRUD operations
-4. Provide audit report API
-
-### Bài 4: Add Caching Layer
-**Mục tiêu**: Improve performance với Redis
+### Bài 3: Add Request Validation
+**Mục tiêu**: Enhance DTO validation
 
 **Yêu cầu**:
-1. Setup Redis container
-2. Cache invoice data
-3. Implement cache invalidation
-4. Add cache metrics
+1. Add custom validators
+2. Implement business rule validation
+3. Return detailed error messages
+4. Test validation scenarios
+
+### Bài 4: Implement Health Checks
+**Mục tiêu**: Add health monitoring
+
+**Yêu cầu**:
+1. Add health check endpoints
+2. Check database connectivity
+3. Check Kafka connectivity
+4. Return service status
 
 ---
 
 ## 🚀 PHẦN 9: ADVANCED TOPICS
 
-### 9.1 Monitoring & Observability
+### 9.1 Authentication với Keycloak
 
 ```typescript
-// Health Check Implementation
-@Controller('health')
-export class HealthController {
-  @Get()
-  check() {
-    return {
-      status: 'OK',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-    };
-  }
-}
-```
-
-### 9.2 Security Best Practices
-
-```typescript
-// JWT Guard Implementation
+// User Guard Implementation
 @Injectable()
-export class JwtAuthGuard implements CanActivate {
+export class UserGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
@@ -1065,13 +1065,13 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     
-    // Verify JWT token
-    return this.verifyToken(token);
+    // Verify JWT token with Keycloak
+    return this.verifyKeycloakToken(token);
   }
 }
 ```
 
-### 9.3 Testing Strategies
+### 9.2 Testing Strategies
 
 ```typescript
 // Unit Test Example
@@ -1085,7 +1085,15 @@ describe('InvoiceService', () => {
         InvoiceService,
         {
           provide: InvoiceRepository,
-          useValue: mockRepository,
+          useValue: {
+            create: jest.fn(),
+            getById: jest.fn(),
+            updateById: jest.fn(),
+          },
+        },
+        {
+          provide: TCP_SERVICES.PDF_GENERATOR_SERVICE,
+          useValue: { send: jest.fn() },
         },
       ],
     }).compile();
@@ -1104,6 +1112,19 @@ describe('InvoiceService', () => {
 });
 ```
 
+### 9.3 Performance Optimization
+
+```typescript
+// Caching with Redis (Future Enhancement)
+@Injectable()
+export class InvoiceService {
+  @Cacheable('invoice', 300) // 5 minutes cache
+  async getById(id: string) {
+    return this.invoiceRepository.getById(id);
+  }
+}
+```
+
 ---
 
 ## 📚 PHẦN 10: TÀI LIỆU THAM KHẢO
@@ -1112,6 +1133,7 @@ describe('InvoiceService', () => {
 - [NestJS Documentation](https://docs.nestjs.com/)
 - [MongoDB Manual](https://docs.mongodb.com/manual/)
 - [Kafka Documentation](https://kafka.apache.org/documentation/)
+- [Keycloak Documentation](https://www.keycloak.org/documentation)
 - [Docker Documentation](https://docs.docker.com/)
 
 ### 10.2 Design Patterns
@@ -1129,211 +1151,29 @@ describe('InvoiceService', () => {
 Hệ thống E-Invoice này là một ví dụ tuyệt vời về **Production-Ready Microservices Architecture**. Các điểm nổi bật:
 
 ### ✅ Strengths
-1. **Well-structured**: Clear separation of concerns
-2. **Scalable**: Each service can scale independently  
+1. **Well-structured**: Clear separation of concerns với Nx monorepo
+2. **Scalable**: Each service can scale independently
 3. **Maintainable**: Clean code với proper abstractions
 4. **Observable**: Comprehensive logging và error handling
 5. **Testable**: Dependency injection cho easy mocking
+6. **Production-ready**: Docker containerization và proper configuration
 
-### 🔄 Areas for Improvement
-1. **Security**: Add authentication/authorization
-2. **Monitoring**: Implement distributed tracing
-3. **Caching**: Add Redis for performance
-4. **Testing**: More comprehensive test coverage
-5. **Documentation**: API versioning strategy
+### 🔄 Architecture Highlights
+- **7 Microservices** với vai trò rõ ràng
+- **Mixed Communication**: TCP (sync), gRPC (auth), Kafka (async)
+- **Event-Driven**: Kafka cho decoupled communication
+- **Authentication**: Keycloak integration
+- **File Processing**: PDF generation và cloud storage
 
 ### 🎯 Key Takeaways
-- **Microservices** không phải silver bullet, cần cân nhắc trade-offs
+- **Microservices** cần cân nhắc trade-offs giữa complexity và benefits
 - **Event-Driven Architecture** giúp decouple services nhưng tăng complexity
 - **Proper error handling** và **logging** rất quan trọng trong distributed systems
 - **Configuration management** cần được centralized và environment-specific
-
----
-
-## 🐳 PHẦN 11: DEPLOYMENT ARCHITECTURE
-
-### 11.1 Docker Container Architecture
-
-```mermaid
-graph TB
-    %% Docker Network
-    subgraph DockerNetwork["🌐 einvoice-nw (Docker Network)"]
-        
-        %% Application Services
-        subgraph AppServices["📦 Application Services"]
-            BFF[🚪 BFF Container<br/>:3000]
-            Invoice[📄 Invoice Container<br/>:3001]
-            Media[📁 Media Container<br/>:3002]
-            PDF[📄 PDF Generator<br/>:3003]
-            Mail[📧 Mail Container<br/>:3004]
-            UserAccess[👤 User Access<br/>:3005]
-            Auth[🔐 Authorizer<br/>:3006]
-        end
-        
-        %% Infrastructure Services
-        subgraph Infrastructure["🔧 Infrastructure Services"]
-            MongoDB[🗄️ MongoDB<br/>:27017]
-            Kafka[🔄 Kafka<br/>:9092]
-        end
-        
-        %% External Services
-        subgraph External["☁️ External Services"]
-            Cloudinary[☁️ Cloudinary API]
-            SMTP[📮 SMTP Server]
-        end
-    end
-    
-    %% External Access
-    Client[🌐 Client/Browser] -->|Port 3000| BFF
-    
-    %% Internal Communication
-    BFF -.->|TCP| Invoice
-    BFF -.->|TCP| UserAccess
-    BFF -.->|TCP| Auth
-    
-    Invoice -.->|TCP| PDF
-    Invoice -.->|TCP| Media
-    Invoice -.->|Events| Kafka
-    Invoice -->|Data| MongoDB
-    
-    Kafka -.->|Events| Mail
-    Mail -.->|TCP| Invoice
-    Mail -->|Email| SMTP
-    
-    UserAccess -->|Data| MongoDB
-    Auth -->|Data| MongoDB
-    Media -->|Upload| Cloudinary
-    
-    %% Styling
-    classDef appService fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef infrastructure fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef external fill:#fff3e0,stroke:#e65100,stroke-width:2px
-    
-    class BFF,Invoice,Media,PDF,Mail,UserAccess,Auth appService
-    class MongoDB,Kafka infrastructure
-    class Client,Cloudinary,SMTP external
-```
-
-### 11.2 Production Deployment Strategy
-
-```mermaid
-graph TB
-    %% Load Balancer
-    LB[🔄 Load Balancer<br/>nginx/HAProxy]
-    
-    %% Multiple BFF Instances
-    subgraph BFFCluster["🚪 BFF Cluster"]
-        BFF1[BFF Instance 1<br/>:3000]
-        BFF2[BFF Instance 2<br/>:3001]
-        BFF3[BFF Instance 3<br/>:3002]
-    end
-    
-    %% Microservices Cluster
-    subgraph ServiceMesh["🕸️ Service Mesh"]
-        subgraph InvoiceCluster["📄 Invoice Cluster"]
-            I1[Invoice-1<br/>:3101]
-            I2[Invoice-2<br/>:3102]
-        end
-        
-        subgraph MailCluster["📧 Mail Cluster"]
-            M1[Mail-1<br/>:3201]
-            M2[Mail-2<br/>:3202]
-        end
-        
-        subgraph MediaCluster["📁 Media Cluster"]
-            Med1[Media-1<br/>:3301]
-            Med2[Media-2<br/>:3302]
-        end
-    end
-    
-    %% Database Cluster
-    subgraph DBCluster["🗄️ Database Cluster"]
-        MongoPrimary[MongoDB Primary]
-        MongoSecondary1[MongoDB Secondary 1]
-        MongoSecondary2[MongoDB Secondary 2]
-    end
-    
-    %% Message Queue Cluster
-    subgraph KafkaCluster["📨 Kafka Cluster"]
-        Kafka1[Kafka Broker 1]
-        Kafka2[Kafka Broker 2]
-        Kafka3[Kafka Broker 3]
-        Zookeeper[Zookeeper Ensemble]
-    end
-    
-    %% External Services
-    subgraph ExternalServices["☁️ External Services"]
-        CloudinaryProd[Cloudinary Production]
-        SMTPProd[SMTP Service]
-        Monitoring[Grafana + Prometheus]
-    end
-    
-    %% Connections
-    Client[🌐 Clients] --> LB
-    LB --> BFFCluster
-    BFFCluster -.-> ServiceMesh
-    ServiceMesh --> DBCluster
-    ServiceMesh --> KafkaCluster
-    ServiceMesh --> ExternalServices
-    
-    %% Styling
-    classDef loadBalancer fill:#ffebee,stroke:#c62828,stroke-width:3px
-    classDef cluster fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
-    classDef database fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    classDef external fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
-    
-    class LB loadBalancer
-    class BFFCluster,ServiceMesh,InvoiceCluster,MailCluster,MediaCluster cluster
-    class DBCluster,KafkaCluster database
-    class ExternalServices,CloudinaryProd,SMTPProd,Monitoring external
-```
-
-### 11.3 Environment Configuration
-
-| Environment | BFF Instances | Service Instances | Database | Message Queue |
-|-------------|---------------|-------------------|----------|---------------|
-| **Development** | 1 | 1 each | Single MongoDB | Single Kafka |
-| **Staging** | 2 | 1-2 each | MongoDB Replica Set | Kafka Cluster (3 nodes) |
-| **Production** | 3+ | 2-3 each | MongoDB Sharded Cluster | Kafka Cluster (3+ nodes) |
-
-### 11.4 Scaling Strategy
-
-```mermaid
-graph LR
-    %% Traffic Growth
-    Traffic[📈 Traffic Growth] --> Decision{Scale Decision}
-    
-    %% Horizontal Scaling
-    Decision -->|High CPU/Memory| HorizontalScale[🔄 Horizontal Scaling]
-    HorizontalScale --> AddInstances[➕ Add Service Instances]
-    AddInstances --> LoadBalance[⚖️ Load Balance Traffic]
-    
-    %% Vertical Scaling
-    Decision -->|Resource Intensive| VerticalScale[📊 Vertical Scaling]
-    VerticalScale --> UpgradeResources[⬆️ Upgrade CPU/RAM]
-    
-    %% Database Scaling
-    Decision -->|Database Bottleneck| DBScale[🗄️ Database Scaling]
-    DBScale --> Sharding[🔀 MongoDB Sharding]
-    DBScale --> ReadReplicas[📖 Read Replicas]
-    
-    %% Message Queue Scaling
-    Decision -->|High Event Volume| QueueScale[📨 Queue Scaling]
-    QueueScale --> MorePartitions[🔢 More Kafka Partitions]
-    QueueScale --> ConsumerGroups[👥 More Consumer Groups]
-    
-    %% Styling
-    classDef decision fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    classDef scaling fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
-    classDef action fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
-    
-    class Decision decision
-    class HorizontalScale,VerticalScale,DBScale,QueueScale scaling
-    class AddInstances,LoadBalance,UpgradeResources,Sharding,ReadReplicas,MorePartitions,ConsumerGroups action
-```
+- **Testing strategy** cần cover unit, integration và e2e tests
 
 ---
 
 **Happy Learning! 🚀**
 
-*Tài liệu này được tạo để hỗ trợ việc giảng dạy và học tập. Mọi góp ý xin liên hệ để cải thiện chất lượng nội dung.*
+*Tài liệu này được cập nhật để phản ánh chính xác source code hiện tại. Mọi góp ý xin liên hệ để cải thiện chất lượng nội dung.*
