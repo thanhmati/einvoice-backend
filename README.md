@@ -1,4 +1,4 @@
-# 📚 Hướng Dẫn Sử Dụng Tài Liệu Giảng Dạy
+# 📚 Hướng Dẫn Sử Dụng Tài Liệu Giảng Dạy - Hệ Thống E-Invoice
 
 ## 📋 Danh Sách Tài Liệu
 
@@ -7,6 +7,32 @@
 | **TEACHING_GUIDE.md** | Tài liệu chi tiết cho học viên | 🎓 Học viên |
 | **INSTRUCTOR_SUMMARY.md** | Hướng dẫn ngắn gọn cho giảng viên | 👨‍🏫 Giảng viên |
 | **README.md** | File này - hướng dẫn sử dụng | 📖 Tất cả |
+
+---
+
+## 🏗️ Kiến Trúc Hệ Thống
+
+Hệ thống E-Invoice được xây dựng theo mô hình **Microservices Architecture** với **Nx Monorepo**:
+
+```
+📦 E-Invoice System
+├── 🌐 BFF (Backend for Frontend) - Port 3000
+├── 📄 Invoice Service - TCP Microservice
+├── 📁 Media Service - TCP Microservice  
+├── 📄 PDF Generator Service - TCP Microservice
+├── 📧 Mail Service - Kafka Consumer
+├── 👤 User Access Service - TCP Microservice
+├── 🔐 Authorizer Service - gRPC Microservice
+├── 🗄️ MongoDB - Port 27017
+├── 📨 Kafka - Port 9092
+└── 🔑 Keycloak - Port 8180
+```
+
+### 🔄 Communication Patterns
+- **BFF ↔ Services**: TCP (Synchronous)
+- **Authorizer Service**: gRPC (Synchronous)
+- **Event Processing**: Kafka (Asynchronous)
+- **Database**: MongoDB với Mongoose
 
 ---
 
@@ -32,110 +58,199 @@
    - Đọc tuần tự từ Phần 1 → Phần 11
    - Thực hành theo bài tập
    - Tham khảo sơ đồ để hiểu flow
----
-
-## 🔍 Highlights của Tài Liệu
-
-### 📊 Sơ Đồ Mermaid Mới
-- **Sơ đồ tổng thể hệ thống** với emoji và màu sắc
-- **Sequence diagram** chi tiết invoice flow
-- **Kafka event-driven flow** 
-- **Docker deployment architecture**
-- **Production scaling strategy**
-
-### 💡 Điểm Mới So Với File Cũ
-- ✅ Sơ đồ trực quan hơn với emoji và styling
-- ✅ Chi tiết communication matrix
-- ✅ Deployment và scaling strategies
-- ✅ Bài tập thực hành phân cấp độ khó
-- ✅ Advanced topics (security, testing, monitoring)
 
 ---
 
 ## 🚀 Quick Start
 
+### Yêu Cầu Hệ Thống
+- **Node.js**: v18+
+- **pnpm**: Latest version
+- **Docker**: Latest version
+- **RAM**: 8GB (16GB recommended)
+
 ### Cho Giảng Viên
 ```bash
-# 1. Đọc instructor summary
-cat INSTRUCTOR_SUMMARY.md
-
-# 2. Setup demo environment
+# 1. Clone và setup
+git clone <repo-url>
+cd <repo-name>
 pnpm install
+
+# 2. Khởi động infrastructure (MongoDB + Kafka + Keycloak)
 pnpm docker:start:provider
+
+# 3. Build và start tất cả services
 pnpm build
 
-# 3. Chuẩn bị slides từ TEACHING_GUIDE.md
+# 4. Truy cập Swagger API Documentation
+# http://localhost:3000/api/v1/docs
 ```
 
 ### Cho Học Viên
 ```bash
 # 1. Clone repo
 git clone <repo-url>
+cd <repo-name>
 
-# 2. Đọc tài liệu chính
-cat TEACHING_GUIDE.md
-
-# 3. Setup development environment
+# 2. Install dependencies
 pnpm install
+
+# 3. Start infrastructure
+pnpm docker:start:provider
+
+# 4. Development mode (chạy tất cả services)
 pnpm dev
+
+# 5. Development mode (chỉ chạy core services)
+pnpm dev-lite
 ```
+
+---
+
+## 🔍 Highlights của Hệ Thống
+
+### 🏛️ Architecture Patterns
+- ✅ **Microservices Architecture** với 7 services
+- ✅ **API Gateway Pattern** (BFF)
+- ✅ **Event-Driven Architecture** với Kafka
+- ✅ **Repository Pattern** cho data access
+- ✅ **Dependency Injection** với NestJS
+
+### 💡 Technology Stack
+- **Framework**: NestJS với TypeScript
+- **Database**: MongoDB + Mongoose
+- **Message Queue**: Kafka
+- **Authentication**: Keycloak
+- **File Storage**: Cloudinary
+- **PDF Generation**: Puppeteer + EJS
+- **Email**: Nodemailer
+- **Containerization**: Docker + Docker Compose
+- **Monorepo**: Nx
+
+### 📊 Production-Ready Features
+- ✅ Global error handling với ExceptionInterceptor
+- ✅ Request logging với LoggerMiddleware
+- ✅ Process ID tracking across services
+- ✅ DTO validation với class-validator
+- ✅ Swagger API documentation
+- ✅ Docker containerization
+- ✅ Environment-based configuration
 
 ---
 
 ## 📈 Cấu Trúc Học Tập Đề Xuất
 
-### Tuần 1-2: Foundation
-- Phần 1: Tổng quan kiến trúc
-- Phần 2: Phân tích BFF & Invoice Service
-- **Thực hành**: Setup và chạy hệ thống
+### Tuần 1-2: Foundation (8 giờ)
+- **Phần 1**: Tổng quan kiến trúc Microservices
+- **Phần 2**: Phân tích BFF & API Gateway Pattern
+- **Thực hành**: Setup và chạy hệ thống, test API
 
-### Tuần 3-4: Core Concepts
-- Phần 3: Shared Libraries
-- Phần 4: Communication Patterns
-- **Thực hành**: Thêm endpoint mới
+### Tuần 3-4: Core Services (8 giờ)
+- **Phần 3**: Invoice Service - Business Logic
+- **Phần 4**: TCP Communication Patterns
+- **Thực hành**: Thêm endpoint mới, implement validation
 
-### Tuần 5-6: Advanced Topics
-- Phần 5: Business Flow Analysis
-- Phần 6: Architectural Patterns
-- **Thực hành**: Implement event mới
+### Tuần 5-6: Event-Driven Architecture (8 giờ)
+- **Phần 5**: Kafka Integration & Event Processing
+- **Phần 6**: Mail Service - Event Consumer
+- **Thực hành**: Implement event mới, custom Kafka handler
 
-### Tuần 7-8: Production Ready
-- Phần 7-9: Best Practices & Advanced Topics
-- Phần 10-11: Deployment & Scaling
-- **Thực hành**: Production deployment
+### Tuần 7-8: Advanced Topics (8 giờ)
+- **Phần 7**: Shared Libraries & Code Organization
+- **Phần 8**: Security, Testing, Monitoring
+- **Thực hành**: Authentication, unit tests, logging
+
+### Tuần 9-10: Production Deployment (8 giờ)
+- **Phần 9**: Docker Deployment & Scaling
+- **Phần 10**: Best Practices & Performance
+- **Thực hành**: Production deployment, monitoring setup
 
 ---
 
 ## 🛠️ Tools Hỗ Trợ
 
+### Development Tools
+- **API Testing**: Swagger UI tại `http://localhost:3000/api/v1/docs`
+- **Database**: MongoDB Compass cho GUI
+- **Message Queue**: Kafka UI (có thể enable trong docker-compose)
+- **Authentication**: Keycloak Admin tại `http://localhost:8180`
+
 ### Xem Sơ Đồ Mermaid
-- **GitHub**: Tự động render Mermaid
+- **GitHub**: Tự động render Mermaid diagrams
 - **VSCode**: Mermaid Preview extension
 - **Online**: https://mermaid.live/
 
-### API Testing
-- **Swagger UI**: `http://localhost:3000/api/v1/docs`
-- **Postman**: Import từ Swagger
-- **curl**: Command line testing
+---
 
-### Database
-- **MongoDB Compass**: GUI cho MongoDB
-- **Robo 3T**: Alternative MongoDB client
+## 🎯 Demo Flow
+
+### 1. Tạo Invoice
+```bash
+POST http://localhost:3000/api/v1/invoice
+Content-Type: application/json
+
+{
+  "client": {
+    "name": "Nguyễn Văn A",
+    "email": "client@example.com",
+    "address": "123 Main St"
+  },
+  "items": [
+    {
+      "name": "Product 1",
+      "quantity": 2,
+      "price": 100000
+    }
+  ],
+  "totalAmount": 200000,
+  "vatAmount": 20000
+}
+```
+
+### 2. Gửi Invoice (Trigger PDF + Email)
+```bash
+POST http://localhost:3000/api/v1/invoice/{invoiceId}/send
+```
+
+### 3. Kiểm tra Flow
+- Invoice status chuyển từ `created` → `sent`
+- PDF được generate và upload lên Cloudinary
+- Kafka event được publish
+- Mail service consume event và gửi email với PDF attachment
 
 ---
 
 ## 📞 Hỗ Trợ
 
 ### Nếu Gặp Vấn Đề
-1. **Technical Issues**: Kiểm tra logs trong Docker containers
-2. **Concept Questions**: Tham khảo phần "Khái niệm cần hiểu"
-3. **Code Examples**: Xem trong thư mục `apps/` và `libs/`
+1. **Docker Issues**: Kiểm tra `docker ps` và logs
+2. **Service Connection**: Verify network `einvoice-nw`
+3. **Database**: Ensure MongoDB is running on port 27017
+4. **Kafka**: Check Kafka broker health
 
-### Feedback
+### Debugging
+```bash
+# Check running containers
+docker ps
+
+# View service logs
+docker logs <container-name>
+
+# Check network
+docker network ls | grep einvoice
+
+# MongoDB connection test
+docker exec -it mongodb mongosh
+```
+
+### Feedback & Contributions
 - Góp ý cải thiện tài liệu
 - Đề xuất bài tập mới
 - Báo lỗi trong code examples
+- Contribute to documentation
 
 ---
 
 **Happy Teaching & Learning! 🎓🚀**
+
+*Tài liệu này được cập nhật để phản ánh chính xác source code hiện tại. Mọi thắc mắc xin liên hệ để được hỗ trợ.*
