@@ -58,7 +58,7 @@ export class KeycloakService {
         metadata: {
           jwt: payload,
           permissions: (user.roles as unknown as Role[])
-            .map((role) => role?.permissions)
+            ?.map((role) => role?.permissions)
             .flat()
             .filter(Boolean),
           userId: user.id,
