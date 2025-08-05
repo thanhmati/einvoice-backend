@@ -39,7 +39,10 @@ Hệ thống được thiết kế theo mô hình **Microservices Architecture**
 ├── 🔐 Authorizer Service - gRPC Microservice
 ├── 🗄️ MongoDB - Port 27017
 ├── 📨 Kafka - Port 9092
-└── 🔑 Keycloak - Port 8180 (Authentication Server)
+├── 🔑 Keycloak - Port 8180 (Authentication Server)
+├── 📊 Grafana - Port 3001 (Monitoring Dashboard)
+├── 📋 Loki - Port 3100 (Log Aggregation Server)
+└── 📡 Promtail - Log Collection Agent
 ```
 
 ### 1.2 Sơ Đồ Tổng Thể Hệ Thống
@@ -75,6 +78,19 @@ graph TB
     Mail -->|"Send Email"| SMTP["📮 SMTP Server"]
     Auth -->|"User Management"| Keycloak["🔑 Keycloak<br/>:8180"]
     
+    %% Logging Infrastructure
+    Promtail["📡 Promtail<br/>(Log Agent)"]
+    Loki["📋 Loki<br/>:3100"]
+    Grafana["📊 Grafana<br/>:3001"]
+    
+    %% Log Flow
+    BFF -.->|"Container Logs"| Promtail
+    Invoice -.->|"Container Logs"| Promtail
+    UserAccess -.->|"Container Logs"| Promtail
+    Mail -.->|"Container Logs"| Promtail
+    Promtail -->|"Ship Logs"| Loki
+    Loki -->|"Query Logs"| Grafana
+    
     %% Styling
     classDef serviceBox fill:#e1f5fe,stroke:#01579b,stroke-width:2px
     classDef dbBox fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
@@ -85,6 +101,7 @@ graph TB
     class MongoDB dbBox
     class Client,Cloudinary,Puppeteer,SMTP,Keycloak externalBox
     class Kafka eventBox
+    class Promtail,Loki,Grafana serviceBox
 ```
 
 ### 1.3 Chi Tiết Flow Dữ Liệu Chính
@@ -190,16 +207,253 @@ sequenceDiagram
 | **Email** | Nodemailer | Email delivery |
 | **Containerization** | Docker + Docker Compose | Deployment |
 | **Monorepo** | Nx | Code organization |
+| **Monitoring** | Grafana | Dashboard & Visualization |
+| **Log Aggregation** | Loki | Centralized log storage |
+| **Log Collection** | Promtail | Docker container log shipping |
 
 ---
 
-## 🧩 PHẦN 2: PHÂN TÍCH TỪNG MICROSERVICE
+## 📊 PHẦN 2: CENTRALIZED LOGGING ARCHITECTURE
 
-### 2.1 🌐 BFF (Backend for Frontend) Service
+### 2.1 Tổng Quan Logging Stack
+
+Hệ thống sử dụng **Grafana + Loki + Promtail** stack để thu thập và quản lý log tập trung:
+
+```mermaid
+graph TB
+    %% Microservices Layer
+    BFF["🌐 BFF Service<br/>:3000"]
+    Invoice["📄 Invoice Service"]
+    Mail["📧 Mail Service"]
+    UserAccess["👤 User Access Service"]
+    
+    %% Docker Layer
+    Docker["🐳 Docker Engine<br/>/var/lib/docker/containers"]
+    
+    %% Logging Stack
+    Promtail["📡 Promtail<br/>Log Collection Agent"]
+    Loki["📋 Loki<br/>:3100<br/>Log Aggregation Server"]
+    Grafana["📊 Grafana<br/>:3001<br/>Dashboard & Visualization"]
+    
+    %% Log Flow
+    BFF -->|"Container Logs"| Docker
+    Invoice -->|"Container Logs"| Docker
+    Mail -->|"Container Logs"| Docker
+    UserAccess -->|"Container Logs"| Docker
+    
+    Docker -->|"File System"| Promtail
+    Promtail -->|"HTTP Push API"| Loki
+    Loki -->|"LogQL Queries"| Grafana
+    
+    %% User Access
+    User["👨‍💻 Developer/DevOps"] -->|"Web UI"| Grafana
+    User -->|"Direct API"| Loki
+    
+    %% Styling
+    classDef serviceBox fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef logBox fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef userBox fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    
+    class BFF,Invoice,Mail,UserAccess serviceBox
+    class Docker,Promtail,Loki,Grafana logBox
+    class User userBox
+```
+
+### 2.2 Promtail Configuration (Thực Tế)
+
+**📍 Vai trò**: Thu thập logs từ Docker containers và gửi đến Loki
+
+```yaml
+# docker/promtail-config.yaml
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+
+    pipeline_stages:
+      - docker: {}
+
+    relabel_configs:
+      # Gán app label từ tên container
+      - source_labels: [__meta_docker_container_name]
+        regex: /(.+)
+        target_label: app
+        replacement: $1
+
+      # Lọc chỉ invoice và bff containers
+      - source_labels: [__meta_docker_container_name]
+        regex: /invoice.*
+        action: keep
+      - source_labels: [__meta_docker_container_name]
+        regex: /bff.*
+        action: keep
+```
+
+**💡 Key Features:**
+- **Docker Service Discovery**: Tự động phát hiện containers
+- **Label Extraction**: Gán labels từ container metadata
+- **Selective Collection**: Chỉ thu thập logs từ invoice và bff services
+- **Real-time Streaming**: Refresh interval 5 giây
+
+### 2.3 Loki Configuration (Thực Tế)
+
+**📍 Vai trò**: Log aggregation server với efficient storage
+
+```yaml
+# docker/loki-config.yaml
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
+  log_level: debug
+
+common:
+  instance_addr: 127.0.0.1
+  path_prefix: /tmp/loki
+  storage:
+    filesystem:
+      chunks_directory: /tmp/loki/chunks
+      rules_directory: /tmp/loki/rules
+  replication_factor: 1
+
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+pattern_ingester:
+  enabled: true
+  metric_aggregation:
+    loki_address: localhost:3100
+```
+
+**💡 Key Features:**
+- **Filesystem Storage**: Local storage cho development
+- **TSDB Schema**: Time-series database cho efficient querying
+- **Pattern Ingester**: Tự động extract patterns từ logs
+- **No Authentication**: Simplified setup cho development
+
+### 2.4 Grafana Integration
+
+**📍 Vai trò**: Dashboard và visualization cho logs
+
+#### 2.4.1 Loki Data Source Setup
+```json
+{
+  "name": "Loki",
+  "type": "loki",
+  "url": "http://loki:3100",
+  "access": "proxy",
+  "isDefault": true
+}
+```
+
+#### 2.4.2 LogQL Query Examples
+```logql
+# Tất cả logs từ BFF service
+{app="bff"}
+
+# Error logs từ Invoice service
+{app="invoice"} |= "ERROR"
+
+# HTTP requests với response time > 1000ms
+{app="bff"} | json | response_time > 1000
+
+# Process ID tracking across services
+{app=~"bff|invoice"} |= "process"
+
+# Kafka event processing logs
+{app="mail"} |= "invoice.sent"
+```
+
+### 2.5 Log Flow trong Microservices
+
+```mermaid
+sequenceDiagram
+    participant App as 📱 Application
+    participant Docker as 🐳 Docker
+    participant Promtail as 📡 Promtail
+    participant Loki as 📋 Loki
+    participant Grafana as 📊 Grafana
+    participant Dev as 👨‍💻 Developer
+
+    Note over App,Dev: 📋 CENTRALIZED LOGGING FLOW
+
+    %% Log Generation
+    rect rgb(240, 248, 255)
+        Note over App,Docker: 1. Log Generation
+        App->>Docker: Write logs to stdout/stderr
+        Docker->>Docker: Store logs in /var/lib/docker/containers
+    end
+
+    %% Log Collection
+    rect rgb(255, 248, 240)
+        Note over Docker,Loki: 2. Log Collection & Shipping
+        Promtail->>Docker: Discover containers via Docker API
+        Promtail->>Docker: Read log files
+        Promtail->>Promtail: Apply labels và filtering
+        Promtail->>Loki: HTTP Push API /loki/api/v1/push
+        Loki->>Loki: Index và store logs
+    end
+
+    %% Log Visualization
+    rect rgb(248, 255, 248)
+        Note over Loki,Dev: 3. Log Query & Visualization
+        Dev->>Grafana: Access dashboard http://localhost:3001
+        Grafana->>Loki: LogQL queries
+        Loki-->>Grafana: Log results
+        Grafana-->>Dev: Dashboard với charts và logs
+    end
+
+    %% Real-time Monitoring
+    rect rgb(255, 248, 255)
+        Note over Grafana,Dev: 4. Real-time Monitoring
+        Grafana->>Loki: Continuous queries (auto-refresh)
+        Loki-->>Grafana: Live log stream
+        Grafana-->>Dev: Real-time alerts và notifications
+    end
+```
+
+### 2.6 Practical Benefits
+
+#### 2.6.1 For Development
+- **Centralized View**: Tất cả service logs ở một nơi
+- **Real-time Monitoring**: Live log streaming
+- **Process Tracking**: Follow request flow across services
+- **Error Debugging**: Quick error identification và context
+
+#### 2.6.2 For Production
+- **Log Aggregation**: Thu thập logs từ multiple instances
+- **Search & Filter**: Powerful LogQL queries
+- **Alerting**: Grafana alerts based on log patterns
+- **Retention**: Configurable log retention policies
+
+---
+
+## 🧩 PHẦN 3: PHÂN TÍCH TỪNG MICROSERVICE
+
+### 3.1 🌐 BFF (Backend for Frontend) Service
 
 **📍 Vai trò**: API Gateway - điểm tập trung cho frontend
 
-#### 2.1.1 Cấu Trúc Project
+#### 3.1.1 Cấu Trúc Project
 ```
 apps/bff/
 ├── src/
@@ -214,7 +468,7 @@ apps/bff/
 │   └── configuration/       # BFF-specific config
 ```
 
-#### 2.1.2 Main.ts Configuration (Thực tế)
+#### 3.1.2 Main.ts Configuration (Thực tế)
 
 ```typescript
 // apps/bff/src/main.ts
@@ -259,7 +513,7 @@ async function bootstrap() {
 }
 ```
 
-#### 2.1.3 App Module Structure (Thực tế)
+#### 3.1.3 App Module Structure (Thực tế)
 
 ```typescript
 // apps/bff/src/app/app.module.ts
@@ -301,11 +555,11 @@ export class AppModule implements NestModule {
 
 ---
 
-### 2.2 📄 Invoice Service (Core Business Logic)
+### 3.2 📄 Invoice Service (Core Business Logic)
 
 **📍 Vai trò**: Xử lý logic nghiệp vụ chính của hóa đơn
 
-#### 2.2.1 Service Structure (Thực tế)
+#### 3.2.1 Service Structure (Thực tế)
 ```
 apps/invoice/src/app/modules/invoice/
 ├── controllers/
@@ -319,7 +573,7 @@ apps/invoice/src/app/modules/invoice/
 └── invoice.module.ts            # Module configuration
 ```
 
-#### 2.2.2 Invoice Module Configuration
+#### 3.2.2 Invoice Module Configuration
 
 ```typescript
 // apps/invoice/src/app/modules/invoice/invoice.module.ts
@@ -338,7 +592,7 @@ apps/invoice/src/app/modules/invoice/
 export class InvoiceModule {}
 ```
 
-#### 2.2.3 Business Logic Implementation (Thực tế)
+#### 3.2.3 Business Logic Implementation (Thực tế)
 
 ```typescript
 // apps/invoice/src/app/modules/invoice/services/invoice.service.ts
@@ -397,7 +651,7 @@ export class InvoiceService {
 }
 ```
 
-#### 2.2.4 TCP Controller (Thực tế)
+#### 3.2.4 TCP Controller (Thực tế)
 
 ```typescript
 // apps/invoice/src/app/modules/invoice/controllers/invoice.controller.ts
@@ -426,11 +680,11 @@ export class InvoiceController {
 
 ---
 
-### 2.3 📧 Mail Service (Event-Driven Consumer)
+### 3.3 📧 Mail Service (Event-Driven Consumer)
 
 **📍 Vai trò**: Xử lý gửi email và consume Kafka events
 
-#### 2.3.1 Kafka Consumer Setup (Thực tế)
+#### 3.3.1 Kafka Consumer Setup (Thực tế)
 
 ```typescript
 // apps/mail/src/app/app.module.ts
@@ -452,7 +706,7 @@ export class InvoiceController {
 export class AppModule {}
 ```
 
-#### 2.3.2 Event Handler (Thực tế)
+#### 3.3.2 Event Handler (Thực tế)
 
 ```typescript
 // apps/mail/src/app/modules/mail/services/mail-queue.service.ts
@@ -468,7 +722,7 @@ export class MailQueueService {
 }
 ```
 
-#### 2.3.3 Mail Business Logic (Thực tế)
+#### 3.3.3 Mail Business Logic (Thực tế)
 
 ```typescript
 // apps/mail/src/app/modules/mail/services/mail-invoice.service.ts
@@ -523,9 +777,9 @@ export class MailInvoiceService {
 
 ---
 
-## 🔧 PHẦN 3: SHARED LIBRARIES ANALYSIS
+## 🔧 PHẦN 4: SHARED LIBRARIES ANALYSIS
 
-### 3.1 📊 Database Schema Design (Thực tế)
+### 4.1 📊 Database Schema Design (Thực tế)
 
 ```typescript
 // libs/schemas/src/lib/invoice/invoice.schema.ts
@@ -571,9 +825,9 @@ export enum INVOICE_STATUS {
 }
 ```
 
-### 3.2 🔄 Kafka Integration (Thực tế)
+### 4.2 🔄 Kafka Integration (Thực tế)
 
-#### 3.2.1 Kafka Topics
+#### 4.2.1 Kafka Topics
 
 ```typescript
 // libs/constants/src/lib/kafka.constant.ts
@@ -584,7 +838,7 @@ export const KAFKA_TOPICS = {
 };
 ```
 
-#### 3.2.2 Kafka Consumer Service
+#### 4.2.2 Kafka Consumer Service
 
 ```typescript
 // libs/queue/src/lib/modules/kafka/services/kafka-consumer.service.ts
@@ -647,9 +901,9 @@ export class KafkaConsumerService implements OnModuleInit, OnModuleDestroy {
 }
 ```
 
-### 3.3 🛡️ Error Handling & Logging (Thực tế)
+### 4.3 🛡️ Error Handling & Logging (Thực tế)
 
-#### 3.3.1 Global Exception Interceptor
+#### 4.3.1 Global Exception Interceptor
 
 ```typescript
 // libs/interceptors/src/lib/exception.interceptor.ts
@@ -688,7 +942,7 @@ export class ExceptionInterceptor implements NestInterceptor {
 }
 ```
 
-#### 3.3.2 Logger Middleware
+#### 4.3.2 Logger Middleware
 
 ```typescript
 // libs/middlewares/src/lib/logger.middleware.ts
@@ -723,9 +977,9 @@ export class LoggerMiddleware implements NestMiddleware {
 
 ---
 
-## 🔄 PHẦN 4: COMMUNICATION PATTERNS
+## 🔄 PHẦN 5: COMMUNICATION PATTERNS
 
-### 4.1 Synchronous Communication (TCP)
+### 5.1 Synchronous Communication (TCP)
 
 ```typescript
 // BFF → Invoice Service
@@ -741,14 +995,14 @@ this.pdfGeneratorClient.send<string, InvoiceTcpResponse>(
 )
 ```
 
-### 4.2 gRPC Communication (Authorizer Service)
+### 5.2 gRPC Communication (Authorizer Service)
 
 ```typescript
 // BFF → Authorizer Service (gRPC)
 ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)])
 ```
 
-### 4.3 Asynchronous Communication (Kafka)
+### 5.3 Asynchronous Communication (Kafka)
 
 ```typescript
 // Producer (Invoice Service)
@@ -766,9 +1020,9 @@ async eventInvoiceCreated(payload: KafkaPayload<InvoiceSentPayload>) {
 
 ---
 
-## 📈 PHẦN 5: BUSINESS FLOW ANALYSIS
+## 📈 PHẦN 6: BUSINESS FLOW ANALYSIS
 
-### 5.1 Complete Invoice Workflow
+### 6.1 Complete Invoice Workflow
 
 ```mermaid
 sequenceDiagram
@@ -818,7 +1072,7 @@ sequenceDiagram
     Mail->>Mail: Send email via SMTP
 ```
 
-### 5.2 Event-Driven Architecture
+### 6.2 Event-Driven Architecture
 
 ```mermaid
 graph LR
@@ -848,9 +1102,9 @@ graph LR
 
 ---
 
-## 🏛️ PHẦN 6: ARCHITECTURAL PATTERNS
+## 🏛️ PHẦN 7: ARCHITECTURAL PATTERNS
 
-### 6.1 Repository Pattern Implementation
+### 7.1 Repository Pattern Implementation
 
 ```typescript
 // apps/invoice/src/app/modules/invoice/repositories/invoice.repository.ts
@@ -882,7 +1136,7 @@ export class InvoiceRepository {
 }
 ```
 
-### 6.2 Dependency Injection Pattern
+### 7.2 Dependency Injection Pattern
 
 ```typescript
 // Constructor injection trong InvoiceService
@@ -894,7 +1148,7 @@ constructor(
 ) {}
 ```
 
-### 6.3 API Gateway Pattern (BFF)
+### 7.3 API Gateway Pattern (BFF)
 
 ```typescript
 // BFF acts as single entry point
@@ -907,9 +1161,9 @@ Frontend → BFF → {
 
 ---
 
-## 🛠️ PHẦN 7: DEPLOYMENT & DOCKER
+## 🛠️ PHẦN 8: DEPLOYMENT & DOCKER
 
-### 7.1 Docker Compose Structure
+### 8.1 Docker Compose Structure
 
 #### Infrastructure Services (docker-compose.provider.yaml)
 ```yaml
@@ -963,7 +1217,7 @@ services:
   # ... other services
 ```
 
-### 7.2 Build & Deployment Commands
+### 8.2 Build & Deployment Commands
 
 ```bash
 # Build all services
@@ -984,7 +1238,7 @@ pnpm build
 
 ---
 
-## 🧪 PHẦN 8: BÀI TẬP THỰC HÀNH
+## 🧪 PHẦN 9: BÀI TẬP THỰC HÀNH
 
 ### Bài 1: Thêm Invoice Status Mới
 **Mục tiêu**: Thêm status `CANCELLED` cho invoice
@@ -1047,11 +1301,34 @@ async cancelById(id: string) {
 3. Check Kafka connectivity
 4. Return service status
 
+### Bài 5: Centralized Logging Setup
+**Mục tiêu**: Enable và configure Grafana + Loki + Promtail
+
+**Yêu cầu**:
+1. Uncomment logging services trong docker-compose.provider.yaml
+2. Configure Grafana data source cho Loki
+3. Tạo dashboard để monitor application logs
+4. Setup log alerts cho error patterns
+
+**Code Template**:
+```bash
+# Enable logging stack
+docker-compose -f docker-compose.provider.yaml up -d grafana loki promtail
+
+# Access Grafana
+open http://localhost:3001  # admin/admin
+
+# Add Loki data source
+curl -X POST http://admin:admin@localhost:3001/api/datasources \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Loki","type":"loki","url":"http://loki:3100","access":"proxy"}'
+```
+
 ---
 
-## 🚀 PHẦN 9: ADVANCED TOPICS
+## 🚀 PHẦN 10: ADVANCED TOPICS
 
-### 9.1 Authentication với Keycloak
+### 10.1 Authentication với Keycloak
 
 ```typescript
 // User Guard Implementation
@@ -1071,7 +1348,7 @@ export class UserGuard implements CanActivate {
 }
 ```
 
-### 9.2 Testing Strategies
+### 10.2 Testing Strategies
 
 ```typescript
 // Unit Test Example
@@ -1112,7 +1389,7 @@ describe('InvoiceService', () => {
 });
 ```
 
-### 9.3 Performance Optimization
+### 10.3 Performance Optimization
 
 ```typescript
 // Caching with Redis (Future Enhancement)
@@ -1127,20 +1404,20 @@ export class InvoiceService {
 
 ---
 
-## 📚 PHẦN 10: TÀI LIỆU THAM KHẢO
+## 📚 PHẦN 11: TÀI LIỆU THAM KHẢO
 
-### 10.1 Official Documentation
+### 11.1 Official Documentation
 - [NestJS Documentation](https://docs.nestjs.com/)
 - [MongoDB Manual](https://docs.mongodb.com/manual/)
 - [Kafka Documentation](https://kafka.apache.org/documentation/)
 - [Keycloak Documentation](https://www.keycloak.org/documentation)
 - [Docker Documentation](https://docs.docker.com/)
 
-### 10.2 Design Patterns
+### 11.2 Design Patterns
 - [Microservices Patterns](https://microservices.io/patterns/)
 - [Enterprise Integration Patterns](https://www.enterpriseintegrationpatterns.com/)
 
-### 10.3 Best Practices
+### 11.3 Best Practices
 - [12-Factor App](https://12factor.net/)
 - [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 

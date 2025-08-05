@@ -25,7 +25,10 @@ Hệ thống E-Invoice được xây dựng theo mô hình **Microservices Archi
 ├── 🔐 Authorizer Service - gRPC Microservice
 ├── 🗄️ MongoDB - Port 27017
 ├── 📨 Kafka - Port 9092
-└── 🔑 Keycloak - Port 8180
+├── 🔑 Keycloak - Port 8180
+├── 📊 Grafana - Port 3001 (Monitoring Dashboard)
+├── 📋 Loki - Port 3100 (Log Aggregation)
+└── 📡 Promtail - Log Collection Agent
 ```
 
 ### 🔄 Communication Patterns
@@ -76,7 +79,7 @@ git clone <repo-url>
 cd <repo-name>
 pnpm install
 
-# 2. Khởi động infrastructure (MongoDB + Kafka + Keycloak)
+# 2. Khởi động infrastructure (MongoDB + Kafka + Keycloak + Logging Stack)
 pnpm docker:start:provider
 
 # 3. Build và start tất cả services
@@ -126,6 +129,9 @@ pnpm dev-lite
 - **Email**: Nodemailer
 - **Containerization**: Docker + Docker Compose
 - **Monorepo**: Nx
+- **Monitoring**: Grafana Dashboard
+- **Log Aggregation**: Loki + Promtail
+- **Centralized Logging**: Docker container logs collection
 
 ### 📊 Production-Ready Features
 - ✅ Global error handling với ExceptionInterceptor
@@ -135,6 +141,9 @@ pnpm dev-lite
 - ✅ Swagger API documentation
 - ✅ Docker containerization
 - ✅ Environment-based configuration
+- ✅ Centralized logging với Grafana + Loki + Promtail
+- ✅ Real-time log monitoring và dashboard
+- ✅ Container log aggregation và search
 
 ---
 
@@ -174,6 +183,9 @@ pnpm dev-lite
 - **Database**: MongoDB Compass cho GUI
 - **Message Queue**: Kafka UI (có thể enable trong docker-compose)
 - **Authentication**: Keycloak Admin tại `http://localhost:8180`
+- **Monitoring**: Grafana Dashboard tại `http://localhost:3001` (admin/admin)
+- **Log Search**: Loki API tại `http://localhost:3100`
+- **Log Collection**: Promtail agent tự động thu thập logs từ Docker containers
 
 ### Xem Sơ Đồ Mermaid
 - **GitHub**: Tự động render Mermaid diagrams
@@ -227,6 +239,8 @@ POST http://localhost:3000/api/v1/invoice/{invoiceId}/send
 2. **Service Connection**: Verify network `einvoice-nw`
 3. **Database**: Ensure MongoDB is running on port 27017
 4. **Kafka**: Check Kafka broker health
+5. **Logging Stack**: Verify Grafana (3001), Loki (3100), và Promtail services
+6. **Log Collection**: Check Promtail is collecting container logs properly
 
 ### Debugging
 ```bash
@@ -241,6 +255,15 @@ docker network ls | grep einvoice
 
 # MongoDB connection test
 docker exec -it mongodb mongosh
+
+# Check logging stack
+docker logs grafana
+docker logs loki
+docker logs promtail
+
+# Verify log collection
+curl http://localhost:3100/ready
+curl http://localhost:3100/metrics
 ```
 
 ### Feedback & Contributions
