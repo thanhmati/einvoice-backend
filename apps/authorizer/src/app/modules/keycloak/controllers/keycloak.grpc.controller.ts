@@ -12,7 +12,7 @@ export class KeycloakGrpcController {
 
   @GrpcMethod('KeycloakService', 'verifyUserToken')
   async verifyToken(payload: UserTokenRequest): Promise<Response<AuthorizeResponse>> {
-    const result = await this.keycloakService.verifyToken(payload.token);
+    const result = await this.keycloakService.verifyToken(payload.token, payload.processID);
     return Response.successData<AuthorizeResponse>(result);
   }
 }

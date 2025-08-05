@@ -2,6 +2,9 @@ syntax = "proto3";
 
 package GRPC_USER_ACCESS_SERVICE;
 
+service UserAccessService {
+  rpc getByUserId (UserById) returns (User);
+}
 
 message Role {
   string name = 1;
@@ -16,4 +19,9 @@ message User {
   string lastName = 4;
   string email = 5;
   repeated Role roles = 6; 
+}
+
+message UserById {
+  string userId = 1;
+  string processID = 2;
 }

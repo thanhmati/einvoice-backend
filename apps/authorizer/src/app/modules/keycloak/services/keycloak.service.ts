@@ -1,17 +1,25 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import jwksRsa, { JwksClient } from 'jwks-rsa';
 import jwt, { Jwt, JwtPayload } from 'jsonwebtoken';
 import { AuthorizeResponse } from '@common/interfaces/grpc/authorizer';
+import { GRPC_SERVICES } from '@common/configuration';
+import { ClientGrpc } from '@nestjs/microservices';
+import { UserAccessService } from '@common/interfaces/grpc/user-access';
+import { firstValueFrom, map } from 'rxjs';
 
 @Injectable()
 export class KeycloakService {
+  private userAccessService: UserAccessService;
   private readonly logger = new Logger(KeycloakService.name);
   private jwksClient: JwksClient;
   private host: string;
   private realm: string;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(GRPC_SERVICES.USER_ACCESS_SERVICE) private readonly grpcClient: ClientGrpc,
+  ) {
     this.host = this.configService.get('KEYCLOAK_CONFIG.HOST');
     this.realm = this.configService.get('KEYCLOAK_CONFIG.REALM');
 
@@ -20,9 +28,11 @@ export class KeycloakService {
       cache: true,
       rateLimit: true,
     });
+
+    this.userAccessService = this.grpcClient.getService<UserAccessService>('UserAccessService');
   }
 
-  async verifyToken(token: string): Promise<AuthorizeResponse> {
+  async verifyToken(token: string, processID: string): Promise<AuthorizeResponse> {
     const decoded = jwt.decode(token, { complete: true }) as Jwt;
     if (!decoded || !decoded.header || !decoded.header.kid) {
       throw new UnauthorizedException('Invalid token structure');
@@ -34,18 +44,36 @@ export class KeycloakService {
       const publicKey = key.getPublicKey();
 
       const payload = jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as JwtPayload;
+      this.logger.debug('JWT payload: ', payload);
+
+      const user = await this.userValidation(payload.sub, processID);
+
       return {
         valid: true,
         metadata: {
           jwt: payload,
           permissions: [],
           userId: payload.sub,
-          user: null,
+          user,
         },
       };
     } catch (error) {
       this.logger.error({ error });
       throw new UnauthorizedException('Token is invalid');
     }
+  }
+
+  private async userValidation(userId: string, processID: string) {
+    const user = await firstValueFrom(
+      this.userAccessService.getByUserId({ userId, processID }).pipe(map((data) => data.data)),
+    );
+
+    this.logger.debug('User: ', user);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return user;
   }
 }

@@ -14,6 +14,10 @@ export class UserRepository {
     return this.userModel.findById(id).exec();
   }
 
+  getByUserId(userId: string) {
+    return this.userModel.findOne({ userId }).exec();
+  }
+
   getByEmail(email: string) {
     return this.userModel.findOne({ email }).exec();
   }

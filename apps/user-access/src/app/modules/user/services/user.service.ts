@@ -19,4 +19,8 @@ export class UserService {
 
     return this.userRepository.create(input);
   }
+
+  getByUserId(userId: string) {
+    return this.userRepository.getByUserId(userId);
+  }
 }
