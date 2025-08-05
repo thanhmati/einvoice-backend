@@ -10,11 +10,10 @@ services:
     image: grafana/grafana
     container_name: grafana
     ports:
-      - 3001:3000
+      - 3000:3000
     volumes:
       - ./docker/docker_data/grafana-data:/var/lib/grafana
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+
     networks:
       - einvoice-nw
 
@@ -24,8 +23,7 @@ services:
     ports:
       - 3100:3100
     volumes:
-      - ./docker/loki-config.yaml:/etc/loki/local-config.yaml
-    command: -config.file=/etc/loki/local-config.yaml
+      - ./docker/loki-config.yaml:/etc/loki/loki.yaml
     networks:
       - einvoice-nw
 
@@ -61,24 +59,6 @@ services:
     volumes:
       - ./docker/docker_data/kafka_data/bitnami_data:/bitnami/kafka
     restart: unless-stopped
-
-  # kafka-ui:
-  #   container_name: kafka-ui
-  #   image: provectuslabs/kafka-ui:latest
-  #   ports:
-  #     - 8080:8080
-  #   depends_on:
-  #     - kafka
-  #   networks:
-  #     - einvoice-nw
-  #   environment:
-  #     KAFKA_CLUSTERS_0_NAME: local
-  #     KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
-  #     KAFKA_CLUSTERS_0_METRICS_PORT: 9997
-  #     SERVER_SERVLET_CONTEXT_PATH: /
-  #     AUTH_TYPE: 'LOGIN_FORM'
-  #     SPRING_SECURITY_USER_NAME: admin
-  #     SPRING_SECURITY_USER_PASSWORD: pass
 
   mongodb:
     image: mongo
