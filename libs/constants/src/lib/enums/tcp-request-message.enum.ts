@@ -25,6 +25,10 @@ enum USER {
   CREATE = 'user.create',
 }
 
+enum KEYCLOAK {
+  CREATE_USER = 'keycloak.create_user',
+}
+
 export const TCP_REQUEST_MESSAGE = {
   /* Invoice */
   INVOICE,
@@ -40,4 +44,7 @@ export const TCP_REQUEST_MESSAGE = {
 
   /* USER */
   USER,
+
+  /* KEYCLOAK */
+  KEYCLOAK,
 };

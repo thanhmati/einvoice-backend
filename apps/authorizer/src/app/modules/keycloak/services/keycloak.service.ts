@@ -7,6 +7,9 @@ import { GRPC_SERVICES } from '@common/configuration';
 import { ClientGrpc } from '@nestjs/microservices';
 import { UserAccessService } from '@common/interfaces/grpc/user-access';
 import { firstValueFrom, map } from 'rxjs';
+import { Role } from '@common/schemas/role.schema';
+import { CreateKeycloakUserTcpReq } from '@common/interfaces/tcp/authorizer';
+import { KeycloakHttpService } from './keycloak-http.service';
 
 @Injectable()
 export class KeycloakService {
@@ -18,6 +21,7 @@ export class KeycloakService {
 
   constructor(
     private readonly configService: ConfigService,
+    private readonly keycloakHttpService: KeycloakHttpService,
     @Inject(GRPC_SERVICES.USER_ACCESS_SERVICE) private readonly grpcClient: ClientGrpc,
   ) {
     this.host = this.configService.get('KEYCLOAK_CONFIG.HOST');
@@ -44,15 +48,16 @@ export class KeycloakService {
       const publicKey = key.getPublicKey();
 
       const payload = jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as JwtPayload;
-      this.logger.debug('JWT payload: ', payload);
 
       const user = await this.userValidation(payload.sub, processID);
+
+      this.logger.debug('User: ', user);
 
       return {
         valid: true,
         metadata: {
           jwt: payload,
-          permissions: [],
+          permissions: (user.roles as unknown as Role[]).map((role) => role.permissions).flat(),
           userId: payload.sub,
           user,
         },
@@ -68,12 +73,16 @@ export class KeycloakService {
       this.userAccessService.getByUserId({ userId, processID }).pipe(map((data) => data.data)),
     );
 
-    this.logger.debug('User: ', user);
+    this.logger.debug('User', user);
 
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
 
     return user;
+  }
+
+  createUser(data: CreateKeycloakUserTcpReq) {
+    return this.keycloakHttpService.createUser(data);
   }
 }

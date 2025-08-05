@@ -18,8 +18,8 @@ async function bootstrap() {
     app.connectMicroservice<MicroserviceOptions>({
       transport: Transport.TCP,
       options: {
-        port: 3203,
-        host: '127.0.0.1',
+        port: AppModule.CONFIGURATION.TCP_SERV.TCP_MEDIA_SERVICE.options.port,
+        host: AppModule.CONFIGURATION.TCP_SERV.TCP_MEDIA_SERVICE.options.host,
       },
     });
 

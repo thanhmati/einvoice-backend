@@ -12,7 +12,7 @@
     "docker:start:provider": "docker compose -f docker-compose.provider.yaml up -d",
     "docker:start:dev": "docker compose -f docker-compose.dev.yaml up -d",
     "build": "pnpm nx:run-many -t build && pnpm docker-build && pnpm docker:start:provider && pnpm docker:start:dev",
-    "dev": "pnpm nx:reset && pnpm nx:run-many -t serve  --projects=bff,invoice,authorizer",
+    "dev": "pnpm nx:reset && pnpm nx:run-many -t serve  --projects=bff,invoice,authorizer,user-access",
     "prepare": "husky"
   },
   "private": true,

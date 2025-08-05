@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { CONFIGURATION } from '../configuration';
+import { CONFIGURATION, TConfiguration } from '../configuration';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { PdfModule } from './modules/pdf/pdf.module';
 
@@ -16,4 +16,6 @@ import { PdfModule } from './modules/pdf/pdf.module';
 
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  static CONFIGURATION: TConfiguration = CONFIGURATION;
+}

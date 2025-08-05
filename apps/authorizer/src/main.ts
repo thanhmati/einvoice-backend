@@ -16,6 +16,14 @@ async function bootstrap() {
     });
 
     app.connectMicroservice<MicroserviceOptions>({
+      transport: Transport.TCP,
+      options: {
+        port: AppModule.CONFIGURATION.TCP_SERV.TCP_AUTHORIZER_SERVICE.options.port,
+        host: AppModule.CONFIGURATION.TCP_SERV.TCP_AUTHORIZER_SERVICE.options.host,
+      },
+    });
+
+    app.connectMicroservice<MicroserviceOptions>({
       transport: Transport.GRPC,
       options: {
         package: AppModule.CONFIGURATION.GRPC_SERV.GRPC_AUTHORIZER_SERVICE.name,

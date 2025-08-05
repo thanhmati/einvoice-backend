@@ -3,7 +3,13 @@ syntax = "proto3";
 package GRPC_USER_ACCESS_SERVICE;
 
 service UserAccessService {
-  rpc getByUserId (UserById) returns (User);
+  rpc getByUserId (UserById) returns (UserResponse);
+}
+
+message UserResponse {
+  string code = 1;
+  User data = 2;
+  string error = 3;
 }
 
 message Role {
@@ -25,3 +31,4 @@ message UserById {
   string userId = 1;
   string processID = 2;
 }
+

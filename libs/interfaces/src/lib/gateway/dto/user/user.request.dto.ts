@@ -21,4 +21,9 @@ export class CreateUserRequestDto {
   @IsString({ each: true })
   @IsArray()
   roles: string[];
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  password: string;
 }

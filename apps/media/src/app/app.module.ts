@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { CONFIGURATION } from '../configuration';
+import { CONFIGURATION, TConfiguration } from '../configuration';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { MediaModule } from './modules/media/media.module';
 
@@ -15,4 +15,6 @@ import { MediaModule } from './modules/media/media.module';
   ],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  static CONFIGURATION: TConfiguration = CONFIGURATION;
+}

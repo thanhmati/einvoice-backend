@@ -1,4 +1,4 @@
-import { BaseConfiguration, AppConfiguration, CloudinaryConfiguration } from '@common/configuration';
+import { BaseConfiguration, AppConfiguration, CloudinaryConfiguration, TcpConfiguration } from '@common/configuration';
 import { ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -6,6 +6,10 @@ class Configuration extends BaseConfiguration {
   @ValidateNested()
   @Type(() => AppConfiguration)
   APP_CONFIG = new AppConfiguration();
+
+  @ValidateNested()
+  @Type(() => TcpConfiguration)
+  TCP_SERV = new TcpConfiguration();
 
   @ValidateNested()
   @Type(() => CloudinaryConfiguration)

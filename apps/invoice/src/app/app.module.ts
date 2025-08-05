@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { CONFIGURATION } from '../configuration';
+import { CONFIGURATION, TConfiguration } from '../configuration';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { ProductModule } from './modules/product/product.module';
 import { KafkaModule } from '@common/queue/modules/kafka/kafka.module';
@@ -19,4 +19,6 @@ import { KAFKA_SERVICES } from '@common/constants/enums/kafka.enum';
 
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  static CONFIGURATION: TConfiguration = CONFIGURATION;
+}

@@ -15,7 +15,7 @@ export class UserRepository {
   }
 
   getByUserId(userId: string) {
-    return this.userModel.findOne({ userId }).exec();
+    return this.userModel.findOne({ userId }).populate('roles').exec();
   }
 
   getByEmail(email: string) {
