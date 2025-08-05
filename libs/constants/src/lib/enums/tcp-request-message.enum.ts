@@ -27,6 +27,7 @@ enum USER {
 
 enum KEYCLOAK {
   CREATE_USER = 'keycloak.create_user',
+  LOGIN = 'keycloak.login',
 }
 
 export const TCP_REQUEST_MESSAGE = {

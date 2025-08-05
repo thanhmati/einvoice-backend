@@ -8,7 +8,7 @@ import { ClientGrpc } from '@nestjs/microservices';
 import { UserAccessService } from '@common/interfaces/grpc/user-access';
 import { firstValueFrom, map } from 'rxjs';
 import { Role } from '@common/schemas/role.schema';
-import { CreateKeycloakUserTcpReq } from '@common/interfaces/tcp/authorizer';
+import { CreateKeycloakUserTcpReq, LoginTcpRequest, LoginTcpResponse } from '@common/interfaces/tcp/authorizer';
 import { KeycloakHttpService } from './keycloak-http.service';
 
 @Injectable()
@@ -87,5 +87,13 @@ export class KeycloakService {
 
   createUser(data: CreateKeycloakUserTcpReq) {
     return this.keycloakHttpService.createUser(data);
+  }
+
+  async login(data: LoginTcpRequest): Promise<LoginTcpResponse> {
+    const result = await this.keycloakHttpService.exchangeUserToken(data);
+    return {
+      accessToken: result.access_token,
+      refreshToken: result.refresh_token,
+    };
   }
 }

@@ -10,6 +10,7 @@ import { UserModule } from './modules/user/user.module';
 import { ClientsModule } from '@nestjs/microservices';
 import { GRPC_SERVICES, GrpcProvider } from '@common/configuration';
 import { UserGuard } from '@common/guard/user.guard';
+import { AuthorizerModule } from './modules/authorizer/authorizer.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { UserGuard } from '@common/guard/user.guard';
     ProductModule,
     InvoiceModule,
     UserModule,
+    AuthorizerModule,
   ],
   controllers: [],
   providers: [
