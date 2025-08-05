@@ -12,6 +12,8 @@ Repo này là một **hệ thống E-Invoice hoàn chỉnh** được xây dựn
 - ✅ **Production-ready practices** (logging, error handling, validation)
 - ✅ **Authentication Integration** với Keycloak
 - ✅ **Docker Containerization** và deployment
+- ✅ **Centralized Logging** với Grafana + Loki + Promtail
+- ✅ **Real-time Monitoring** và log aggregation
 
 ---
 
@@ -28,7 +30,10 @@ Repo này là một **hệ thống E-Invoice hoàn chỉnh** được xây dựn
 ├── 🔐 Authorizer Service - gRPC Microservice
 ├── 🗄️ MongoDB - Port 27017 (Document database)
 ├── 📨 Kafka - Port 9092 (Event streaming)
-└── 🔑 Keycloak - Port 8180 (Identity & Access Management)
+├── 🔑 Keycloak - Port 8180 (Identity & Access Management)
+├── 📊 Grafana - Port 3001 (Monitoring Dashboard)
+├── 📋 Loki - Port 3100 (Log Aggregation Server)
+└── 📡 Promtail - Log Collection Agent
 ```
 
 ### 🔄 Communication Patterns (Thực Tế)
@@ -69,8 +74,9 @@ Repo này là một **hệ thống E-Invoice hoàn chỉnh** được xây dựn
 ### **Buổi 9-10: Shared Libraries & Infrastructure** (4 giờ)
 - Nx monorepo structure và shared libraries
 - Error handling, logging, validation patterns
+- Centralized logging với Grafana + Loki + Promtail
 - Docker deployment strategy
-- **Thực hành**: Tạo shared library, deploy với Docker
+- **Thực hành**: Setup logging stack, tạo shared library, deploy với Docker
 
 ### **Buổi 11-12: Advanced Topics** (4 giờ)
 - Keycloak integration cho authentication
@@ -100,7 +106,7 @@ cd <repo-name>
 # Install dependencies
 pnpm install
 
-# Start infrastructure services (MongoDB, Kafka, Keycloak)
+# Start infrastructure services (MongoDB, Kafka, Keycloak, Logging Stack)
 pnpm docker:start:provider
 
 # Build all services
@@ -122,6 +128,8 @@ pnpm dev-lite
 ### 3. **Demo Flow (Thực Tế)**
 1. **Access Swagger UI**: `http://localhost:3000/api/v1/docs`
 2. **Keycloak Admin**: `http://localhost:8180` (admin/admin)
+3. **Grafana Dashboard**: `http://localhost:3001` (admin/admin)
+4. **Loki API**: `http://localhost:3100`
 3. **Create Invoice**: POST `/api/v1/invoice`
    ```json
    {
@@ -141,12 +149,13 @@ pnpm dev-lite
      "vatAmount": 20000
    }
    ```
-4. **Send Invoice**: POST `/api/v1/invoice/{invoiceId}/send`
-5. **Verify Flow**:
+5. **Send Invoice**: POST `/api/v1/invoice/{invoiceId}/send`
+6. **Verify Flow**:
    - Invoice status: `created` → `sent`
    - PDF generated và uploaded to Cloudinary
    - Kafka event `invoice.sent` published
    - Mail service consumes event và sends email
+   - All logs collected và visible trong Grafana dashboard
 
 ---
 
@@ -174,6 +183,8 @@ pnpm dev-lite
 ├── libs/decorators/src/lib/                # Custom decorators (@KafkaHandler)
 ├── libs/middlewares/src/lib/               # Request logging middleware
 ├── libs/interceptors/src/lib/              # Global error handling
+├── docker/loki-config.yaml                 # Loki log aggregation config
+├── docker/promtail-config.yaml             # Promtail log collection config
 └── docker-compose.*.yaml                   # Docker deployment configuration
 ```
 
@@ -187,6 +198,8 @@ pnpm dev-lite
 - **Docker Compose** cho infrastructure và application deployment
 - **Kafka** với custom decorators cho event handling
 - **Keycloak** integration cho enterprise authentication
+- **Grafana + Loki + Promtail** stack cho centralized logging
+- **Real-time log monitoring** với dashboard và alerting
 
 ### **2. Best Practices Được Áp Dụng**
 - ✅ **Repository Pattern** - Clean data access layer
@@ -197,6 +210,9 @@ pnpm dev-lite
 - ✅ **Configuration Management** - Environment-based config
 - ✅ **Custom Decorators** - @KafkaHandler cho event handling
 - ✅ **Auto-Discovery** - Kafka consumers tự động register
+- ✅ **Centralized Logging** - Docker container log aggregation
+- ✅ **Log Monitoring** - Real-time log streaming và search
+- ✅ **Observability** - Process tracking across services
 
 ### **3. Real-World Patterns (Thực Tế)**
 - **API Gateway** (BFF) với authentication guard
@@ -220,13 +236,17 @@ pnpm dev-lite
 6. **Invoice Approval Workflow**: Thêm approval process với supervisor
 7. **Custom Kafka Topics**: Implement `invoice.cancelled` event
 8. **Database Indexing**: Optimize MongoDB queries với indexes
+9. **Logging Dashboard**: Tạo custom Grafana dashboard cho monitoring
+10. **Log Alerting**: Setup alerts cho error patterns trong logs
 
 ### **Khó** (Buổi 9-12)
-9. **Keycloak Integration**: Implement full JWT authentication flow
-10. **Redis Caching**: Add caching layer cho invoice queries
-11. **Distributed Tracing**: Implement correlation ID across services
-12. **Automated Testing**: Unit + Integration + E2E test suite
-13. **Production Monitoring**: Health checks, metrics, logging aggregation
+11. **Keycloak Integration**: Implement full JWT authentication flow
+12. **Redis Caching**: Add caching layer cho invoice queries
+13. **Distributed Tracing**: Implement correlation ID across services
+14. **Automated Testing**: Unit + Integration + E2E test suite
+15. **Production Monitoring**: Health checks, metrics, logging aggregation
+16. **Advanced LogQL**: Complex log queries và pattern extraction
+17. **Log Retention Policies**: Configure log rotation và storage optimization
 
 ---
 
@@ -245,8 +265,9 @@ pnpm dev-lite
 - ⚠️ **Kafka Topics**: Hiện tại chỉ có `invoice.sent`, có thể mở rộng
 - ⚠️ **Authentication**: Keycloak setup cần configuration thêm
 - ⚠️ **Testing**: Cần thêm comprehensive test coverage
-- ⚠️ **Monitoring**: Chưa có observability tools (Grafana, Prometheus)
+- ⚠️ **Metrics Collection**: Chưa có Prometheus metrics (chỉ có logs)
 - ⚠️ **Error Recovery**: Kafka consumer error handling có thể enhance
+- ⚠️ **Log Retention**: Default filesystem storage, cần configure retention policies
 
 ### **Challenges Học Viên Có Thể Gặp**
 1. **Docker Networking**: Hiểu `einvoice-nw` network và service discovery
@@ -254,6 +275,8 @@ pnpm dev-lite
 3. **Kafka Events**: Event-driven thinking và async processing
 4. **gRPC vs TCP**: Khi nào dùng gRPC vs TCP
 5. **Nx Monorepo**: Shared libraries và build dependencies
+6. **LogQL Syntax**: Learning Loki query language cho log analysis
+7. **Log Volume**: Managing high-volume logs trong development environment
 
 ### **Tips Giảng Dạy**
 - **Start Simple**: Begin với BFF → Invoice flow trước khi vào Kafka
@@ -261,6 +284,8 @@ pnpm dev-lite
 - **Live Demo**: Show Swagger UI và real API calls
 - **Debug Together**: Show Docker logs và error handling
 - **Code Walkthrough**: Explain design patterns trong context
+- **Logging Demo**: Show real-time logs trong Grafana dashboard
+- **Log Analysis**: Demonstrate LogQL queries cho debugging
 
 ---
 

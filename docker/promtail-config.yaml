@@ -24,10 +24,7 @@ scrape_configs:
         target_label: app
         replacement: $1
 
-      # Tùy chọn: lọc chỉ container có tên nhất định
+      # Lọc chỉ E-Invoice application containers
       - source_labels: [__meta_docker_container_name]
-        regex: /invoice.*
-        action: keep
-      - source_labels: [__meta_docker_container_name]
-        regex: /bff.*
+        regex: /(bff|invoice|mail|media|pdf-generator|user-access|authorizer).*
         action: keep
