@@ -10,6 +10,7 @@ import { getAccessToken, setUserData } from '@common/utils/request.util';
 import { getProcessId } from '@common/utils/string.utils';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import crypto from 'crypto';
 
 @Injectable()
 export class UserGuard implements CanActivate {
@@ -37,9 +38,14 @@ export class UserGuard implements CanActivate {
     return this.verifyUserToken(req);
   }
 
+  generateTokenCacheKey(token: string): string {
+    const hash = crypto.createHash('sha256').update(token).digest('hex');
+    return `user-token:${hash}`;
+  }
+
   private verifyUserToken(req: any): Observable<boolean> {
     const token = getAccessToken(req);
-    const cacheKey = `user-data:${token}`;
+    const cacheKey = this.generateTokenCacheKey(token);
 
     const processID = req[MetadataKeys.PROCESS_ID] || getProcessId('einvoice-app');
     req[MetadataKeys.PROCESS_ID] = processID;

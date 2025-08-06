@@ -85,3 +85,15 @@ services:
     restart: unless-stopped
     volumes:
       - ./docker/docker_data/keycloak_data:/opt/keycloak/data
+
+  redis:
+    image: redis
+    container_name: redis_server
+    hostname: redis
+    ports:
+      - '6379:6379'
+    networks:
+      - einvoice-nw
+    restart: unless-stopped
+    volumes:
+      - ./docker/docker_data/redis_data:/data

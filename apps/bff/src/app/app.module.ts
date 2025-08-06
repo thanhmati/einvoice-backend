@@ -11,7 +11,7 @@ import { ClientsModule } from '@nestjs/microservices';
 import { GRPC_SERVICES, GrpcProvider } from '@common/configuration';
 import { UserGuard } from '@common/guard/user.guard';
 import { AuthorizerModule } from './modules/authorizer/authorizer.module';
-import { CacheModule } from '@nestjs/cache-manager';
+import { RedisProvider } from '@common/configuration';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { CacheModule } from '@nestjs/cache-manager';
       isGlobal: true,
       load: [() => ({ ...CONFIGURATION })],
     }),
-    CacheModule.register(),
+    RedisProvider,
     ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)]),
     ProductModule,
     InvoiceModule,
