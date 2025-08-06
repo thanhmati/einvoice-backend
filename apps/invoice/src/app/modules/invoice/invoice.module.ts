@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { InvoiceController } from './controllers/invoice.controller';
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceRepository } from './repositories/invoice.repository';
@@ -16,9 +16,10 @@ import { PaymentModule } from '../payment/payment.module';
       TcpProvider(TCP_SERVICES.PDF_GENERATOR_SERVICE),
       TcpProvider(TCP_SERVICES.MEDIA_SERVICE),
     ]),
-    PaymentModule,
+    forwardRef(() => PaymentModule),
   ],
   controllers: [InvoiceController],
   providers: [InvoiceService, InvoiceRepository],
+  exports: [InvoiceService],
 })
 export class InvoiceModule {}

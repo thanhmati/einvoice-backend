@@ -18,6 +18,7 @@ async function bootstrap() {
 
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: isDev ? ['error', 'warn', 'log', 'debug', 'verbose'] : ['error', 'warn', 'log'],
+      rawBody: true,
     });
 
     app.enableCors({

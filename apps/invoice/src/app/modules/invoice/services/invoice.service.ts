@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InvoiceRepository } from '../repositories/invoice.repository';
 import {
   CreateInvoiceTcpReq,
@@ -28,7 +28,7 @@ export class InvoiceService {
     @Inject(TCP_SERVICES.PDF_GENERATOR_SERVICE) private readonly pdfGeneratorClient: TcpClient,
     @Inject(TCP_SERVICES.MEDIA_SERVICE) private readonly mediaClient: TcpClient,
     private readonly KafkaClient: KafkaClient,
-    private readonly paymentService: PaymentService,
+    @Inject(forwardRef(() => PaymentService)) private readonly paymentService: PaymentService,
   ) {}
 
   create(params: CreateInvoiceTcpReq) {
@@ -122,5 +122,11 @@ export class InvoiceService {
         })
         .pipe(map((data) => data.data)),
     );
+  }
+
+  paySuccess(invoiceId: string) {
+    return this.invoiceRepository.updateById(invoiceId, {
+      status: INVOICE_STATUS.PAID,
+    });
   }
 }

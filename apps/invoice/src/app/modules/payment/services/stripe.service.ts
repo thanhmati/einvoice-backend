@@ -40,4 +40,8 @@ export class StripeService {
       sessionId: session.id,
     };
   }
+
+  verifyWebhookSignature(body: Buffer, signature: string) {
+    return this.stripe.webhooks.constructEvent(body, signature, this.configService.get('STRIPE_CONFIG.WEBHOOK_SECRET'));
+  }
 }

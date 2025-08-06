@@ -30,6 +30,10 @@ enum KEYCLOAK {
   LOGIN = 'keycloak.login',
 }
 
+enum PAYMENT {
+  STRIPE_WEBHOOK = 'payment.stripe_webhook',
+}
+
 export const TCP_REQUEST_MESSAGE = {
   /* Invoice */
   INVOICE,
@@ -48,4 +52,7 @@ export const TCP_REQUEST_MESSAGE = {
 
   /* KEYCLOAK */
   KEYCLOAK,
+
+  /* PAYMENT */
+  PAYMENT,
 };

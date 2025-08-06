@@ -12,6 +12,7 @@ import { GRPC_SERVICES, GrpcProvider } from '@common/configuration';
 import { UserGuard } from '@common/guard/user.guard';
 import { AuthorizerModule } from './modules/authorizer/authorizer.module';
 import { RedisProvider } from '@common/configuration';
+import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { RedisProvider } from '@common/configuration';
     ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)]),
     ProductModule,
     InvoiceModule,
+    PaymentModule,
     UserModule,
     AuthorizerModule,
   ],
