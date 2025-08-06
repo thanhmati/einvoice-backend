@@ -251,16 +251,26 @@ Content-Type: application/json
 }
 ```
 
-### 2. Gửi Invoice (Trigger PDF + Email)
+### 2. Gửi Invoice (Trigger PDF + Email + Stripe Payment)
 ```bash
 POST http://localhost:3000/api/v1/invoice/{invoiceId}/send
 ```
 
-### 3. Kiểm tra Flow
-- Invoice status chuyển từ `created` → `sent`
+- Khi gửi invoice, hệ thống sẽ:
+  - Generate PDF và upload lên Cloudinary
+  - Tạo link thanh toán Stripe (Checkout Session)
+  - Gửi email cho khách hàng kèm PDF và link thanh toán Stripe
+
+### 3. Thanh Toán Invoice qua Stripe
+- Khách hàng nhận email, bấm vào link thanh toán Stripe để thực hiện thanh toán online.
+- Sau khi thanh toán thành công, Stripe sẽ gọi webhook về hệ thống để cập nhật trạng thái invoice thành `paid`.
+
+### 4. Kiểm tra Flow
+- Invoice status chuyển từ `created` → `sent` → `paid`
 - PDF được generate và upload lên Cloudinary
 - Kafka event được publish
-- Mail service consume event và gửi email với PDF attachment
+- Mail service consume event và gửi email với PDF attachment và link thanh toán Stripe
+- Stripe webhook cập nhật trạng thái invoice khi thanh toán thành công
 
 ---
 

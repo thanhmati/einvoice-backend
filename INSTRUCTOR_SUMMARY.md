@@ -155,10 +155,11 @@ pnpm dev-lite
    ```
 5. **Send Invoice**: POST `/api/v1/invoice/{invoiceId}/send`
 6. **Verify Flow**:
-   - Invoice status: `created` → `sent`
+   - Invoice status: `created` → `sent` → `paid`
    - PDF generated và uploaded to Cloudinary
    - Kafka event `invoice.sent` published
-   - Mail service consumes event và sends email
+   - Mail service consumes event và sends email (kèm PDF + link thanh toán Stripe)
+   - Khách hàng thanh toán qua link Stripe, Stripe webhook cập nhật trạng thái invoice thành `paid`
    - All logs collected và visible trong Grafana dashboard
 
 ---
@@ -222,8 +223,8 @@ pnpm dev-lite
 - **API Gateway** (BFF) với authentication guard
 - **Event Sourcing** với Kafka topics (`invoice.sent`)
 - **Mixed Communication**: TCP (sync), gRPC (auth), Kafka (async)
-- **File Processing Pipeline**: PDF generation → Cloud storage → Email attachment
-- **Business State Management**: Invoice lifecycle với validation
+- **File Processing Pipeline**: PDF generation → Cloud storage → Email attachment + Stripe payment link
+- **Business State Management**: Invoice lifecycle với validation và trạng thái `paid` qua Stripe webhook
 
 ---
 

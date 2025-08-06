@@ -118,7 +118,7 @@ graph TB
 ```mermaid
 sequenceDiagram
     participant C as 🌐 Client
-    participant B as 🚪 BFF
+    participant B as 🏠 BFF
     participant I as 📄 Invoice Service
     participant P as 📄 PDF Generator
     participant M as 📁 Media Service
@@ -127,6 +127,7 @@ sequenceDiagram
     participant DB as 🗄️ MongoDB
     participant Cloud as ☁️ Cloudinary
     participant SMTP as 📮 SMTP
+    participant Stripe as 💳 Stripe
 
     Note over C,SMTP: 🔄 COMPLETE INVOICE WORKFLOW
 
@@ -141,9 +142,9 @@ sequenceDiagram
         B-->>C: ✅ Invoice created successfully
     end
 
-    %% 2. Send Invoice (Complex Flow)
+    %% 2. Send Invoice (Trigger PDF + Email + Stripe Payment)
     rect rgb(255, 248, 240)
-        Note over C,SMTP: 📤 Phase 2: Send Invoice (Trigger PDF & Email)
+        Note over C,SMTP: 📤 Phase 2: Send Invoice (Trigger PDF, Email, Stripe)
         C->>B: POST /api/v1/invoice/:id/send
         B->>I: TCP: SEND_INVOICE
         
@@ -161,13 +162,18 @@ sequenceDiagram
         Cloud-->>M: Public URL
         M-->>I: File URL
         
+        %% Stripe Payment Link
+        Note over I,Stripe: 💳 Stripe Payment Link
+        I->>Stripe: Create Checkout Session
+        Stripe-->>I: Payment Link (session.url)
+        
         %% Update Database
         I->>DB: UPDATE invoice SET status='SENT', fileUrl='...', supervisorId
         DB-->>I: Invoice updated
         
         %% Kafka Event
         Note over I,Mail: 📨 Async Event Processing
-        I->>K: PUBLISH: invoice.sent event
+        I->>K: PUBLISH: invoice.sent event (kèm paymentLink)
         I-->>B: ✅ Invoice sent successfully
         B-->>C: ✅ Success response
     end
@@ -181,11 +187,22 @@ sequenceDiagram
         DB-->>I: Invoice with fileUrl
         I-->>Mail: Complete invoice data
         
-        Mail->>Mail: Render email template
+        Mail->>Mail: Render email template (kèm link thanh toán Stripe)
         Mail->>Cloud: Download PDF from URL
         Cloud-->>Mail: PDF file
-        Mail->>SMTP: Send email with PDF attachment
+        Mail->>SMTP: Send email with PDF attachment + Stripe payment link
         SMTP-->>Mail: ✅ Email sent
+    end
+
+    %% 4. Stripe Payment & Webhook
+    rect rgb(240,255,240)
+        Note over Stripe,I: 💳 Stripe Payment & Webhook
+        C->>Stripe: Truy cập link thanh toán Stripe
+        Stripe->>C: Giao diện thanh toán
+        C->>Stripe: Thanh toán thành công
+        Stripe->>I: Webhook: checkout.session.completed (metadata.invoiceId)
+        I->>DB: UPDATE invoice SET status='PAID'
+        DB-->>I: Invoice updated (status: PAID)
     end
 ```
 
@@ -1301,14 +1318,18 @@ async cancelById(id: string) {
 3. Return detailed error messages
 4. Test validation scenarios
 
-### Bài 4: Implement Health Checks
-**Mục tiêu**: Add health monitoring
+### Bài 4: Tích hợp Stripe Payment cho Invoice
+**Mục tiêu**: Thực hành tích hợp thanh toán Stripe cho invoice và xử lý webhook cập nhật trạng thái.
 
 **Yêu cầu**:
-1. Add health check endpoints
-2. Check database connectivity
-3. Check Kafka connectivity
-4. Return service status
+1. Khi gửi invoice, tạo link thanh toán Stripe và gửi kèm trong email cho khách hàng.
+2. Khi khách hàng thanh toán thành công qua Stripe, webhook Stripe sẽ cập nhật trạng thái invoice thành `paid`.
+3. Kiểm tra trạng thái invoice trên hệ thống sau khi thanh toán.
+
+**Gợi ý kiểm thử**:
+- Gửi invoice, kiểm tra email nhận được có link thanh toán Stripe.
+- Thực hiện thanh toán thử qua link Stripe (có thể dùng test card của Stripe).
+- Kiểm tra trạng thái invoice chuyển sang `paid` sau khi webhook được gọi.
 
 ### Bài 5: Centralized Logging Setup
 **Mục tiêu**: Enable và configure Grafana + Loki + Promtail
