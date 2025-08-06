@@ -7,7 +7,7 @@ import {
   SendInvoiceTcpReq,
   UpdateInvoiceTcpReq,
 } from '@common/interfaces/tcp/invoice';
-import { invoiceRequestMapping } from '../mappers';
+import { createCheckoutSessionMapping, invoiceRequestMapping } from '../mappers';
 import { ERROR_CODE } from '@common/constants/enums/error-code.enum';
 import { INVOICE_STATUS } from '@common/constants/invoice.constant';
 import { TCP_SERVICES } from '@common/configuration';
@@ -19,6 +19,7 @@ import { KafkaClient } from '@common/queue/modules/kafka/services/kafka-client.s
 import { InvoiceSentPayload } from '@common/interfaces/queue/invoice';
 import { KAFKA_TOPICS } from '@common/constants/kafka.constant';
 import { ObjectId } from 'mongodb';
+import { PaymentService } from '../../payment/services/payment.service';
 
 @Injectable()
 export class InvoiceService {
@@ -27,6 +28,7 @@ export class InvoiceService {
     @Inject(TCP_SERVICES.PDF_GENERATOR_SERVICE) private readonly pdfGeneratorClient: TcpClient,
     @Inject(TCP_SERVICES.MEDIA_SERVICE) private readonly mediaClient: TcpClient,
     private readonly KafkaClient: KafkaClient,
+    private readonly paymentService: PaymentService,
   ) {}
 
   create(params: CreateInvoiceTcpReq) {
@@ -84,6 +86,7 @@ export class InvoiceService {
 
     const pdfBase64 = await this.generatorInvoicePdf({ ...invoice.toObject(), status: INVOICE_STATUS.SENT }, invoiceId);
     const pdfUrl = await this.uploadFile({ fileBase64: pdfBase64, fileName: `invoice-${invoiceId}` }, processID);
+    const checkoutSession = await this.paymentService.createCheckoutSession(createCheckoutSessionMapping(invoice));
 
     const invoiceSent = await this.invoiceRepository.updateById(invoiceId, {
       status: INVOICE_STATUS.SENT,
@@ -91,7 +94,10 @@ export class InvoiceService {
       supervisorId: new ObjectId(userId),
     });
 
-    this.KafkaClient.send<InvoiceSentPayload>(KAFKA_TOPICS.INVOICE.SENT, { id: invoiceId });
+    this.KafkaClient.send<InvoiceSentPayload>(KAFKA_TOPICS.INVOICE.SENT, {
+      id: invoiceId,
+      paymentLink: checkoutSession.url,
+    });
 
     return invoiceSent;
   }

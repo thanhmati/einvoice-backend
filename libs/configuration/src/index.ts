@@ -8,3 +8,4 @@ export * from './lib/mail.config';
 export * from './lib/keycloak.config';
 export * from './lib/grpc.config';
 export * from './lib/redis.config';
+export * from './lib/stripe.config';

@@ -6,6 +6,7 @@ import { MongoProvider, TCP_SERVICES, TcpProvider } from '@common/configuration'
 import { MongooseModule } from '@nestjs/mongoose';
 import { InvoiceDestination } from '@common/schemas/invoice/invoice.schema';
 import { ClientsModule } from '@nestjs/microservices';
+import { PaymentModule } from '../payment/payment.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ClientsModule } from '@nestjs/microservices';
       TcpProvider(TCP_SERVICES.PDF_GENERATOR_SERVICE),
       TcpProvider(TCP_SERVICES.MEDIA_SERVICE),
     ]),
+    PaymentModule,
   ],
   controllers: [InvoiceController],
   providers: [InvoiceService, InvoiceRepository],

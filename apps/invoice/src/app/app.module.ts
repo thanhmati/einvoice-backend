@@ -5,6 +5,7 @@ import { InvoiceModule } from './modules/invoice/invoice.module';
 import { ProductModule } from './modules/product/product.module';
 import { KafkaModule } from '@common/queue/modules/kafka/kafka.module';
 import { KAFKA_SERVICES } from '@common/constants/enums/kafka.enum';
+import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { KAFKA_SERVICES } from '@common/constants/enums/kafka.enum';
     }),
     InvoiceModule,
     ProductModule,
+    PaymentModule,
     KafkaModule.forProducerAsync({ serviceName: KAFKA_SERVICES.INVOICE }),
   ],
 

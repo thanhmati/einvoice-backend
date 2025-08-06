@@ -16,14 +16,15 @@ export class MailInvoiceService {
     private readonly mailTemplateService: MailTemplateService,
   ) {}
 
-  async sendInvoiceCreated(payload: InvoiceSentPayload) {
-    const { id: invoiceId } = payload;
+  async sendInvoice(payload: InvoiceSentPayload) {
+    const { id: invoiceId, paymentLink } = payload;
 
     const invoice = await this.getInvoiceById(invoiceId);
     const html = await this.mailTemplateService.render('invoice', {
       clientName: invoice.client.name,
       senderName: 'Tan Thanh DEV',
       invoiceCode: `#${invoice.id}`,
+      paymentLink,
     });
 
     const attachment = await this.mailService.getAttachmentFromUrl(

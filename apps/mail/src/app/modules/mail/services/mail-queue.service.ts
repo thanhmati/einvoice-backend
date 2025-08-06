@@ -10,9 +10,9 @@ export class MailQueueService {
   constructor(private readonly mailInvoiceService: MailInvoiceService) {}
 
   @KafkaHandler(KAFKA_TOPICS.INVOICE.SENT)
-  async eventInvoiceCreated(payload: KafkaPayload<InvoiceSentPayload>) {
+  async eventInvoiceSent(payload: KafkaPayload<InvoiceSentPayload>) {
     const { message } = payload;
 
-    await this.mailInvoiceService.sendInvoiceCreated(message);
+    await this.mailInvoiceService.sendInvoice(message);
   }
 }

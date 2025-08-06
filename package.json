@@ -46,6 +46,7 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "streamifier": "^0.1.1",
+    "stripe": "^18.4.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

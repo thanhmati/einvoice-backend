@@ -4,6 +4,7 @@ import {
   KafkaConfiguration,
   MongoConfiguration,
   TcpConfiguration,
+  StripeConfiguration,
 } from '@common/configuration';
 import { ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -24,6 +25,10 @@ class Configuration extends BaseConfiguration {
   @ValidateNested()
   @Type(() => TcpConfiguration)
   TCP_SERV = new TcpConfiguration();
+
+  @ValidateNested()
+  @Type(() => StripeConfiguration)
+  STRIPE_CONFIG = new StripeConfiguration();
 }
 
 export const CONFIGURATION = new Configuration();
