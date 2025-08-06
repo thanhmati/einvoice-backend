@@ -49,73 +49,67 @@ Hệ thống được thiết kế theo mô hình **Microservices Architecture**
 ### 1.2 Sơ Đồ Tổng Thể Hệ Thống
 
 ```mermaid
-graph TB
-    %% External Layer
-    Client["🌐 Client/Frontend"] --> BFF["🚪 BFF Service<br/>:3000 (HTTP)"]
-    
-    %% BFF Layer with Guard
-    BFF -->|"Guard Check"| UserGuard["🛡️ UserGuard<br/>(Cache Layer)"]
-    UserGuard -->|"gRPC: Authentication"| Auth["🔐 Authorizer<br/>(gRPC Service)"]
-    
-    %% BFF TCP Connections
-    BFF -->|"TCP: CRUD Invoice"| Invoice["📄 Invoice Service<br/>(TCP Microservice)"]
-    BFF -->|"TCP: User Management"| UserAccess["👤 User Access<br/>(TCP Microservice)"]
-    BFF -->|"HTTP: Webhook"| Payment["💳 Payment Service<br/>(Stripe Integration)"]
-    
-    %% Invoice Service TCP Connections
-    Invoice -->|"TCP: Generate PDF"| PDF["📄 PDF Generator<br/>(TCP Microservice)"]
-    Invoice -->|"TCP: Upload File"| Media["📁 Media Service<br/>(TCP Microservice)"]
-    Invoice -->|"TCP: Payment Processing"| Payment
-    
-    %% Mail Service Connections
-    Mail -->|"TCP: Get Invoice Details"| Invoice
-    
-    %% Kafka Asynchronous Events
-    Invoice -.->|"📨 Event: invoice.sent"| Kafka(("🔄 Kafka<br/>:9092"))
-    Kafka -.->|"📨 Consume Events"| Mail["📧 Mail Service<br/>(Kafka Consumer)"]
-    
-    %% Database Connections
-    Invoice -->|"Read/Write"| MongoDB[("🗄️ MongoDB<br/>:27017")]
-    UserAccess -->|"Read/Write"| MongoDB
-    
-    %% Cache Layer
-    UserGuard -->|"Token Cache"| Redis["🔴 Redis<br/>:6379"]
-    
-    %% External Services
-    Media -->|"Upload Files"| Cloudinary["☁️ Cloudinary"]
-    PDF -->|"HTML to PDF"| Puppeteer["🎭 Puppeteer Engine"]
-    Mail -->|"Send Email"| SMTP["📮 SMTP Server"]
-    Auth -->|"User Management"| Keycloak["🔑 Keycloak<br/>:8180"]
-    Payment -->|"Payment Processing"| Stripe["💳 Stripe<br/>(Payment Gateway)"]
-    
-    %% Logging Infrastructure
-    Promtail["📡 Promtail<br/>(Log Agent)"]
-    Loki["📋 Loki<br/>:3100"]
-    Grafana["📊 Grafana<br/>:3001"]
-    
-    %% Log Flow
-    BFF -.->|"Container Logs"| Promtail
-    Invoice -.->|"Container Logs"| Promtail
-    UserAccess -.->|"Container Logs"| Promtail
-    Mail -.->|"Container Logs"| Promtail
-    Payment -.->|"Container Logs"| Promtail
-    Promtail -->|"Ship Logs"| Loki
-    Loki -->|"Query Logs"| Grafana
-    
-    %% Styling
+---
+config:
+  theme: mc
+  look: neo
+  layout: dagre
+---
+flowchart TB
+    Client["🌐 Client/Frontend"] --> BFF["🚪 BFF Service<br>:3000 (HTTP)"]
+    BFF -- Guard Check --> UserGuard["🛡️ UserGuard<br>(Cache Layer)"]
+    UserGuard -- gRPC: Authentication --> Auth["🔐 Authorizer<br>(gRPC Service)"]
+    BFF -- TCP: CRUD Invoice --> Invoice["📄 Invoice Service<br>(TCP Microservice)"]
+    BFF -- TCP: User Management --> UserAccess["👤 User Access<br>(TCP Microservice)"]
+    BFF -- HTTP: Webhook --> Payment["💳 Payment Service<br>(Stripe Integration)"]
+    Invoice -- TCP: Generate PDF --> PDF["📄 PDF Generator<br>(TCP Microservice)"]
+    Invoice -- TCP: Upload File --> Media["📁 Media Service<br>(TCP Microservice)"]
+    Invoice -- TCP: Payment Processing --> Payment
+    Invoice -. "📨 Event: invoice.sent" .-> Kafka(("🔄 Kafka<br>:9092"))
+    Kafka -. 📨 Consume Events .-> Mail["📧 Mail Service<br>(Kafka Consumer)"]
+    Invoice -- Read/Write --> MongoDB[("🗄️ MongoDB<br>:27017")]
+    UserAccess -- Read/Write --> MongoDB
+    UserGuard -- Token Cache --> Redis["🔴 Redis<br>:6379"]
+    Media -- Upload Files --> Cloudinary["☁️ Cloudinary"]
+    PDF -- HTML to PDF --> Puppeteer["🎭 Puppeteer Engine"]
+    Mail -- Send Email --> SMTP["📮 SMTP Server"]
+    Auth -- User Management --> Keycloak["🔑 Keycloak<br>:8180"]
+    Payment -- Payment Processing --> Stripe["💳 Stripe<br>(Payment Gateway)"]
+    BFF -. Container Logs .-> Promtail["📡 Promtail<br>(Log Agent)"]
+    Invoice -. Container Logs .-> Promtail
+    UserAccess -. Container Logs .-> Promtail
+    Mail -. Container Logs .-> Promtail
+    Payment -. Container Logs .-> Promtail
+    Promtail -- Ship Logs --> Loki["📋 Loki<br>:3100"]
+    Loki -- Query Logs --> Grafana["📊 Grafana<br>:3001"]
+     Client:::externalBox
+     BFF:::serviceBox
+     UserGuard:::cacheBox
+     Auth:::serviceBox
+     Invoice:::serviceBox
+     UserAccess:::serviceBox
+     Payment:::serviceBox
+     PDF:::serviceBox
+     Media:::serviceBox
+     Mail:::serviceBox
+     Kafka:::eventBox
+     MongoDB:::dbBox
+     Redis:::cacheBox
+     Cloudinary:::externalBox
+     Puppeteer:::externalBox
+     SMTP:::externalBox
+     Keycloak:::externalBox
+     Stripe:::externalBox
+     Promtail:::serviceBox
+     Loki:::serviceBox
+     Grafana:::serviceBox
     classDef serviceBox fill:#e1f5fe,stroke:#01579b,stroke-width:2px
     classDef dbBox fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
     classDef externalBox fill:#fff3e0,stroke:#e65100,stroke-width:2px
     classDef eventBox fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
     classDef cacheBox fill:#ffebee,stroke:#c62828,stroke-width:2px
     classDef paymentBox fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
-    
-    class BFF,Invoice,UserAccess,Auth,PDF,Media,Mail,Payment serviceBox
-    class UserGuard,Redis cacheBox
-    class MongoDB dbBox
-    class Client,Cloudinary,Puppeteer,SMTP,Keycloak,Stripe externalBox
-    class Kafka eventBox
-    class Promtail,Loki,Grafana serviceBox
+
 ```
 
 ### 1.3 Chi Tiết Flow Dữ Liệu Chính
