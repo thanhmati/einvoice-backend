@@ -60,10 +60,12 @@ graph TB
     %% BFF TCP Connections
     BFF -->|"TCP: CRUD Invoice"| Invoice["📄 Invoice Service<br/>(TCP Microservice)"]
     BFF -->|"TCP: User Management"| UserAccess["👤 User Access<br/>(TCP Microservice)"]
+    BFF -->|"HTTP: Webhook"| Payment["💳 Payment Service<br/>(Stripe Integration)"]
     
     %% Invoice Service TCP Connections
     Invoice -->|"TCP: Generate PDF"| PDF["📄 PDF Generator<br/>(TCP Microservice)"]
     Invoice -->|"TCP: Upload File"| Media["📁 Media Service<br/>(TCP Microservice)"]
+    Invoice -->|"TCP: Payment Processing"| Payment
     
     %% Mail Service Connections
     Mail -->|"TCP: Get Invoice Details"| Invoice
@@ -84,6 +86,7 @@ graph TB
     PDF -->|"HTML to PDF"| Puppeteer["🎭 Puppeteer Engine"]
     Mail -->|"Send Email"| SMTP["📮 SMTP Server"]
     Auth -->|"User Management"| Keycloak["🔑 Keycloak<br/>:8180"]
+    Payment -->|"Payment Processing"| Stripe["💳 Stripe<br/>(Payment Gateway)"]
     
     %% Logging Infrastructure
     Promtail["📡 Promtail<br/>(Log Agent)"]
@@ -95,6 +98,7 @@ graph TB
     Invoice -.->|"Container Logs"| Promtail
     UserAccess -.->|"Container Logs"| Promtail
     Mail -.->|"Container Logs"| Promtail
+    Payment -.->|"Container Logs"| Promtail
     Promtail -->|"Ship Logs"| Loki
     Loki -->|"Query Logs"| Grafana
     
@@ -104,11 +108,12 @@ graph TB
     classDef externalBox fill:#fff3e0,stroke:#e65100,stroke-width:2px
     classDef eventBox fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
     classDef cacheBox fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef paymentBox fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
     
-    class BFF,Invoice,UserAccess,Auth,PDF,Media,Mail serviceBox
+    class BFF,Invoice,UserAccess,Auth,PDF,Media,Mail,Payment serviceBox
     class UserGuard,Redis cacheBox
     class MongoDB dbBox
-    class Client,Cloudinary,Puppeteer,SMTP,Keycloak externalBox
+    class Client,Cloudinary,Puppeteer,SMTP,Keycloak,Stripe externalBox
     class Kafka eventBox
     class Promtail,Loki,Grafana serviceBox
 ```
@@ -127,8 +132,10 @@ sequenceDiagram
     participant DB as 🗄️ MongoDB
     participant Cloud as ☁️ Cloudinary
     participant SMTP as 📮 SMTP
+    participant Pay as 💳 Payment Service
+    participant Stripe as 💳 Stripe
 
-    Note over C,SMTP: 🔄 COMPLETE INVOICE WORKFLOW
+    Note over C,Stripe: 🔄 COMPLETE INVOICE & PAYMENT WORKFLOW
 
     %% 1. Create Invoice
     rect rgb(240, 248, 255)
@@ -143,7 +150,7 @@ sequenceDiagram
 
     %% 2. Send Invoice (Complex Flow)
     rect rgb(255, 248, 240)
-        Note over C,SMTP: 📤 Phase 2: Send Invoice (Trigger PDF & Email)
+        Note over C,SMTP: 📤 Phase 2: Send Invoice (Trigger PDF, Email & Payment)
         C->>B: POST /api/v1/invoice/:id/send
         B->>I: TCP: SEND_INVOICE
         
@@ -161,31 +168,55 @@ sequenceDiagram
         Cloud-->>M: Public URL
         M-->>I: File URL
         
+        %% Payment Session Creation
+        Note over I,Stripe: 💳 Payment Session Sub-flow
+        I->>Pay: TCP: CREATE_CHECKOUT_SESSION
+        Pay->>Stripe: Create Checkout Session
+        Stripe-->>Pay: Payment URL & Session ID
+        Pay-->>I: Payment Link
+        
         %% Update Database
         I->>DB: UPDATE invoice SET status='SENT', fileUrl='...', supervisorId
         DB-->>I: Invoice updated
         
-        %% Kafka Event
+        %% Kafka Event with Payment Link
         Note over I,Mail: 📨 Async Event Processing
-        I->>K: PUBLISH: invoice.sent event
+        I->>K: PUBLISH: invoice.sent event (with payment link)
         I-->>B: ✅ Invoice sent successfully
         B-->>C: ✅ Success response
     end
 
-    %% 3. Email Processing (Async)
+    %% 3. Email Processing with Payment Link (Async)
     rect rgb(248, 255, 248)
-        Note over K,SMTP: 📧 Phase 3: Email Processing (Async)
+        Note over K,SMTP: 📧 Phase 3: Email Processing with Payment Link (Async)
         K->>Mail: CONSUME: invoice.sent event
         Mail->>I: TCP: GET_INVOICE_BY_ID
         I->>DB: SELECT invoice details
         DB-->>I: Invoice with fileUrl
-        I-->>Mail: Complete invoice data
+        I-->>Mail: Complete invoice data with payment link
         
-        Mail->>Mail: Render email template
+        Mail->>Mail: Render email template with payment link
         Mail->>Cloud: Download PDF from URL
         Cloud-->>Mail: PDF file
-        Mail->>SMTP: Send email with PDF attachment
+        Mail->>SMTP: Send email with PDF attachment + payment link
         SMTP-->>Mail: ✅ Email sent
+    end
+
+    %% 4. Payment Processing (Async)
+    rect rgb(255, 240, 255)
+        Note over C,Stripe: 💳 Phase 4: Payment Processing (Async)
+        Note over C,Stripe: Customer clicks payment link in email
+        C->>Stripe: Navigate to Checkout Session
+        Stripe->>Stripe: Process payment
+        Stripe->>B: POST /api/v1/payment/stripe/webhook
+        B->>Pay: TCP: STRIPE_WEBHOOK
+        Pay->>Pay: Verify webhook signature
+        Pay->>Pay: Extract invoice ID from metadata
+        Pay->>I: TCP: PAY_SUCCESS (invoice ID)
+        I->>DB: UPDATE invoice SET status='PAID'
+        DB-->>I: Invoice updated
+        Pay-->>B: ✅ Webhook processed
+        B-->>Stripe: ✅ 200 OK
     end
 ```
 
@@ -196,8 +227,11 @@ sequenceDiagram
 | **BFF** → Invoice | TCP | CRUD operations | Synchronous |
 | **BFF** → User Access | TCP | User management | Synchronous |
 | **BFF** → Authorizer | gRPC | Authentication | Synchronous |
+| **BFF** → Payment | HTTP | Webhook handling | Asynchronous |
 | **Invoice** → PDF Generator | TCP | Generate PDF | Synchronous |
 | **Invoice** → Media | TCP | Upload files | Synchronous |
+| **Invoice** → Payment | TCP | Create checkout session | Synchronous |
+| **Payment** → Stripe | HTTP | Payment processing | Asynchronous |
 | **Invoice** → Kafka | Event | Async notifications | Fire & Forget |
 | **Mail** → Invoice | TCP | Get invoice data | Synchronous |
 | **Mail** ← Kafka | Event | Consume events | Async |
@@ -214,11 +248,205 @@ sequenceDiagram
 | **File Storage** | Cloudinary | Media file storage |
 | **PDF Generation** | Puppeteer + EJS | PDF creation |
 | **Email** | Nodemailer | Email delivery |
+| **Payment** | Stripe | Payment processing |
 | **Containerization** | Docker + Docker Compose | Deployment |
 | **Monorepo** | Nx | Code organization |
 | **Monitoring** | Grafana | Dashboard & Visualization |
 | **Log Aggregation** | Loki | Centralized log storage |
 | **Log Collection** | Promtail | Docker container log shipping |
+
+---
+
+## 💳 PHẦN 1.5: STRIPE PAYMENT INTEGRATION
+
+### 1.5.1 Tổng Quan Payment Flow
+
+Hệ thống tích hợp **Stripe** để xử lý thanh toán với flow hoàn chỉnh:
+
+```mermaid
+graph LR
+    %% Invoice Flow
+    A[📄 Create Invoice] --> B[📤 Send Invoice]
+    B --> C[💳 Create Payment Link]
+    C --> D[📧 Send Email with Payment Link]
+    D --> E[👤 Customer Clicks Link]
+    E --> F[💳 Stripe Checkout]
+    F --> G[✅ Payment Success]
+    G --> H[📨 Stripe Webhook]
+    H --> I[🔄 Update Invoice Status]
+    
+    %% Status Transitions
+    J[📊 Invoice Status Flow]
+    J --> K[CREATED]
+    K --> L[SENT]
+    L --> M[PAID]
+    
+    %% Styling
+    classDef flowBox fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef statusBox fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    
+    class A,B,C,D,E,F,G,H,I flowBox
+    class J,K,L,M statusBox
+```
+
+### 1.5.2 Payment Service Architecture
+
+**📍 Vai trò**: Xử lý thanh toán và webhook handling
+
+```typescript
+// apps/invoice/src/app/modules/payment/services/stripe.service.ts
+@Injectable()
+export class StripeService {
+  private stripe: Stripe;
+
+  constructor(private configService: ConfigService) {
+    this.stripe = new Stripe(configService.get('STRIPE_CONFIG.SECRET_KEY'), {
+      apiVersion: '2025-07-30.basil',
+    });
+  }
+
+  async createCheckoutSession(data: CreateCheckoutSessionRequest) {
+    const session = await this.stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: data.lineItems.map((item) => ({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: item.name,
+          },
+          unit_amount: item.price * 100,
+        },
+        quantity: item.quantity,
+      })),
+      mode: 'payment',
+      customer_email: data.clientEmail,
+      success_url: `${this.configService.get('STRIPE_CONFIG.SUCCESS_URL')}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: this.configService.get('STRIPE_CONFIG.CANCEL_URL'),
+      metadata: {
+        invoiceId: data.invoiceId,
+      },
+    });
+
+    return {
+      url: session.url,
+      sessionId: session.id,
+    };
+  }
+
+  verifyWebhookSignature(body: Buffer, signature: string) {
+    return this.stripe.webhooks.constructEvent(
+      body, 
+      signature, 
+      this.configService.get('STRIPE_CONFIG.WEBHOOK_SECRET')
+    );
+  }
+}
+```
+
+### 1.5.3 Webhook Processing
+
+**📍 Vai trò**: Xử lý webhook từ Stripe để cập nhật trạng thái invoice
+
+```typescript
+// apps/invoice/src/app/modules/payment/services/payment.service.ts
+@Injectable()
+export class PaymentService {
+  async stripeWebhook(data: StripeWebhookTcpReq) {
+    const { rawBodyBase64, signature } = data;
+
+    const event = this.stripeService.verifyWebhookSignature(
+      Buffer.from(rawBodyBase64, 'base64'), 
+      signature
+    );
+
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+
+        if (session.metadata?.invoiceId) {
+          await this.invoiceService.paySuccess(session.metadata.invoiceId);
+        }
+        break;
+      }
+      default:
+        this.logger.log(`Unhandled event type ${event.type}`);
+    }
+  }
+}
+```
+
+### 1.5.4 Email Template với Payment Link
+
+**📍 Vai trò**: Email template động với payment link
+
+```html
+<!-- apps/mail/src/app/modules/mail-template/templates/invoice.ejs -->
+<h2>Xin chào <%= clientName %>,</h2>
+
+<p>Bạn nhận được hóa đơn từ <strong><%= senderName %></strong> với mã số hóa đơn <strong><%= invoiceCode %></strong>.</p>
+
+<p>Vui lòng xem chi tiết hóa đơn trong tập tin PDF đính kèm.</p>
+
+<% if (paymentLink) { %>
+  <p>Để thuận tiện cho việc thanh toán, bạn có thể nhấn vào liên kết bên dưới để thanh toán trực tuyến:</p>
+
+  <p>
+    <a href="<%= paymentLink %>" target="_blank" style="color: #2196F3; font-weight: bold;">
+      👉 Thanh toán ngay
+    </a>
+  </p>
+<% } %>
+
+<p>Nếu bạn có bất kỳ câu hỏi nào, xin vui lòng liên hệ lại với chúng tôi.</p>
+```
+
+### 1.5.5 Payment Configuration
+
+**📍 Vai trò**: Cấu hình Stripe cho development và production
+
+```typescript
+// libs/configuration/src/lib/stripe.config.ts
+export class StripeConfiguration {
+  @IsString()
+  @IsNotEmpty()
+  SECRET_KEY: string;
+
+  @IsString()
+  @IsNotEmpty()
+  WEBHOOK_SECRET: string;
+
+  @IsString()
+  @IsNotEmpty()
+  SUCCESS_URL: string;
+
+  @IsString()
+  @IsNotEmpty()
+  CANCEL_URL: string;
+}
+```
+
+**🔧 Environment Variables:**
+```bash
+# Stripe Configuration
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_SUCCESS_URL=http://localhost:3000/payment/success
+STRIPE_CANCEL_URL=http://localhost:3000/payment/cancel
+```
+
+### 1.5.6 Security Features
+
+**🛡️ Webhook Security:**
+- **Signature Verification**: Verify webhook signature với Stripe secret
+- **Event Validation**: Validate event type và data structure
+- **Metadata Validation**: Ensure invoice ID exists trong metadata
+- **Error Handling**: Graceful handling của invalid webhooks
+
+**🔐 Payment Security:**
+- **HTTPS Only**: Tất cả payment requests qua HTTPS
+- **Token-based**: Không lưu trữ sensitive payment data
+- **PCI Compliance**: Stripe handles PCI compliance
+- **Fraud Protection**: Stripe's built-in fraud detection
 
 ---
 
@@ -249,6 +477,7 @@ graph TB
     Invoice -->|"Container Logs"| Docker
     Mail -->|"Container Logs"| Docker
     UserAccess -->|"Container Logs"| Docker
+    Payment -->|"Container Logs"| Docker
     
     Docker -->|"File System"| Promtail
     Promtail -->|"HTTP Push API"| Loki
@@ -263,7 +492,7 @@ graph TB
     classDef logBox fill:#fff3e0,stroke:#e65100,stroke-width:2px
     classDef userBox fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
     
-    class BFF,Invoice,Mail,UserAccess serviceBox
+    class BFF,Invoice,Mail,UserAccess,Payment serviceBox
     class Docker,Promtail,Loki,Grafana logBox
     class User userBox
 ```

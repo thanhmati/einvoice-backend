@@ -23,6 +23,7 @@ Hệ thống E-Invoice được xây dựng theo mô hình **Microservices Archi
 ├── 📧 Mail Service - Kafka Consumer
 ├── 👤 User Access Service - TCP Microservice
 ├── 🔐 Authorizer Service - gRPC Microservice
+├── 💳 Payment Service - TCP Microservice (Stripe Integration)
 ├── 🗄️ MongoDB - Port 27017
 ├── 📨 Kafka - Port 9092
 ├── 🔑 Keycloak - Port 8180
@@ -38,6 +39,7 @@ Hệ thống E-Invoice được xây dựng theo mô hình **Microservices Archi
 - **Event Processing**: Kafka (Asynchronous)
 - **Database**: MongoDB với Mongoose
 - **Cache Layer**: Redis với @nestjs/cache-manager
+- **Payment Integration**: Stripe Webhook (Asynchronous)
 
 ---
 
@@ -120,6 +122,7 @@ pnpm dev-lite
 - ✅ **Event-Driven Architecture** với Kafka
 - ✅ **Repository Pattern** cho data access
 - ✅ **Dependency Injection** với NestJS
+- ✅ **Payment Integration** với Stripe
 
 ### 💡 Technology Stack
 - **Framework**: NestJS với TypeScript
@@ -130,6 +133,7 @@ pnpm dev-lite
 - **File Storage**: Cloudinary
 - **PDF Generation**: Puppeteer + EJS
 - **Email**: Nodemailer
+- **Payment**: Stripe (Checkout Sessions + Webhooks)
 - **Containerization**: Docker + Docker Compose
 - **Monorepo**: Nx
 - **Monitoring**: Grafana Dashboard
@@ -150,6 +154,40 @@ pnpm dev-lite
 - ✅ Centralized logging với Grafana + Loki + Promtail
 - ✅ Real-time log monitoring và dashboard
 - ✅ Container log aggregation và search
+- ✅ **Stripe Payment Integration** với webhook handling
+- ✅ **Payment Link Generation** trong email templates
+
+---
+
+## 💳 Stripe Payment Integration
+
+### 🎯 Payment Flow
+Hệ thống tích hợp **Stripe** cho thanh toán với flow hoàn chỉnh:
+
+1. **Invoice Creation**: Tạo invoice với thông tin khách hàng
+2. **Send Invoice**: Khi gửi invoice, hệ thống:
+   - Generate PDF và upload lên Cloudinary
+   - Tạo Stripe Checkout Session
+   - Gửi email với payment link đính kèm
+3. **Payment Processing**: Khách hàng click link và thanh toán
+4. **Webhook Handling**: Stripe gửi webhook khi thanh toán thành công
+5. **Status Update**: Invoice status chuyển từ `sent` → `paid`
+
+### 🔧 Stripe Configuration
+```typescript
+// Stripe Configuration
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_SUCCESS_URL=http://localhost:3000/payment/success
+STRIPE_CANCEL_URL=http://localhost:3000/payment/cancel
+```
+
+### 📈 Payment Features
+- ⚡ **Secure Checkout**: Stripe-hosted payment pages
+- 🔄 **Webhook Processing**: Real-time payment status updates
+- 📧 **Email Integration**: Payment links trong email templates
+- 🛡️ **Signature Verification**: Secure webhook handling
+- 💾 **Status Management**: Automatic invoice status updates
 
 ---
 
@@ -196,14 +234,19 @@ REDIS_TTL=1800000 (30 minutes in milliseconds)
 - **Phần 6**: Mail Service - Event Consumer
 - **Thực hành**: Implement event mới, custom Kafka handler
 
-### Tuần 7-8: Advanced Topics (8 giờ)
-- **Phần 7**: Shared Libraries & Code Organization
-- **Phần 8**: Security, Testing, Monitoring
+### Tuần 7-8: Payment Integration (8 giờ)
+- **Phần 7**: Stripe Integration & Webhook Handling
+- **Phần 8**: Payment Flow & Email Templates
+- **Thực hành**: Implement payment features, test webhooks
+
+### Tuần 9-10: Advanced Topics (8 giờ)
+- **Phần 9**: Shared Libraries & Code Organization
+- **Phần 10**: Security, Testing, Monitoring
 - **Thực hành**: Authentication, unit tests, logging
 
-### Tuần 9-10: Production Deployment (8 giờ)
-- **Phần 9**: Docker Deployment & Scaling
-- **Phần 10**: Best Practices & Performance
+### Tuần 11-12: Production Deployment (8 giờ)
+- **Phần 11**: Docker Deployment & Scaling
+- **Phần 12**: Best Practices & Performance
 - **Thực hành**: Production deployment, monitoring setup
 
 ---
@@ -218,6 +261,7 @@ REDIS_TTL=1800000 (30 minutes in milliseconds)
 - **Monitoring**: Grafana Dashboard tại `http://localhost:3001` (admin/admin)
 - **Log Search**: Loki API tại `http://localhost:3100`
 - **Log Collection**: Promtail agent tự động thu thập logs từ Docker containers
+- **Payment Testing**: Stripe CLI cho webhook testing
 
 ### Xem Sơ Đồ Mermaid
 - **GitHub**: Tự động render Mermaid diagrams
@@ -251,7 +295,7 @@ Content-Type: application/json
 }
 ```
 
-### 2. Gửi Invoice (Trigger PDF + Email)
+### 2. Gửi Invoice (Trigger PDF + Email + Payment Link)
 ```bash
 POST http://localhost:3000/api/v1/invoice/{invoiceId}/send
 ```
@@ -259,8 +303,12 @@ POST http://localhost:3000/api/v1/invoice/{invoiceId}/send
 ### 3. Kiểm tra Flow
 - Invoice status chuyển từ `created` → `sent`
 - PDF được generate và upload lên Cloudinary
-- Kafka event được publish
-- Mail service consume event và gửi email với PDF attachment
+- Stripe Checkout Session được tạo
+- Kafka event được publish với payment link
+- Mail service consume event và gửi email với PDF attachment + payment link
+- Khách hàng click payment link và thanh toán
+- Stripe webhook được gọi khi thanh toán thành công
+- Invoice status chuyển từ `sent` → `paid`
 
 ---
 
@@ -273,6 +321,7 @@ POST http://localhost:3000/api/v1/invoice/{invoiceId}/send
 4. **Kafka**: Check Kafka broker health
 5. **Logging Stack**: Verify Grafana (3001), Loki (3100), và Promtail services
 6. **Log Collection**: Check Promtail is collecting container logs properly
+7. **Stripe Integration**: Verify webhook configuration và signature verification
 
 ### Debugging
 ```bash
@@ -296,6 +345,9 @@ docker logs promtail
 # Verify log collection
 curl http://localhost:3100/ready
 curl http://localhost:3100/metrics
+
+# Test Stripe webhook (if using Stripe CLI)
+stripe listen --forward-to localhost:3000/api/v1/payment/stripe/webhook
 ```
 
 ### Feedback & Contributions

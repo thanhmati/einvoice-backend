@@ -12,10 +12,12 @@ Repo này là một **hệ thống E-Invoice hoàn chỉnh** được xây dựn
 - ✅ **Production-ready practices** (logging, error handling, validation)
 - ✅ **Authentication Integration** với Keycloak
 - ✅ **Redis Cache Layer** cho performance optimization
-- ✅ **Token Caching Strategy** trong UserGuard
+- ✅ **Token Caching Strategy** trong UserGuard để tránh auto verify token
 - ✅ **Docker Containerization** và deployment
 - ✅ **Centralized Logging** với Grafana + Loki + Promtail
 - ✅ **Real-time Monitoring** và log aggregation
+- ✅ **Stripe Payment Integration** với webhook handling
+- ✅ **Payment Flow** với email templates và status management
 
 ---
 
@@ -30,6 +32,7 @@ Repo này là một **hệ thống E-Invoice hoàn chỉnh** được xây dựn
 ├── 📧 Mail Service - Kafka Consumer + TCP Client
 ├── 👤 User Access Service - TCP Microservice
 ├── 🔐 Authorizer Service - gRPC Microservice
+├── 💳 Payment Service - TCP Microservice (Stripe Integration)
 ├── 🗄️ MongoDB - Port 27017 (Document database)
 ├── 📨 Kafka - Port 9092 (Event streaming)
 ├── 🔑 Keycloak - Port 8180 (Identity & Access Management)
@@ -45,6 +48,7 @@ Repo này là một **hệ thống E-Invoice hoàn chỉnh** được xây dựn
 - **UserGuard ↔ Redis**: Cache Layer (Token & UserData)
 - **Invoice → Kafka**: Event Publishing
 - **Mail ← Kafka**: Event Consumption
+- **Payment ↔ Stripe**: Webhook Handling (Asynchronous)
 - **Database**: MongoDB với Mongoose ODM
 
 ---
@@ -75,14 +79,20 @@ Repo này là một **hệ thống E-Invoice hoàn chỉnh** được xây dựn
 - Mail Service analysis và email processing
 - **Thực hành**: Thêm Kafka event mới, implement consumer
 
-### **Buổi 9-10: Shared Libraries & Infrastructure** (4 giờ)
+### **Buổi 9-10: Payment Integration** (4 giờ)
+- Stripe integration và webhook handling
+- Payment flow analysis và status management
+- Email templates với payment links
+- **Thực hành**: Implement payment features, test webhooks
+
+### **Buổi 11-12: Shared Libraries & Infrastructure** (4 giờ)
 - Nx monorepo structure và shared libraries
 - Error handling, logging, validation patterns
 - Centralized logging với Grafana + Loki + Promtail
 - Docker deployment strategy
 - **Thực hành**: Setup logging stack, tạo shared library, deploy với Docker
 
-### **Buổi 11-12: Advanced Topics** (4 giờ)
+### **Buổi 13-14: Advanced Topics** (4 giờ)
 - Keycloak integration cho authentication
 - Testing strategies (unit, integration, e2e)
 - Monitoring, observability, performance optimization
@@ -99,6 +109,7 @@ Repo này là một **hệ thống E-Invoice hoàn chỉnh** được xây dựn
 - pnpm (latest)
 - Docker & Docker Compose
 - 8GB RAM (16GB recommended)
+- Stripe CLI (optional, for webhook testing)
 ```
 
 ### 2. **Quick Start**
@@ -134,7 +145,7 @@ pnpm dev-lite
 2. **Keycloak Admin**: `http://localhost:8180` (admin/admin)
 3. **Grafana Dashboard**: `http://localhost:3001` (admin/admin)
 4. **Loki API**: `http://localhost:3100`
-3. **Create Invoice**: POST `/api/v1/invoice`
+5. **Create Invoice**: POST `/api/v1/invoice`
    ```json
    {
      "client": {
@@ -153,12 +164,16 @@ pnpm dev-lite
      "vatAmount": 20000
    }
    ```
-5. **Send Invoice**: POST `/api/v1/invoice/{invoiceId}/send`
-6. **Verify Flow**:
+6. **Send Invoice**: POST `/api/v1/invoice/{invoiceId}/send`
+7. **Verify Flow**:
    - Invoice status: `created` → `sent`
    - PDF generated và uploaded to Cloudinary
-   - Kafka event `invoice.sent` published
-   - Mail service consumes event và sends email
+   - Stripe Checkout Session created
+   - Kafka event `invoice.sent` published với payment link
+   - Mail service consumes event và sends email với payment link
+   - Customer clicks payment link và completes payment
+   - Stripe webhook triggers khi payment successful
+   - Invoice status: `sent` → `paid`
    - All logs collected và visible trong Grafana dashboard
 
 ---
@@ -175,18 +190,24 @@ pnpm dev-lite
 📁 Key Files for Teaching:
 ├── apps/bff/src/main.ts                    # Entry point + Swagger setup
 ├── apps/bff/src/app/app.module.ts          # Global guards, interceptors, middleware
+├── apps/bff/src/app/modules/payment/       # Payment controller (webhook endpoint)
 ├── apps/invoice/src/app/modules/invoice/
 │   ├── services/invoice.service.ts         # Business logic với Kafka integration
 │   ├── controllers/invoice.controller.ts   # TCP message handlers
 │   └── repositories/invoice.repository.ts  # Repository pattern implementation
+├── apps/invoice/src/app/modules/payment/   # Payment service với Stripe integration
+│   ├── services/payment.service.ts         # Payment logic và webhook handling
+│   ├── services/stripe.service.ts          # Stripe API integration
+│   └── controllers/payment.controller.ts   # TCP payment handlers
 ├── apps/mail/src/app/modules/mail/
 │   ├── services/mail-queue.service.ts      # Kafka event consumer
-│   └── services/mail-invoice.service.ts    # Email processing logic
+│   └── services/mail-invoice.service.ts    # Email processing logic với payment links
 ├── libs/schemas/src/lib/invoice/            # MongoDB schema với Mongoose
 ├── libs/queue/src/lib/modules/kafka/       # Kafka integration
 ├── libs/decorators/src/lib/                # Custom decorators (@KafkaHandler)
 ├── libs/middlewares/src/lib/               # Request logging middleware
 ├── libs/interceptors/src/lib/              # Global error handling
+├── libs/interfaces/src/lib/common/          # Stripe interfaces
 ├── docker/loki-config.yaml                 # Loki log aggregation config
 ├── docker/promtail-config.yaml             # Promtail log collection config
 └── docker-compose.*.yaml                   # Docker deployment configuration
@@ -204,6 +225,7 @@ pnpm dev-lite
 - **Keycloak** integration cho enterprise authentication
 - **Grafana + Loki + Promtail** stack cho centralized logging
 - **Real-time log monitoring** với dashboard và alerting
+- **Stripe Payment Integration** với webhook handling
 
 ### **2. Best Practices Được Áp Dụng**
 - ✅ **Repository Pattern** - Clean data access layer
@@ -211,19 +233,25 @@ pnpm dev-lite
 - ✅ **Global Error Handling** - ExceptionInterceptor cho consistent responses
 - ✅ **Process ID Tracking** - Request tracing across services
 - ✅ **DTO Validation** - class-validator cho input validation
-- ✅ **Configuration Management** - Environment-based config
+- ✅ **Swagger API documentation**
+- ✅ **Docker containerization**
+- ✅ **Environment-based configuration**
 - ✅ **Custom Decorators** - @KafkaHandler cho event handling
 - ✅ **Auto-Discovery** - Kafka consumers tự động register
 - ✅ **Centralized Logging** - Docker container log aggregation
 - ✅ **Log Monitoring** - Real-time log streaming và search
 - ✅ **Observability** - Process tracking across services
+- ✅ **Payment Integration** - Stripe webhook handling và signature verification
+- ✅ **Email Templates** - Dynamic content với payment links
 
 ### **3. Real-World Patterns (Thực Tế)**
 - **API Gateway** (BFF) với authentication guard
 - **Event Sourcing** với Kafka topics (`invoice.sent`)
-- **Mixed Communication**: TCP (sync), gRPC (auth), Kafka (async)
+- **Mixed Communication**: TCP (sync), gRPC (auth), Kafka (async), Webhook (async)
 - **File Processing Pipeline**: PDF generation → Cloud storage → Email attachment
 - **Business State Management**: Invoice lifecycle với validation
+- **Payment Flow**: Checkout Session → Webhook → Status Update
+- **Email Marketing**: Payment links trong professional email templates
 
 ---
 
@@ -235,23 +263,79 @@ pnpm dev-lite
 3. **Swagger Enhancement**: Customize API documentation với examples
 4. **Environment Configuration**: Add new config variables
 
-### **Trung Bình** (Buổi 5-8)
+### **Trung Bình** (Buổi 5-10)
 5. **Notification Service**: Tạo service mới consume `invoice.sent` events
 6. **Invoice Approval Workflow**: Thêm approval process với supervisor
 7. **Custom Kafka Topics**: Implement `invoice.cancelled` event
 8. **Database Indexing**: Optimize MongoDB queries với indexes
 9. **Logging Dashboard**: Tạo custom Grafana dashboard cho monitoring
 10. **Log Alerting**: Setup alerts cho error patterns trong logs
+11. **Payment Methods**: Thêm support cho multiple payment methods
+12. **Payment Analytics**: Track payment success rates và conversion
+13. **Email Templates**: Customize email templates với branding
+14. **Webhook Security**: Implement additional webhook validation
 
-### **Khó** (Buổi 9-12)
-11. **Keycloak Integration**: Implement full JWT authentication flow
-12. **Redis Cache Analysis**: Phân tích UserGuard cache strategy và tối ưu hóa
-13. **Custom Cache Implementation**: Thêm cache layer cho invoice queries
-14. **Distributed Tracing**: Implement correlation ID across services
-15. **Automated Testing**: Unit + Integration + E2E test suite
-16. **Production Monitoring**: Health checks, metrics, logging aggregation
-17. **Advanced LogQL**: Complex log queries và pattern extraction
-18. **Log Retention Policies**: Configure log rotation và storage optimization
+### **Khó** (Buổi 11-14)
+15. **Keycloak Integration**: Implement full JWT authentication flow
+16. **Redis Cache Analysis**: Phân tích UserGuard cache strategy và tối ưu hóa
+17. **Custom Cache Implementation**: Thêm cache layer cho invoice queries
+18. **Distributed Tracing**: Implement correlation ID across services
+19. **Automated Testing**: Unit + Integration + E2E test suite
+20. **Production Monitoring**: Health checks, metrics, logging aggregation
+21. **Advanced LogQL**: Complex log queries và pattern extraction
+22. **Log Retention Policies**: Configure log rotation và storage optimization
+23. **Payment Refunds**: Implement refund functionality với Stripe
+24. **Subscription Payments**: Add recurring payment support
+25. **Payment Gateway**: Support multiple payment providers (PayPal, etc.)
+26. **Advanced Webhooks**: Handle complex payment events (disputes, chargebacks)
+
+---
+
+## 💳 Stripe Payment Integration (Mới)
+
+### **Tính Năng Đã Implement**
+Hệ thống đã có **Stripe Payment Integration** hoàn chỉnh:
+
+#### ✅ Payment Flow
+```typescript
+// Complete payment flow
+Invoice Creation → Send Invoice → Stripe Checkout → Payment → Webhook → Status Update
+- Invoice status: created → sent → paid
+- Payment link được gửi trong email
+- Webhook tự động update status khi thanh toán thành công
+```
+
+#### ✅ Key Components
+- **StripeService**: Stripe API integration với checkout sessions
+- **PaymentService**: Webhook handling và payment processing
+- **Email Templates**: Payment links trong professional email
+- **Webhook Security**: Signature verification cho secure processing
+- **Status Management**: Automatic invoice status updates
+
+### **Demo Payment Flow**
+```bash
+# 1. Create invoice
+POST /api/v1/invoice
+
+# 2. Send invoice (creates payment link)
+POST /api/v1/invoice/{id}/send
+
+# 3. Check email with payment link
+# Customer clicks link and pays
+
+# 4. Webhook triggers (simulate with Stripe CLI)
+stripe listen --forward-to localhost:3000/api/v1/payment/stripe/webhook
+
+# 5. Verify invoice status changed to 'paid'
+GET /api/v1/invoice/{id}
+```
+
+### **Điểm Giảng Dạy Quan Trọng**
+1. **Payment Security**: Webhook signature verification
+2. **State Management**: Invoice status transitions
+3. **Email Integration**: Payment links trong templates
+4. **Error Handling**: Payment failure scenarios
+5. **Testing**: Webhook testing với Stripe CLI
 
 ---
 
@@ -306,10 +390,12 @@ docker exec -it redis_server redis-cli
 - ✅ **Well-structured modules** theo NestJS best practices
 - ✅ **Event-driven design** với Kafka integration
 - ✅ **Docker deployment** ready
-- ✅ **Mixed communication patterns** (TCP, gRPC, Events)
+- ✅ **Mixed communication patterns** (TCP, gRPC, Events, Webhooks)
 - ✅ **Authentication integration** với Keycloak
 - ✅ **Redis Cache Layer** với secure token caching strategy
 - ✅ **Performance optimization** với 90%+ cache hit improvement
+- ✅ **Stripe Payment Integration** với complete payment flow
+- ✅ **Professional email templates** với payment links
 
 ### **Điểm Cần Lưu Ý**
 - ⚠️ **Kafka Topics**: Hiện tại chỉ có `invoice.sent`, có thể mở rộng
@@ -318,6 +404,8 @@ docker exec -it redis_server redis-cli
 - ⚠️ **Metrics Collection**: Chưa có Prometheus metrics (chỉ có logs)
 - ⚠️ **Error Recovery**: Kafka consumer error handling có thể enhance
 - ⚠️ **Log Retention**: Default filesystem storage, cần configure retention policies
+- ⚠️ **Stripe Configuration**: Cần setup Stripe keys cho production
+- ⚠️ **Payment Testing**: Cần Stripe test mode cho development
 
 ### **Challenges Học Viên Có Thể Gặp**
 1. **Docker Networking**: Hiểu `einvoice-nw` network và service discovery
@@ -327,6 +415,9 @@ docker exec -it redis_server redis-cli
 5. **Nx Monorepo**: Shared libraries và build dependencies
 6. **LogQL Syntax**: Learning Loki query language cho log analysis
 7. **Log Volume**: Managing high-volume logs trong development environment
+8. **Webhook Security**: Understanding webhook signature verification
+9. **Payment Flow**: Understanding async payment processing
+10. **Email Templates**: Dynamic content generation với EJS
 
 ### **Tips Giảng Dạy**
 - **Start Simple**: Begin với BFF → Invoice flow trước khi vào Kafka
@@ -336,6 +427,8 @@ docker exec -it redis_server redis-cli
 - **Code Walkthrough**: Explain design patterns trong context
 - **Logging Demo**: Show real-time logs trong Grafana dashboard
 - **Log Analysis**: Demonstrate LogQL queries cho debugging
+- **Payment Demo**: Show complete payment flow với Stripe
+- **Webhook Testing**: Demonstrate webhook handling với Stripe CLI
 
 ---
 
@@ -354,6 +447,7 @@ docker exec -it redis_server redis-cli
 - MongoDB Compass (database GUI)
 - Postman hoặc Insomnia (API testing)
 - Docker Desktop với Kubernetes (optional)
+- Stripe CLI (for webhook testing)
 ```
 
 ### **System Resources**
@@ -372,6 +466,9 @@ docker exec -it redis_server redis-cli
    # Pre-build application images
    pnpm install
    pnpm build
+   
+   # Setup Stripe CLI (optional)
+   stripe login
    ```
 
 2. **Student Checklist**:
@@ -380,6 +477,7 @@ docker exec -it redis_server redis-cli
    - [ ] Git configured
    - [ ] VSCode với extensions
    - [ ] Stable internet connection
+   - [ ] Stripe CLI installed (optional)
 
 ---
 
@@ -394,19 +492,23 @@ docker exec -it redis_server redis-cli
 - **Docker Containerization**: Multi-service deployment
 - **Error Handling**: Global exception handling, logging strategies
 - **Testing**: Unit tests, integration tests, mocking strategies
+- **Payment Integration**: Stripe API, webhook handling
+- **Email Systems**: Template engines, dynamic content
 
 ### **Architectural Skills**
 - **System Design**: Trade-offs giữa sync vs async communication
-- **Service Communication**: TCP, gRPC, Event-driven patterns
+- **Service Communication**: TCP, gRPC, Event-driven patterns, Webhooks
 - **Data Flow Design**: Request tracing, process ID tracking
 - **Deployment Strategy**: Docker Compose, environment management
 - **Scalability Planning**: Service independence, horizontal scaling
+- **Payment Architecture**: Secure payment processing, webhook security
 
 ### **Production Skills**
-- **Monitoring**: Health checks, logging, error tracking
+- **Monitoring**: Health checks, metrics, error tracking
 - **Configuration Management**: Environment-based config
-- **Security**: Authentication, authorization, input validation
+- **Security**: Authentication, authorization, input validation, webhook security
 - **Performance**: Caching strategies, database optimization
+- **Payment Security**: Webhook signature verification, secure payment flow
 
 ---
 
@@ -420,19 +522,24 @@ Sau khóa học, học viên có thể:
 3. **Deploy** multi-service application với Docker
 4. **Debug** distributed systems issues
 5. **Test** microservices với proper mocking
+6. **Integrate** payment systems với webhook handling
+7. **Design** secure payment flows với proper validation
 
 ### **Long-term Outcomes**
-6. **Scale** individual services theo business needs
-7. **Integrate** authentication systems (Keycloak, Auth0, etc.)
-8. **Optimize** performance với caching và database tuning
-9. **Monitor** production systems với observability tools
-10. **Lead** microservices adoption trong team/organization
+8. **Scale** individual services theo business needs
+9. **Integrate** authentication systems (Keycloak, Auth0, etc.)
+10. **Optimize** performance với caching và database tuning
+11. **Monitor** production systems với observability tools
+12. **Lead** microservices adoption trong team/organization
+13. **Implement** secure payment processing systems
+14. **Design** email marketing systems với dynamic content
 
 ### **Career Impact**
 - **Senior Developer**: Microservices expertise
 - **Solution Architect**: System design skills
 - **DevOps Engineer**: Container orchestration
 - **Technical Lead**: Team guidance on architecture decisions
+- **Payment Engineer**: Payment system integration expertise
 
 ---
 
@@ -473,6 +580,18 @@ pnpm nx:reset
 rm -rf node_modules
 pnpm install
 pnpm build
+```
+
+#### Payment Issues
+```bash
+# Test Stripe webhook
+stripe listen --forward-to localhost:3000/api/v1/payment/stripe/webhook
+
+# Check payment logs
+docker logs invoice_service
+
+# Verify webhook signature
+# Check STRIPE_WEBHOOK_SECRET environment variable
 ```
 
 ---
