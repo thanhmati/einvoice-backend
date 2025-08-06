@@ -10,7 +10,7 @@ import { TCP_REQUEST_MESSAGE } from '@common/constants/enums/tcp-request-message
 import { map } from 'rxjs';
 
 @ApiTags('Authorizer')
-@Controller('authorizer')
+@Controller('auth')
 export class AuthorizerController {
   constructor(@Inject(TCP_SERVICES.AUTHORIZER_SERVICE) private readonly authorizerClient: TcpClient) {}
 

@@ -49,9 +49,9 @@ export class KeycloakService {
 
       const payload = jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as JwtPayload;
 
-      const user = await this.userValidation(payload.sub, processID);
+      this.logger.debug('payload: ', payload);
 
-      this.logger.debug('User: ', user);
+      const user = await this.userValidation(payload.sub, processID);
 
       return {
         valid: true,
