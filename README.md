@@ -26,6 +26,7 @@ Hệ thống E-Invoice được xây dựng theo mô hình **Microservices Archi
 ├── 🗄️ MongoDB - Port 27017
 ├── 📨 Kafka - Port 9092
 ├── 🔑 Keycloak - Port 8180
+├── 🔴 Redis - Port 6379 (Cache Store)
 ├── 📊 Grafana - Port 3001 (Monitoring Dashboard)
 ├── 📋 Loki - Port 3100 (Log Aggregation)
 └── 📡 Promtail - Log Collection Agent
@@ -36,6 +37,7 @@ Hệ thống E-Invoice được xây dựng theo mô hình **Microservices Archi
 - **Authorizer Service**: gRPC (Synchronous)
 - **Event Processing**: Kafka (Asynchronous)
 - **Database**: MongoDB với Mongoose
+- **Cache Layer**: Redis với @nestjs/cache-manager
 
 ---
 
@@ -124,6 +126,7 @@ pnpm dev-lite
 - **Database**: MongoDB + Mongoose
 - **Message Queue**: Kafka
 - **Authentication**: Keycloak
+- **Cache Store**: Redis với @keyv/redis
 - **File Storage**: Cloudinary
 - **PDF Generation**: Puppeteer + EJS
 - **Email**: Nodemailer
@@ -141,9 +144,38 @@ pnpm dev-lite
 - ✅ Swagger API documentation
 - ✅ Docker containerization
 - ✅ Environment-based configuration
+- ✅ **Redis Cache Layer** cho authentication tokens
+- ✅ **UserData Caching** trong UserGuard để tránh auto verify token
+- ✅ **Token-based Caching Strategy** với SHA256 hash keys
 - ✅ Centralized logging với Grafana + Loki + Promtail
 - ✅ Real-time log monitoring và dashboard
 - ✅ Container log aggregation và search
+
+---
+
+## 🔴 Redis Cache Implementation
+
+### 🎯 Cache Strategy
+Hệ thống sử dụng **Redis** làm cache store chính với các tính năng:
+
+- **Token Caching**: Cache kết quả xác thực từ Keycloak
+- **UserData Caching**: Tránh việc gọi API verify token liên tục
+- **TTL Management**: Auto-expire sau 30 phút
+- **Hash-based Keys**: SHA256 hash của token để bảo mật
+
+### 🔧 Configuration
+```typescript
+// Redis Configuration
+REDIS_HOST=redis (default)
+REDIS_PORT=6379 (default)
+REDIS_TTL=1800000 (30 minutes in milliseconds)
+```
+
+### 📈 Performance Benefits
+- ⚡ **Giảm latency**: Không cần gọi Keycloak mỗi request
+- 🔄 **Tăng throughput**: Cache hit giảm tải cho authentication service
+- 💾 **Optimized Memory**: Chỉ cache dữ liệu cần thiết với TTL
+- 🛡️ **Security**: Token được hash trước khi làm cache key
 
 ---
 

@@ -40,6 +40,7 @@ Hệ thống được thiết kế theo mô hình **Microservices Architecture**
 ├── 🗄️ MongoDB - Port 27017
 ├── 📨 Kafka - Port 9092
 ├── 🔑 Keycloak - Port 8180 (Authentication Server)
+├── 🔴 Redis - Port 6379 (Cache Store)
 ├── 📊 Grafana - Port 3001 (Monitoring Dashboard)
 ├── 📋 Loki - Port 3100 (Log Aggregation Server)
 └── 📡 Promtail - Log Collection Agent
@@ -52,10 +53,13 @@ graph TB
     %% External Layer
     Client["🌐 Client/Frontend"] --> BFF["🚪 BFF Service<br/>:3000 (HTTP)"]
     
+    %% BFF Layer with Guard
+    BFF -->|"Guard Check"| UserGuard["🛡️ UserGuard<br/>(Cache Layer)"]
+    UserGuard -->|"gRPC: Authentication"| Auth["🔐 Authorizer<br/>(gRPC Service)"]
+    
     %% BFF TCP Connections
     BFF -->|"TCP: CRUD Invoice"| Invoice["📄 Invoice Service<br/>(TCP Microservice)"]
     BFF -->|"TCP: User Management"| UserAccess["👤 User Access<br/>(TCP Microservice)"]
-    BFF -->|"gRPC: Authentication"| Auth["🔐 Authorizer<br/>(gRPC Service)"]
     
     %% Invoice Service TCP Connections
     Invoice -->|"TCP: Generate PDF"| PDF["📄 PDF Generator<br/>(TCP Microservice)"]
@@ -71,6 +75,9 @@ graph TB
     %% Database Connections
     Invoice -->|"Read/Write"| MongoDB[("🗄️ MongoDB<br/>:27017")]
     UserAccess -->|"Read/Write"| MongoDB
+    
+    %% Cache Layer
+    UserGuard -->|"Token Cache"| Redis["🔴 Redis<br/>:6379"]
     
     %% External Services
     Media -->|"Upload Files"| Cloudinary["☁️ Cloudinary"]
@@ -96,8 +103,10 @@ graph TB
     classDef dbBox fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
     classDef externalBox fill:#fff3e0,stroke:#e65100,stroke-width:2px
     classDef eventBox fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef cacheBox fill:#ffebee,stroke:#c62828,stroke-width:2px
     
     class BFF,Invoice,UserAccess,Auth,PDF,Media,Mail serviceBox
+    class UserGuard,Redis cacheBox
     class MongoDB dbBox
     class Client,Cloudinary,Puppeteer,SMTP,Keycloak externalBox
     class Kafka eventBox
@@ -1392,7 +1401,7 @@ describe('InvoiceService', () => {
 ### 10.3 Performance Optimization
 
 ```typescript
-// Caching with Redis (Future Enhancement)
+// Caching with Redis (Current Implementation)
 @Injectable()
 export class InvoiceService {
   @Cacheable('invoice', 300) // 5 minutes cache
@@ -1404,7 +1413,238 @@ export class InvoiceService {
 
 ---
 
-## 📚 PHẦN 11: TÀI LIỆU THAM KHẢO
+## 🔴 PHẦN 11: REDIS CACHE IMPLEMENTATION
+
+### 11.1 Tổng Quan Redis Cache
+
+Hệ thống đã implement **Redis Cache Layer** để tối ưu hóa performance, đặc biệt cho **authentication process**. Cache được sử dụng chính trong **UserGuard** để tránh việc verify token với Keycloak liên tục.
+
+#### 🎯 Lý Do Implement Cache
+```typescript
+// Vấn đề: Mỗi request đều phải verify token với Keycloak
+// ❌ Without Cache
+BFF Request → UserGuard → Keycloak gRPC → Verify Token → Return UserData
+
+// ✅ With Redis Cache  
+BFF Request → UserGuard → Check Redis → Return Cached UserData (if exists)
+                      ↘ Cache Miss → Keycloak gRPC → Cache Result → Return UserData
+```
+
+### 11.2 Architecture & Configuration
+
+#### 🔧 Redis Configuration
+```typescript
+// libs/configuration/src/lib/redis.config.ts
+export class RedisConfiguration {
+  HOST: string;        // Default: 'redis'
+  PORT: number;        // Default: 6379  
+  TTL: number;         // Default: 30 * 60000 (30 minutes)
+}
+
+export const RedisProvider = CacheModule.registerAsync({
+  imports: [ConfigModule],
+  inject: [ConfigService],
+  useFactory: async (configService: ConfigService) => ({
+    stores: [
+      createKeyv(`redis://${configService.get('REDIS_CONFIG.HOST')}:${configService.get('REDIS_CONFIG.PORT')}`),
+    ],
+    ttl: configService.get('REDIS_CONFIG.TTL'),
+  }),
+});
+```
+
+#### 🏗️ Integration trong BFF
+```typescript
+// apps/bff/src/app/app.module.ts
+@Module({
+  imports: [
+    RedisProvider,  // ← Redis Cache Module
+    // ... other imports
+  ],
+  providers: [
+    { provide: APP_GUARD, useClass: UserGuard }, // ← Guard sử dụng cache
+  ],
+})
+export class AppModule {}
+```
+
+### 11.3 UserGuard Cache Implementation
+
+#### 🛡️ Cache Strategy trong UserGuard
+```typescript
+// libs/guard/src/lib/user.guard.ts
+@Injectable()
+export class UserGuard implements CanActivate {
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    // ... other dependencies
+  ) {}
+
+  // 1. Generate secure cache key
+  generateTokenCacheKey(token: string): string {
+    const hash = crypto.createHash('sha256').update(token).digest('hex');
+    return `user-token:${hash}`;
+  }
+
+  // 2. Cache-first verification strategy
+  private verifyUserToken(req: any): Observable<boolean> {
+    const token = getAccessToken(req);
+    const cacheKey = this.generateTokenCacheKey(token);
+
+    return new Observable<boolean>((observer) => {
+      // Check cache first
+      this.cacheManager.get<AuthorizedResult>(cacheKey).then((cached) => {
+        if (cached) {
+          // ✅ Cache HIT - Use cached data
+          setUserData(req, cached);
+          observer.next(true);
+          observer.complete();
+        } else {
+          // ❌ Cache MISS - Verify with Keycloak
+          this.keycloakService
+            .verifyUserToken({ token, processID })
+            .pipe(
+              map(({ data, error }) => {
+                if (!data?.valid) {
+                  throw new UnauthorizedException(error);
+                }
+
+                setUserData(req, data);
+                
+                // Cache the result for 30 minutes
+                this.cacheManager.set(cacheKey, data, 30 * 60 * 1000);
+
+                observer.next(true);
+                observer.complete();
+              })
+            )
+            .subscribe();
+        }
+      });
+    });
+  }
+}
+```
+
+### 11.4 Cache Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant BFF
+    participant UserGuard  
+    participant Redis
+    participant Keycloak
+
+    Client->>BFF: HTTP Request with Token
+    BFF->>UserGuard: canActivate()
+    UserGuard->>UserGuard: generateTokenCacheKey(token)
+    
+    alt Cache HIT
+        UserGuard->>Redis: get(cacheKey)
+        Redis-->>UserGuard: cached userData
+        UserGuard->>BFF: setUserData() & return true
+        BFF-->>Client: Response with cached data
+    else Cache MISS
+        UserGuard->>Redis: get(cacheKey)
+        Redis-->>UserGuard: null
+        UserGuard->>Keycloak: verifyUserToken(gRPC)
+        Keycloak-->>UserGuard: userData
+        UserGuard->>Redis: set(cacheKey, userData, 30min)
+        UserGuard->>BFF: setUserData() & return true
+        BFF-->>Client: Response with fresh data
+    end
+```
+
+### 11.5 Security Considerations
+
+#### 🔐 Token Security
+```typescript
+// ✅ Security Best Practices
+1. **Hash Token**: SHA256 hash thay vì lưu raw token
+   - Tránh token leakage trong Redis logs
+   - Key collision cực kỳ thấp
+
+2. **TTL Management**: Auto-expire sau 30 phút
+   - Tránh stale data
+   - Sync với Keycloak token expiry
+
+3. **Namespace Keys**: Prefix `user-token:` 
+   - Tránh key collision với cache khác
+   - Dễ dàng monitor và debug
+```
+
+#### 🎯 Cache Key Strategy
+```typescript
+// Cache Key Format: user-token:{sha256_hash}
+const token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...";
+const hash = crypto.createHash('sha256').update(token).digest('hex');
+const cacheKey = `user-token:${hash}`;
+// Result: "user-token:a1b2c3d4e5f6..."
+```
+
+### 11.6 Performance Metrics
+
+#### 📊 Expected Performance Gains
+```typescript
+// Without Cache (mỗi request)
+- Keycloak gRPC call: ~50-100ms
+- Network latency: ~10-20ms  
+- Total per request: ~60-120ms
+
+// With Cache (cache hit)
+- Redis get operation: ~1-5ms
+- Performance gain: 90-95% faster
+- Reduced load on Keycloak: Significant
+```
+
+### 11.7 Monitoring & Debugging
+
+#### 🔍 Debug Commands
+```bash
+# Connect to Redis container
+docker exec -it redis_server redis-cli
+
+# List all cache keys
+KEYS user-token:*
+
+# Get cache value
+GET user-token:a1b2c3d4e5f6...
+
+# Check TTL
+TTL user-token:a1b2c3d4e5f6...
+
+# Monitor cache operations
+MONITOR
+```
+
+#### 📈 Metrics to Track
+- Cache hit ratio
+- Average response time  
+- Keycloak request reduction
+- Memory usage
+
+### 11.8 Thực Hành: Testing Cache
+
+#### 🧪 Test Cache Behavior
+```bash
+# 1. First request (cache miss)
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  http://localhost:3000/api/v1/invoice
+
+# 2. Second request (cache hit - should be faster)  
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  http://localhost:3000/api/v1/invoice
+
+# 3. Check Redis
+docker exec -it redis_server redis-cli
+> KEYS user-token:*
+> GET user-token:{hash}
+```
+
+---
+
+## 📚 PHẦN 12: TÀI LIỆU THAM KHẢO
 
 ### 11.1 Official Documentation
 - [NestJS Documentation](https://docs.nestjs.com/)
@@ -1439,8 +1679,9 @@ Hệ thống E-Invoice này là một ví dụ tuyệt vời về **Production-R
 - **7 Microservices** với vai trò rõ ràng
 - **Mixed Communication**: TCP (sync), gRPC (auth), Kafka (async)
 - **Event-Driven**: Kafka cho decoupled communication
-- **Authentication**: Keycloak integration
+- **Authentication**: Keycloak integration với Redis cache layer
 - **File Processing**: PDF generation và cloud storage
+- **Performance Optimization**: Redis caching cho authentication tokens
 
 ### 🎯 Key Takeaways
 - **Microservices** cần cân nhắc trade-offs giữa complexity và benefits
