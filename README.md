@@ -90,7 +90,7 @@ pnpm docker:start:provider
 pnpm build
 
 # 4. Truy cập Swagger API Documentation
-# http://localhost:3000/api/v1/docs
+# http://localhost:3300/api/v1/docs
 ```
 
 ### Cho Học Viên
@@ -159,97 +159,6 @@ pnpm dev-lite
 
 ---
 
-## 💳 Stripe Payment Integration
-
-### 🎯 Payment Flow
-Hệ thống tích hợp **Stripe** cho thanh toán với flow hoàn chỉnh:
-
-1. **Invoice Creation**: Tạo invoice với thông tin khách hàng
-2. **Send Invoice**: Khi gửi invoice, hệ thống:
-   - Generate PDF và upload lên Cloudinary
-   - Tạo Stripe Checkout Session
-   - Gửi email với payment link đính kèm
-3. **Payment Processing**: Khách hàng click link và thanh toán
-4. **Webhook Handling**: Stripe gửi webhook khi thanh toán thành công
-5. **Status Update**: Invoice status chuyển từ `sent` → `paid`
-
-### 🔧 Stripe Configuration
-```typescript
-// Stripe Configuration
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_SUCCESS_URL=http://localhost:3000/payment/success
-STRIPE_CANCEL_URL=http://localhost:3000/payment/cancel
-```
-
-### 📈 Payment Features
-- ⚡ **Secure Checkout**: Stripe-hosted payment pages
-- 🔄 **Webhook Processing**: Real-time payment status updates
-- 📧 **Email Integration**: Payment links trong email templates
-- 🛡️ **Signature Verification**: Secure webhook handling
-- 💾 **Status Management**: Automatic invoice status updates
-
----
-
-## 🔴 Redis Cache Implementation
-
-### 🎯 Cache Strategy
-Hệ thống sử dụng **Redis** làm cache store chính với các tính năng:
-
-- **Token Caching**: Cache kết quả xác thực từ Keycloak
-- **UserData Caching**: Tránh việc gọi API verify token liên tục
-- **TTL Management**: Auto-expire sau 30 phút
-- **Hash-based Keys**: SHA256 hash của token để bảo mật
-
-### 🔧 Configuration
-```typescript
-// Redis Configuration
-REDIS_HOST=redis (default)
-REDIS_PORT=6379 (default)
-REDIS_TTL=1800000 (30 minutes in milliseconds)
-```
-
-### 📈 Performance Benefits
-- ⚡ **Giảm latency**: Không cần gọi Keycloak mỗi request
-- 🔄 **Tăng throughput**: Cache hit giảm tải cho authentication service
-- 💾 **Optimized Memory**: Chỉ cache dữ liệu cần thiết với TTL
-- 🛡️ **Security**: Token được hash trước khi làm cache key
-
----
-
-## 📈 Cấu Trúc Học Tập Đề Xuất
-
-### Tuần 1-2: Foundation (8 giờ)
-- **Phần 1**: Tổng quan kiến trúc Microservices
-- **Phần 2**: Phân tích BFF & API Gateway Pattern
-- **Thực hành**: Setup và chạy hệ thống, test API
-
-### Tuần 3-4: Core Services (8 giờ)
-- **Phần 3**: Invoice Service - Business Logic
-- **Phần 4**: TCP Communication Patterns
-- **Thực hành**: Thêm endpoint mới, implement validation
-
-### Tuần 5-6: Event-Driven Architecture (8 giờ)
-- **Phần 5**: Kafka Integration & Event Processing
-- **Phần 6**: Mail Service - Event Consumer
-- **Thực hành**: Implement event mới, custom Kafka handler
-
-### Tuần 7-8: Payment Integration (8 giờ)
-- **Phần 7**: Stripe Integration & Webhook Handling
-- **Phần 8**: Payment Flow & Email Templates
-- **Thực hành**: Implement payment features, test webhooks
-
-### Tuần 9-10: Advanced Topics (8 giờ)
-- **Phần 9**: Shared Libraries & Code Organization
-- **Phần 10**: Security, Testing, Monitoring
-- **Thực hành**: Authentication, unit tests, logging
-
-### Tuần 11-12: Production Deployment (8 giờ)
-- **Phần 11**: Docker Deployment & Scaling
-- **Phần 12**: Best Practices & Performance
-- **Thực hành**: Production deployment, monitoring setup
-
----
 
 ## 🛠️ Tools Hỗ Trợ
 
@@ -267,48 +176,6 @@ REDIS_TTL=1800000 (30 minutes in milliseconds)
 - **GitHub**: Tự động render Mermaid diagrams
 - **VSCode**: Mermaid Preview extension
 - **Online**: https://mermaid.live/
-
----
-
-## 🎯 Demo Flow
-
-### 1. Tạo Invoice
-```bash
-POST http://localhost:3000/api/v1/invoice
-Content-Type: application/json
-
-{
-  "client": {
-    "name": "Nguyễn Văn A",
-    "email": "client@example.com",
-    "address": "123 Main St"
-  },
-  "items": [
-    {
-      "name": "Product 1",
-      "quantity": 2,
-      "price": 100000
-    }
-  ],
-  "totalAmount": 200000,
-  "vatAmount": 20000
-}
-```
-
-### 2. Gửi Invoice (Trigger PDF + Email + Payment Link)
-```bash
-POST http://localhost:3000/api/v1/invoice/{invoiceId}/send
-```
-
-### 3. Kiểm tra Flow
-- Invoice status chuyển từ `created` → `sent`
-- PDF được generate và upload lên Cloudinary
-- Stripe Checkout Session được tạo
-- Kafka event được publish với payment link
-- Mail service consume event và gửi email với PDF attachment + payment link
-- Khách hàng click payment link và thanh toán
-- Stripe webhook được gọi khi thanh toán thành công
-- Invoice status chuyển từ `sent` → `paid`
 
 ---
 
