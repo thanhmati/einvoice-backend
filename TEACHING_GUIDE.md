@@ -1,26 +1,43 @@
-# 📚 Tài Liệu Giảng Dạy: Hệ Thống E-Invoice Microservices
+# 📚 Tài Liệu Giảng Dạy: Khoá Học NestJS Microservices Thực Chiến: Từ Zero Đến Hero
 
 [![course thumbnail](https://res.cloudinary.com/djvmkh4cs/image/upload/v1754804493/Course_thumbnail_ej2mgk.png "course thumbnail")](https://res.cloudinary.com/djvmkh4cs/image/upload/v1754804493/Course_thumbnail_ej2mgk.png "course thumbnail")
 
 ## 🎯 Giới Thiệu Khóa Học
 
-Chào mừng các bạn đến với khóa học **"Xây Dựng Hệ Thống E-Invoice với Microservices Architecture"**. Khóa học này sẽ hướng dẫn các bạn phân tích và hiểu sâu một hệ thống thực tế được xây dựng bằng **NestJS**, **MongoDB**, **Kafka**, **Keycloak** và **Docker**.
+Chào mừng các bạn đến với khóa học **"Khoá Học NestJS Microservices Thực Chiến: Từ Zero Đến Hero"**. Khóa học này sẽ hướng dẫn các bạn phân tích và hiểu sâu một hệ thống thực tế được xây dựng bằng **NestJS**, **MongoDB**, **Kafka**, **Keycloak** và **Docker**.
 
 ### 🎓 Đối Tượng Học Viên
-- Đã có kiến thức cơ bản về **NestJS**, **MongoDB**, **TypeScript**
-- Hiểu biết về **REST API** và **HTTP Protocol**
-- Có kinh nghiệm với **Docker** cơ bản
-- Muốn học về **Microservices Architecture** và **Event-Driven Design**
+- Backend Developer muốn nâng cao kỹ năng với NestJS Microservices
+- Fullstack Developer cần hiểu và triển khai kiến trúc microservices trong thực tế
+- Sinh viên / Lập trình viên muốn học các công nghệ như Kafka, Keycloak, Redis, Stripe, Docker
+- Người đang tìm hiểu Event-Driven Architecture và Saga Pattern
+- Developer muốn triển khai hệ thống production-ready với logging & monitoring chuyên nghiệp
+- Ai yêu thích học qua dự án thực chiến thay vì lý thuyết thuần túy
 
 ### 🏆 Mục Tiêu Học Tập
 Sau khóa học, học viên sẽ:
+
 1. Hiểu rõ kiến trúc **Microservices** và **Event-Driven Architecture**
-2. Nắm vững cách thiết kế và implement **API Gateway Pattern** (BFF)
-3. Biết cách sử dụng **Kafka** cho async communication
-4. Áp dụng được các **Design Patterns**: Repository, DI, Factory
-5. Implement được **Error Handling**, **Logging**, **Validation** trong microservices
-6. Thiết kế database schema với **MongoDB** và **Mongoose**
-7. Tích hợp **Keycloak** cho authentication và authorization
+2. Tổ chức mã nguồn theo kiến trúc monorepo với Nx
+3. Nắm vững cách thiết kế và implement **API Gateway Pattern** (BFF)
+4. Tích hợp Stripe để xử lý thanh toán trực tuyến an toàn
+5. Biết cách sử dụng **Kafka** cho async communication
+6. Áp dụng được các **Design Patterns**: Repository, DI, Factory
+7. Implement được **Error Handling**, **Logging**, **Validation** trong microservices
+8. Thiết kế database schema với **MongoDB** và **Mongoose**
+9. Tích hợp **Keycloak** cho authentication và authorization
+10. Thiết lập dashboard giám sát bằng Grafana
+11. Tập trung và quản lý log với Loki, thu thập log container bằng Promtail
+12. Container hóa và triển khai hệ thống với Docker và Docker Compose
+
+### 🛠️ Yêu cầu hoặc điều kiện tiên quyết để tham gia khóa học
+- Kiến thức cơ bản về JavaScript hoặc TypeScript
+- Hiểu các khái niệm REST API và HTTP
+- Có kinh nghiệm với Node.js (Express.js hoặc NestJS cơ bản là một lợi thế)
+- Kiến thức cơ bản về MongoDB hoặc cơ sở dữ liệu bất kỳ
+- Biết sử dụng Docker ở mức cơ bản (pull, run container)
+- Môi trường phát triển đã cài đặt: Node.js, npm hoặc yarn, Docker Desktop
+- Tinh thần sẵn sàng học các công nghệ mới và thực hành trên dự án thực tế
 
 ---
 
