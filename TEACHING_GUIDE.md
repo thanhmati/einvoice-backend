@@ -1,5 +1,7 @@
 # 📚 Tài Liệu Giảng Dạy: Hệ Thống E-Invoice Microservices
 
+[![course thumbnail](https://res.cloudinary.com/djvmkh4cs/image/upload/v1754804493/Course_thumbnail_ej2mgk.png "course thumbnail")](https://res.cloudinary.com/djvmkh4cs/image/upload/v1754804493/Course_thumbnail_ej2mgk.png "course thumbnail")
+
 ## 🎯 Giới Thiệu Khóa Học
 
 Chào mừng các bạn đến với khóa học **"Xây Dựng Hệ Thống E-Invoice với Microservices Architecture"**. Khóa học này sẽ hướng dẫn các bạn phân tích và hiểu sâu một hệ thống thực tế được xây dựng bằng **NestJS**, **MongoDB**, **Kafka**, **Keycloak** và **Docker**.
