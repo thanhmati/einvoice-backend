@@ -61,7 +61,8 @@ Nếu bạn cần hỗ trợ hoặc muốn kết nối thêm ngoài khóa học,
 - 💼 **LinkedIn:** [https://www.linkedin.com/in/thanh270600/](https://www.linkedin.com/in/thanh270600/)  
 - 🐙 **GitHub:** [https://github.com/thanhmati](https://github.com/thanhmati)  
 - 📺 **YouTube:** [https://www.youtube.com/@laptrinhfullstack](https://www.youtube.com/@laptrinhfullstack)  
-- 💬 **Facebook Group:** [https://www.facebook.com/groups/ltfullstack](https://www.facebook.com/groups/ltfullstack)  
+- 💬 **Facebook Group:** [https://www.facebook.com/groups/ltfullstack](https://www.facebook.com/groups/ltfullstack)
+- 📞 **Zalo** 0762216048 
 
 ---
 
