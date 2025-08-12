@@ -46,20 +46,20 @@ Mỗi service đảm nhận **một chức năng riêng biệt**, có thể phá
 ## Sơ đồ kiến trúc Monolithic
 ```mermaid
 flowchart TD
-    A["Client (Web/Mobile)"] --> B["Monolithic Application"]
-    B --> C["UI Layer"]
-    B --> D["Business Logic Layer"]
-    B --> E["Data Access Layer"]
-    E --> F["Database"]
+    %% Nodes
+    A["💻 Client (Web / Mobile)"]:::client --> B["🟨 Monolithic Application"]:::monolith
+    B --> C["🖥️ UI Layer"]:::ui
+    B --> D["⚙️ Business Logic Layer"]:::business
+    B --> E["📂 Data Access Layer"]:::data
+    E --> F["🗄️ Database"]:::database
 
-    %% Style
-    style A fill:#4cafef,stroke:#1a6fb3,stroke-width:2px,color:#fff
-    style B fill:#ff9800,stroke:#e65100,stroke-width:2px,color:#fff
-    style C fill:#81c784,stroke:#388e3c,stroke-width:2px,color:#fff
-    style D fill:#ba68c8,stroke:#6a1b9a,stroke-width:2px,color:#fff
-    style E fill:#f06292,stroke:#ad1457,stroke-width:2px,color:#fff
-    style F fill:#90a4ae,stroke:#455a64,stroke-width:2px,color:#fff
-
+    %% Styles
+    classDef client fill:#87CEEB,stroke:#1E90FF,stroke-width:2px,color:#000,font-weight:bold,stroke-dasharray: 5 5
+    classDef monolith fill:#FFD700,stroke:#DAA520,stroke-width:3px,color:#000,font-weight:bold
+    classDef ui fill:#90EE90,stroke:#2E8B57,stroke-width:2px,color:#000,font-weight:bold
+    classDef business fill:#FFB6C1,stroke:#FF69B4,stroke-width:2px,color:#000,font-weight:bold
+    classDef data fill:#DDA0DD,stroke:#800080,stroke-width:2px,color:#000,font-weight:bold
+    classDef database fill:#FFA07A,stroke:#FF4500,stroke-width:2px,color:#000,font-weight:bold
 
 
 ```
@@ -80,18 +80,29 @@ flowchart TD
 
 ```mermaid
 graph TD;
-    A["Client (Web / Mobile)"] --> B["API Gateway"];
-    B --> C["Auth Service"];
-    B --> D["Order Service"];
-    B --> E["Payment Service"];
-    B --> F["Inventory Service"];
+    A["💻 Client (Web / Mobile)"] --> B["🌐 API Gateway"];
+    B --> C["🔐 Auth Service"];
+    B --> D["🛒 Order Service"];
+    B --> E["💳 Payment Service"];
+    B --> F["📦 Inventory Service"];
 
-    C -->|Kafka / gRPC / REST| G["Database Auth"];
-    D -->|Kafka / gRPC / REST| H["Database Order"];
-    E -->|Kafka / gRPC / REST| I["Database Payment"];
+    C -->|Kafka / gRPC / REST| G["🗄️ Database Auth"];
+    D -->|Kafka / gRPC / REST| H["🗄️ Database Order"];
+    E -->|Kafka / gRPC / REST| I["🗄️ Database Payment"];
 
-    D -->|"Event Bus (Kafka)"| E;
-    E -->|"Event Bus (Kafka)"| F;
+    D -->|"🗂️ Event Bus (Kafka)"| E;
+    E -->|"🗂️ Event Bus (Kafka)"| F;
+
+    %% Styles
+    classDef db fill:#FFA07A,stroke:#FF4500,stroke-width:2px,color:#000,font-weight:bold
+    class G,H,I db
+    classDef service fill:#87CEFA,stroke:#1E90FF,stroke-width:2px,color:#000,font-weight:bold
+    class C,D,E,F service
+    classDef gateway fill:#FFDEAD,stroke:#DAA520,stroke-width:2px,color:#000,font-weight:bold
+    class B gateway
+    classDef client fill:#B0E0E6,stroke:#4682B4,stroke-width:2px,color:#000,font-weight:bold
+    class A client
+
 
 ```
 ---
@@ -181,27 +192,27 @@ Một hệ thống Microservice thường bao gồm các thành phần sau:
 
 ```mermaid
 graph TD;
-    subgraph Client Side
-        A["Client (Web / Mobile)"]
+    subgraph Client_Side
+        A["💻 Client (Web / Mobile)"]
     end
 
-    subgraph Gateway Layer
-        B["API Gateway"]
+    subgraph Gateway_Layer
+        B["🌐 API Gateway"]
     end
 
-    subgraph Service Layer
-        C["Auth Service"]
-        D["Order Service"]
-        E["Payment Service"]
-        F["Inventory Service"]
-        G["Notification Service"]
+    subgraph Service_Layer
+        C["🔐 Auth Service"]
+        D["🛒 Order Service"]
+        E["💳 Payment Service"]
+        F["📦 Inventory Service"]
+        G["📨 Notification Service"]
     end
 
-    subgraph Database Layer
-        CDB["DB Auth"]
-        DDB["DB Order"]
-        EDB["DB Payment"]
-        FDB["DB Inventory"]
+    subgraph Database_Layer
+        CDB["🗄️ DB Auth"]
+        DDB["🗄️ DB Order"]
+        EDB["🗄️ DB Payment"]
+        FDB["🗄️ DB Inventory"]
     end
 
     A --> B
@@ -216,9 +227,23 @@ graph TD;
     E --> EDB
     F --> FDB
 
-    D -->|"Event Bus (Kafka)"| E
-    E -->|"Event Bus (Kafka)"| F
-    F -->|"Event Bus (Kafka)"| G
+    D -->|"🗂️ Event Bus (Kafka)"| E
+    E -->|"🗂️ Event Bus (Kafka)"| F
+    F -->|"🗂️ Event Bus (Kafka)"| G
+
+    %% Styles
+    classDef db fill:#FFA07A,stroke:#FF4500,stroke-width:2px,color:#000,font-weight:bold
+    class CDB,DDB,EDB,FDB db
+
+    classDef service fill:#87CEFA,stroke:#1E90FF,stroke-width:2px,color:#000,font-weight:bold
+    class C,D,E,F,G service
+
+    classDef gateway fill:#FFDEAD,stroke:#DAA520,stroke-width:2px,color:#000,font-weight:bold
+    class B gateway
+
+    classDef client fill:#B0E0E6,stroke:#4682B4,stroke-width:2px,color:#000,font-weight:bold
+    class A client
+
 
 ```
 ---
@@ -262,14 +287,23 @@ Triển khai hệ thống **E-Invoice Microservices** lên Kubernetes cluster, t
 
 ```mermaid
 flowchart LR
-    A[Developer Push Code] --> B[GitHub Actions CI/CD]
-    B --> C[Build & Test]
-    C --> D[Docker Build Image]
-    D --> E[Push to Docker Registry]
-    E --> F[Kubernetes Deploy New Pods]
-    F --> G[Service Available to Users]
-    G --> H[Monitoring\nGrafana & Prometheus]
-    G --> I[Logging\nLoki]
+    A["👨‍💻 Developer Push Code"] --> B["⚙️ GitHub Actions CI/CD"]
+    B --> C["🔧 Build & Test"]
+    C --> D["🐳 Docker Build Image"]
+    D --> E["📤 Push to Docker Registry"]
+    E --> F["☸️ Kubernetes Deploy New Pods"]
+    F --> G["✅ Service Available to Users"]
+    G --> H["📈 Monitoring\nGrafana & Prometheus"]
+    G --> I["📜 Logging\nLoki"]
+
+    %% Styles
+    classDef process fill:#7FFFD4,stroke:#20B2AA,stroke-width:2px,color:#000,font-weight:bold
+    class B,C,D,E,F,G,H,I process
+
+    classDef start fill:#FFD700,stroke:#DAA520,stroke-width:3px,color:#000,font-weight:bold
+    class A start
+```
+
 
 
 
