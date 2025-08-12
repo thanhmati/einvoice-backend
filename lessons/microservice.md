@@ -21,7 +21,50 @@ Mỗi service đảm nhận **một chức năng riêng biệt**, có thể phá
 
 ---
 
-## 2. So sánh Monolithic vs Microservice
+## 2. Monolithic là gì?
+
+**Monolithic Architecture** là mô hình kiến trúc phần mềm trong đó **toàn bộ ứng dụng** (gồm frontend, backend, business logic, database access) được gói gọn và triển khai như **một khối duy nhất**.
+
+## Đặc điểm
+- Một codebase duy nhất.
+- Triển khai dưới dạng **một file** (hoặc container) duy nhất.
+- Các module chia sẻ chung tài nguyên và runtime.
+
+## Ưu điểm
+- Đơn giản để phát triển và triển khai ban đầu.
+- Debug, test nhanh ở giai đoạn nhỏ.
+- Dễ quản lý khi team nhỏ.
+
+## Nhược điểm
+- Khó mở rộng từng phần.
+- Deploy phải build lại toàn bộ hệ thống.
+- Dễ bị ảnh hưởng dây chuyền khi lỗi.
+
+## Ví dụ
+Ứng dụng e-invoice ban đầu viết toàn bộ API, UI, xử lý PDF, email… trong **một project duy nhất**.
+
+## Sơ đồ kiến trúc Monolithic
+```mermaid
+flowchart TD
+    A["Client (Web/Mobile)"] --> B["Monolithic Application"]
+    B --> C["UI Layer"]
+    B --> D["Business Logic Layer"]
+    B --> E["Data Access Layer"]
+    E --> F["Database"]
+
+    %% Style
+    style A fill:#4cafef,stroke:#1a6fb3,stroke-width:2px,color:#fff
+    style B fill:#ff9800,stroke:#e65100,stroke-width:2px,color:#fff
+    style C fill:#81c784,stroke:#388e3c,stroke-width:2px,color:#fff
+    style D fill:#ba68c8,stroke:#6a1b9a,stroke-width:2px,color:#fff
+    style E fill:#f06292,stroke:#ad1457,stroke-width:2px,color:#fff
+    style F fill:#90a4ae,stroke:#455a64,stroke-width:2px,color:#fff
+
+
+
+```
+
+## 3. So sánh Monolithic vs Microservice
 
 | Tiêu chí        | Monolithic | Microservice |
 |-----------------|------------|--------------|
@@ -33,7 +76,7 @@ Mỗi service đảm nhận **một chức năng riêng biệt**, có thể phá
 
 ---
 
-## 3. Cấu trúc tổng quan hệ thống Microservice
+## 4. Cấu trúc tổng quan hệ thống Microservice
 
 ```mermaid
 graph TD;
@@ -227,6 +270,7 @@ flowchart LR
     F --> G[Service Available to Users]
     G --> H[Monitoring\nGrafana & Prometheus]
     G --> I[Logging\nLoki]
+
 
 
 
