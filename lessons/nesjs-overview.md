@@ -1,6 +1,6 @@
 # Giới thiệu tổng quan về NestJS
 
-<img width="1024" height="576" alt="image" src="https://github.com/user-attachments/assets/ce098d83-0013-4f8f-9d0f-0d5c467317b0" />
+<img width="740" height="360" alt="image" src="https://github.com/user-attachments/assets/ab94d0ac-4926-4c76-b1b4-9002afe920b9" />
 
 ## 1. NestJS là gì?
 
