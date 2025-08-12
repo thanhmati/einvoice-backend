@@ -10,6 +10,10 @@
 ---
 
 ## 1. Microservice là gì?
+
+<img width="1200" height="675" alt="image" src="https://github.com/user-attachments/assets/fadd7249-a45c-4c3b-a6b2-fe1e70ffa43f" />
+
+
 **Microservice** là một kiến trúc phần mềm trong đó hệ thống được chia thành nhiều **dịch vụ nhỏ** (services) độc lập.  
 Mỗi service đảm nhận **một chức năng riêng biệt**, có thể phát triển, triển khai và mở rộng độc lập.
 
@@ -19,9 +23,16 @@ Mỗi service đảm nhận **một chức năng riêng biệt**, có thể phá
 - **Scalability**: Có thể scale từng service độc lập.
 - **Polyglot**: Mỗi service có thể dùng ngôn ngữ & công nghệ khác nhau.
 
+🔍 **Ưu điểm:**
+<img width="1200" height="675" alt="image" src="https://github.com/user-attachments/assets/77474a48-3774-434a-85bc-f2065e2949a8" />
+
+
 ---
 
 ## 2. Monolithic là gì?
+
+<img width="1200" height="610" alt="image" src="https://github.com/user-attachments/assets/dcfe3317-8e66-43ed-b62d-86bd7c207cf0" />
+
 
 **Monolithic Architecture** là mô hình kiến trúc phần mềm trong đó **toàn bộ ứng dụng** (gồm frontend, backend, business logic, database access) được gói gọn và triển khai như **một khối duy nhất**.
 
@@ -303,6 +314,7 @@ flowchart LR
     classDef start fill:#FFD700,stroke:#DAA520,stroke-width:3px,color:#000,font-weight:bold
     class A start
 ```
+
 
 
 
