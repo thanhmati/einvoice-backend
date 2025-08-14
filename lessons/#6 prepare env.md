@@ -22,7 +22,7 @@ Trước khi bắt đầu coding, học viên cần cài đặt đầy đủ cá
    ```bash
    node -v
    npm -v
-  ```
+   ```
 ## 2️⃣ Visual Studio Code (VSCode)
 
 **Công dụng:** Trình soạn thảo code mạnh mẽ, hỗ trợ nhiều extension cho Node.js và NestJS.
@@ -64,7 +64,7 @@ Trước khi bắt đầu coding, học viên cần cài đặt đầy đủ cá
 4. Kiểm tra bằng lệnh:
    ```bash
    docker --version
-  ```
+   ```
 ## 5️⃣ Postman
 
 **Công dụng:** Công cụ test API, gửi request đến backend và xem response.
