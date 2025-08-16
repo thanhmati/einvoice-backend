@@ -23,7 +23,27 @@ Trước khi bắt đầu coding, học viên cần cài đặt đầy đủ cá
    node -v
    npm -v
    ```
-## 2️⃣ Visual Studio Code (VSCode)
+   
+## 2️⃣ pnpm (Package Manager)
+
+**Công dụng:** Quản lý package thay cho npm/yarn, tối ưu dung lượng node_modules và tốc độ cài đặt, đặc biệt hữu ích khi làm việc với **monorepo (Nx)**.
+
+**Cài đặt:**
+
+1. Sau khi cài Node.js, dùng npm để cài pnpm toàn cục:  
+   ```bash
+   npm install -g pnpm
+   ```
+2. Kiểm tra phiên bản:  
+   ```bash
+   pnpm -v
+   ```
+3. (Tùy chọn) Với macOS/Linux, có thể cài qua Homebrew:
+   ```bash
+   brew install pnpm
+   ```    
+   
+## 3️⃣ Visual Studio Code (VSCode)
 
 **Công dụng:** Trình soạn thảo code mạnh mẽ, hỗ trợ nhiều extension cho Node.js và NestJS.
 
@@ -39,7 +59,7 @@ Trước khi bắt đầu coding, học viên cần cài đặt đầy đủ cá
 
 ---
 
-## 3️⃣ MongoDB Compass
+## 4️⃣ MongoDB Compass
 
 **Công dụng:** Giao diện đồ họa để quản lý cơ sở dữ liệu MongoDB.
 
@@ -52,7 +72,7 @@ Trước khi bắt đầu coding, học viên cần cài đặt đầy đủ cá
    - Local: `mongodb://localhost:27017`
    - Remote: Dùng connection string từ MongoDB Atlas hoặc server.
 
-## 4️⃣ Docker
+## 5️⃣ Docker
 
 **Công dụng:** Chạy môi trường phát triển, cơ sở dữ liệu, hoặc các dịch vụ phụ trợ trong container mà không cần cài trực tiếp lên máy.
 
@@ -65,7 +85,7 @@ Trước khi bắt đầu coding, học viên cần cài đặt đầy đủ cá
    ```bash
    docker --version
    ```
-## 5️⃣ Postman
+## 6️⃣ Postman
 
 **Công dụng:** Công cụ test API, gửi request đến backend và xem response.
 
