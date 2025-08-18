@@ -20,6 +20,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.13.4",
     "@keyv/redis": "^5.1.0",
+    "@nest-lab/throttler-storage-redis": "^1.1.0",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.1.4",
     "@nestjs/config": "^4.0.2",
@@ -28,6 +29,7 @@
     "@nestjs/mongoose": "^11.0.3",
     "@nestjs/platform-express": "^11.1.4",
     "@nestjs/swagger": "^11.2.0",
+    "@nestjs/throttler": "^6.4.0",
     "axios": "^1.10.0",
     "cache-manager": "^7.1.0",
     "class-transformer": "^0.5.1",

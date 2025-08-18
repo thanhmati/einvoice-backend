@@ -8,11 +8,12 @@ import { ProductModule } from './modules/product/product.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { UserModule } from './modules/user/user.module';
 import { ClientsModule } from '@nestjs/microservices';
-import { GRPC_SERVICES, GrpcProvider } from '@common/configuration';
+import { GRPC_SERVICES, GrpcProvider, ThrottlerProvider } from '@common/configuration';
 import { UserGuard } from '@common/guard/user.guard';
 import { AuthorizerModule } from './modules/authorizer/authorizer.module';
 import { RedisProvider } from '@common/configuration';
 import { PaymentModule } from './modules/payment/payment.module';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { PaymentModule } from './modules/payment/payment.module';
     PaymentModule,
     UserModule,
     AuthorizerModule,
+    ThrottlerProvider,
   ],
   controllers: [],
   providers: [
@@ -35,6 +37,7 @@ import { PaymentModule } from './modules/payment/payment.module';
       useClass: ExceptionInterceptor,
     },
     { provide: APP_GUARD, useClass: UserGuard },
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
 export class AppModule implements NestModule {
