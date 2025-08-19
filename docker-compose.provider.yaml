@@ -6,39 +6,39 @@ networks:
     name: einvoice-nw
 
 services:
-  # grafana:
-  #   image: grafana/grafana
-  #   container_name: grafana
-  #   ports:
-  #     - 3000:3000
-  #   volumes:
-  #     - ./docker/docker_data/grafana-data:/var/lib/grafana
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./docker/docker_data/grafana-data:/var/lib/grafana
 
-  #   networks:
-  #     - einvoice-nw
+    networks:
+      - einvoice-nw
 
-  # loki:
-  #   image: grafana/loki
-  #   container_name: loki
-  #   ports:
-  #     - 3100:3100
-  #   volumes:
-  #     - ./docker/loki-config.yaml:/etc/loki/loki.yaml
-  #   networks:
-  #     - einvoice-nw
+  loki:
+    image: grafana/loki
+    container_name: loki
+    ports:
+      - 3100:3100
+    volumes:
+      - ./docker/loki-config.yaml:/etc/loki/loki.yaml
+    networks:
+      - einvoice-nw
 
-  # promtail:
-  #   image: grafana/promtail
-  #   container_name: promtail
-  #   volumes:
-  #     - ./docker/promtail-config.yaml:/etc/promtail/config.yml
-  #     - /var/lib/docker/containers:/var/lib/docker/containers:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   command: -config.file=/etc/promtail/config.yml
-  #   depends_on:
-  #     - loki
-  #   networks:
-  #     - einvoice-nw
+  promtail:
+    image: grafana/promtail
+    container_name: promtail
+    volumes:
+      - ./docker/promtail-config.yaml:/etc/promtail/config.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - einvoice-nw
 
   kafka:
     container_name: kafka_server
