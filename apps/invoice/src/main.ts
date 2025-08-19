@@ -3,40 +3,19 @@
  * This is only a minimal backend to get started.
  */
 
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { Logger } from '@nestjs/common';
-declare const module: any;
 
 async function bootstrap() {
-  try {
-    const app = await NestFactory.create(AppModule, {
-      logger: ['error', 'warn', 'log', 'debug', 'verbose'],
-    });
-
-    app.connectMicroservice<MicroserviceOptions>({
-      transport: Transport.TCP,
-      options: {
-        port: AppModule.CONFIGURATION.TCP_SERV.TCP_INVOICE_SERVICE.options.port,
-        host: AppModule.CONFIGURATION.TCP_SERV.TCP_INVOICE_SERVICE.options.host,
-      },
-    });
-
-    app.enableCors({
-      origin: '*',
-    });
-
-    if (module.hot) {
-      module.hot.accept();
-      module.hot.dispose(() => app.close());
-    }
-
-    await app.startAllMicroservices();
-    await app.listen(3001);
-  } catch (error) {
-    Logger.error(`❌ Application failed to start: ${error}`, '', 'Bootstrap', false);
-  }
+  const app = await NestFactory.create(AppModule);
+  const globalPrefix = 'api';
+  app.setGlobalPrefix(globalPrefix);
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+  Logger.log(
+    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
+  );
 }
 
 bootstrap();

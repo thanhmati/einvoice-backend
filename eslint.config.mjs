@@ -1,12 +1,11 @@
 import nx from '@nx/eslint-plugin';
-import parser from 'jsonc-eslint-parser';
 
 export default [
   ...nx.configs['flat/base'],
   ...nx.configs['flat/typescript'],
   ...nx.configs['flat/javascript'],
   {
-    ignores: ['**/dist', '**/node_modules'],
+    ignores: ['**/dist'],
   },
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
@@ -39,25 +38,5 @@ export default [
     ],
     // Override or add rules here
     rules: {},
-  },
-  {
-    files: ['**/*.ts', '**/*.tsx'],
-    rules: {
-      '@typescript-eslint/no-unused-vars': 'error',
-    },
-  },
-  {
-    files: ['**/*.spec.ts', '**/*.spec.tsx', '**/*.spec.js', '**/*.spec.jsx'],
-    languageOptions: {},
-    rules: {},
-  },
-  {
-    files: ['**/*.json'],
-    languageOptions: {
-      parser: parser,
-    },
-    rules: {
-      '@nx/dependency-checks': 'error',
-    },
   },
 ];

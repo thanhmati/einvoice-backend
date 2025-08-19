@@ -1,26 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { CONFIGURATION, TConfiguration } from '../configuration';
-import { InvoiceModule } from './modules/invoice/invoice.module';
-import { ProductModule } from './modules/product/product.module';
-import { KafkaModule } from '@common/queue/modules/kafka/kafka.module';
-import { KAFKA_SERVICES } from '@common/constants/enums/kafka.enum';
-import { PaymentModule } from './modules/payment/payment.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [() => ({ ...CONFIGURATION })],
-    }),
-    InvoiceModule,
-    ProductModule,
-    PaymentModule,
-    KafkaModule.forProducerAsync({ serviceName: KAFKA_SERVICES.INVOICE }),
-  ],
-
-  providers: [],
+  imports: [],
+  controllers: [AppController],
+  providers: [AppService],
 })
-export class AppModule {
-  static CONFIGURATION: TConfiguration = CONFIGURATION;
-}
+export class AppModule {}

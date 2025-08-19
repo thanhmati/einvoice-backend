@@ -3,64 +3,19 @@
  * This is only a minimal backend to get started.
  */
 
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-declare const module: any;
 
 async function bootstrap() {
-  try {
-    const isDev = AppModule.CONFIGURATION.IS_DEV;
-    const globalPrefix = AppModule.CONFIGURATION.GLOBAL_PREFIX;
-    const port = AppModule.CONFIGURATION.APP_CONFIG.PORT || 3000;
-
-    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-      logger: isDev ? ['error', 'warn', 'log', 'debug', 'verbose'] : ['error', 'warn', 'log'],
-      rawBody: true,
-    });
-
-    app.enableCors({
-      origin: '*',
-    });
-
-    if (module.hot) {
-      module.hot.accept();
-      module.hot.dispose(() => app.close());
-    }
-
-    app.useBodyParser('json', { limit: '20mb' });
-    app.setGlobalPrefix(globalPrefix);
-    app.useGlobalPipes(new ValidationPipe({ transform: true }));
-
-    const config = new DocumentBuilder()
-      .setTitle('E-bff API')
-      .setDescription('The E-bff API description')
-      .setVersion('1.0.0')
-      .addBearerAuth({
-        description: 'Default JWT Authorization',
-        type: 'http',
-        in: 'header',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'Authorization',
-      })
-      .build();
-
-    const documentFactory = () => SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup(`${globalPrefix}/docs`, app, documentFactory, {
-      swaggerOptions: {
-        filter: true,
-      },
-    });
-
-    await app.listen(port);
-    Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`);
-    Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}/docs`);
-  } catch (error) {
-    Logger.error(`❌ Application failed to start: ${error}`, '', 'Bootstrap', false);
-  }
+  const app = await NestFactory.create(AppModule);
+  const globalPrefix = 'api';
+  app.setGlobalPrefix(globalPrefix);
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+  Logger.log(
+    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
+  );
 }
 
 bootstrap();
