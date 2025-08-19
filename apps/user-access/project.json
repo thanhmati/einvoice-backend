@@ -39,6 +39,12 @@
       "options": {
         "passWithNoTests": true
       }
+    },
+    "seed": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/seed.js apps/user-access/src/app/seeder migrate"
+      }
     }
   }
 }
