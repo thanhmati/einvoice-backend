@@ -14,9 +14,9 @@
 8. [📈 PHẦN 6: BUSINESS FLOW ANALYSIS](#-phần-6-business-flow-analysis)
 9. [🏛️ PHẦN 7: ARCHITECTURAL PATTERNS](#-phần-7-architectural-patterns)
 10. [🛠️ PHẦN 8: DEPLOYMENT & DOCKER](#-phần-8-deployment--docker)
-11. [🔴 PHẦN 11: REDIS CACHE IMPLEMENTATION](#-phần-11-redis-cache-implementation)
-12. [🧪 PHẦN 9: BÀI TẬP THỰC HÀNH](#-phần-9-bài-tập-thực-hành)
-13. [🚀 PHẦN 10: ADVANCED TOPICS](#-phần-10-advanced-topics)
+11. [🔴 PHẦN 9: REDIS CACHE IMPLEMENTATION](#-phần-9-redis-cache-implementation)
+12. [🧪 PHẦN 10: BÀI TẬP THỰC HÀNH](#-phần-10-bài-tập-thực-hành)
+13. [🚀 PHẦN 11: ADVANCED TOPICS](#-phần-11-advanced-topics)
 14. [📚 PHẦN 12: TÀI LIỆU THAM KHẢO](#-phần-12-tài-liệu-tham-khảo)
 
 ---
@@ -999,9 +999,9 @@ pnpm build
 
 ---
 
-## 🔴 PHẦN 11: REDIS CACHE IMPLEMENTATION
+## 🔴 PHẦN 9: REDIS CACHE IMPLEMENTATION
 
-### 11.1 Tổng Quan Redis Cache
+### 9.1 Tổng Quan Redis Cache
 
 Hệ thống đã implement **Redis Cache Layer** để tối ưu hóa performance, đặc biệt cho **authentication process**. Cache được sử dụng chính trong **UserGuard** để tránh việc verify token với Keycloak liên tục.
 
@@ -1016,7 +1016,7 @@ BFF Request → UserGuard → Check Redis → Return Cached UserData (if exists)
                       ↘ Cache Miss → Keycloak gRPC → Cache Result → Return UserData
 ```
 
-### 11.2 Architecture & Configuration
+### 9.2 Architecture & Configuration
 
 #### 🔧 Redis Configuration
 ```typescript
@@ -1054,7 +1054,7 @@ export const RedisProvider = CacheModule.registerAsync({
 export class AppModule {}
 ```
 
-### 11.3 UserGuard Cache Implementation
+### 9.3 UserGuard Cache Implementation
 
 #### 🛡️ Cache Strategy trong UserGuard
 ```typescript
@@ -1112,7 +1112,7 @@ export class UserGuard implements CanActivate {
 }
 ```
 
-### 11.4 Cache Flow Diagram
+### 9.4 Cache Flow Diagram
 
 ```mermaid
 sequenceDiagram
@@ -1142,7 +1142,7 @@ sequenceDiagram
     end
 ```
 
-### 11.5 Security Considerations
+### 9.5 Security Considerations
 
 #### 🔐 Token Security
 ```typescript
@@ -1169,7 +1169,7 @@ const cacheKey = `user-token:${hash}`;
 // Result: "user-token:a1b2c3d4e5f6..."
 ```
 
-### 11.6 Performance Metrics
+### 9.6 Performance Metrics
 
 #### 📊 Expected Performance Gains
 ```typescript
@@ -1186,7 +1186,7 @@ const cacheKey = `user-token:${hash}`;
 
 ---
 
-## 🧪 PHẦN 9: BÀI TẬP THỰC HÀNH
+## 🧪 PHẦN 10: BÀI TẬP THỰC HÀNH
 
 ### Bài 1: Thêm Invoice Status Mới
 **Mục tiêu**: Thêm status `CANCELLED` cho invoice
@@ -1274,7 +1274,7 @@ curl -X POST http://admin:admin@localhost:3001/api/datasources \
 
 ---
 
-## 🚀 PHẦN 10: ADVANCED TOPICS
+## 🚀 PHẦN 11: ADVANCED TOPICS
 
 ### 10.1 Authentication với Keycloak
 
