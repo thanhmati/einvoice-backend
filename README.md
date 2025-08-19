@@ -1,3 +1,170 @@
+# 📚 Hướng Dẫn Sử Dụng Tài Liệu Giảng Dạy - Hệ Thống E-Invoice
+
+## 📋 Danh Sách Tài Liệu
+
+| File | Mục Đích | Đối Tượng |
+|------|----------|-----------|
+| **TEACHING_GUIDE.md** | Tài liệu chi tiết cho học viên | 🎓 Học viên |
+| **INSTRUCTOR_SUMMARY.md** | Hướng dẫn ngắn gọn cho giảng viên | 👨‍🏫 Giảng viên |
+| **README.md** | File này - hướng dẫn sử dụng | 📖 Tất cả |
+
+---
+
+## 🏗️ Kiến Trúc Hệ Thống
+
+Hệ thống E-Invoice được xây dựng theo mô hình **Microservices Architecture** với **Nx Monorepo**:
+
+```
+📦 E-Invoice System
+├── 🌐 BFF (Backend for Frontend) - Port 3000
+├── 📄 Invoice Service - TCP Microservice
+├── 📁 Media Service - TCP Microservice  
+├── 📄 PDF Generator Service - TCP Microservice
+├── 📧 Mail Service - Kafka Consumer
+├── 👤 User Access Service - TCP Microservice
+├── 🔐 Authorizer Service - gRPC Microservice
+├── 💳 Payment Service - TCP Microservice (Stripe Integration)
+├── 🗄️ MongoDB - Port 27017
+├── 📨 Kafka - Port 9092
+├── 🔑 Keycloak - Port 8180
+├── 🔴 Redis - Port 6379 (Cache Store)
+├── 📊 Grafana - Port 3000 (Monitoring Dashboard)
+├── 📋 Loki - Port 3100 (Log Aggregation)
+└── 📡 Promtail - Log Collection Agent
+```
+
+### 🔄 Communication Patterns
+- **BFF ↔ Services**: TCP (Synchronous)
+- **Authorizer Service**: gRPC (Synchronous)
+- **Event Processing**: Kafka (Asynchronous)
+- **Database**: MongoDB với Mongoose
+- **Cache Layer**: Redis với @nestjs/cache-manager
+- **Payment Integration**: Stripe Webhook (Asynchronous)
+
+---
+
+## 🎯 Cách Sử Dụng
+
+### Cho Giảng Viên 👨‍🏫
+
+1. **Bắt đầu với**: `INSTRUCTOR_SUMMARY.md`
+   - Tổng quan nhanh về repo
+   - Cấu trúc khóa học đề xuất
+   - Cách chạy demo
+   - Bài tập thực hành
+
+2. **Tham khảo chi tiết**: `TEACHING_GUIDE.md`
+   - Nội dung giảng dạy đầy đủ
+   - Code examples với giải thích
+   - Sơ đồ Mermaid chi tiết
+   - Best practices
+
+### Cho Học Viên 🎓
+
+1. **Tài liệu chính**: `TEACHING_GUIDE.md`
+   - Đọc tuần tự từ Phần 1 → Phần 11
+   - Thực hành theo bài tập
+   - Tham khảo sơ đồ để hiểu flow
+
+---
+
+## 🚀 Quick Start
+
+### Yêu Cầu Hệ Thống
+- **Node.js**: v18+
+- **pnpm**: Latest version
+- **Docker**: Latest version
+- **RAM**: 8GB (16GB recommended)
+
+### Cho Giảng Viên
+```bash
+# 1. Clone và setup
+git clone <repo-url>
+cd <repo-name>
+pnpm install
+
+# 2. Khởi động infrastructure (MongoDB + Kafka + Keycloak + Redis + Logging Stack)
+pnpm docker:start:provider
+
+# 3. Build và start tất cả services
+pnpm build
+
+# 4. Truy cập Swagger API Documentation
+# http://localhost:3000/api/v1/docs
+```
+
+### Cho Học Viên
+```bash
+# 1. Clone repo
+git clone <repo-url>
+cd <repo-name>
+
+# 2. Install dependencies
+pnpm install
+
+# 3. Start infrastructure
+pnpm docker:start:provider
+
+# 4. Development mode (chạy tất cả services)
+pnpm dev
+
+# 5. Development mode (chỉ chạy core services)
+pnpm dev-lite
+```
+
+---
+
+## 🔍 Highlights của Hệ Thống
+
+### 🏛️ Architecture Patterns
+- ✅ **Microservices Architecture** với 8 services
+- ✅ **API Gateway Pattern** (BFF)
+- ✅ **Event-Driven Architecture** với Kafka
+- ✅ **Repository Pattern** cho data access
+- ✅ **Dependency Injection** với NestJS
+- ✅ **Payment Integration** với Stripe
+
+### 💡 Technology Stack (Updated)
+- **Framework**: NestJS v11.1.4 với TypeScript v5.8.3
+- **Package Manager**: pnpm
+- **Monorepo**: Nx v21.2.4
+- **Database**: MongoDB v6.18.0 + Mongoose v8.16.4
+- **Message Queue**: Kafka (kafkajs v2.2.4)
+- **Authentication**: Keycloak v25.0.0
+- **Cache Store**: Redis + @keyv/redis v5.1.0 + @nestjs/cache-manager v3.0.1
+- **File Storage**: Cloudinary v2.7.0
+- **PDF Generation**: Puppeteer v24.15.0 + EJS v3.1.10
+- **Email**: Nodemailer v7.0.5
+- **Payment**: Stripe v18.4.0 (Checkout Sessions + Webhooks)
+- **Containerization**: Docker + Docker Compose
+- **Monitoring**: Grafana Dashboard
+- **Log Aggregation**: Loki + Promtail
+- **Rate Limiting**: @nestjs/throttler v6.4.0
+- **API Documentation**: @nestjs/swagger v11.2.0
+- **Testing**: Jest v30.0.4
+- **Code Quality**: ESLint v9.31.0 + Prettier v3.6.2
+
+### 📊 Production-Ready Features (Updated)
+- ✅ Global error handling với ExceptionInterceptor
+- ✅ Request logging với LoggerMiddleware
+- ✅ Process ID tracking across services
+- ✅ DTO validation với class-validator
+- ✅ Swagger API documentation
+- ✅ Docker containerization
+- ✅ Environment-based configuration
+- ✅ **Redis Cache Layer** cho authentication tokens
+- ✅ **UserData Caching** trong UserGuard để tránh auto verify token
+- ✅ **Token-based Caching Strategy** với SHA256 hash keys
+- ✅ Centralized logging với Grafana + Loki + Promtail
+- ✅ Real-time log monitoring và dashboard
+- ✅ Container log aggregation và search
+- ✅ **Stripe Payment Integration** với webhook handling
+- ✅ **Payment Link Generation** trong email templates
+- ✅ **Rate Limiting** với @nestjs/throttler
+- ✅ **Permission-based Authorization** với PermissionGuard
+
+---
+
 ## 🛠️ Tools Hỗ Trợ
 
 ### Development Tools
