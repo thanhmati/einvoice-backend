@@ -1,21 +1,39 @@
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const fs = require('fs');
 const path = require('path');
+
+function mapData(_data) {
+  return _data.map((item) => {
+    return Object.entries(item).reduce((acc, [key, value]) => {
+      if (key === '_id' && value?.$oid) {
+        acc[key] = new ObjectId(value.$oid);
+      } else if (value?.$oid) {
+        acc[key] = new ObjectId(value.$oid);
+      } else if (value?.$date) {
+        acc[key] = new Date(value.$date);
+      } else {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+  });
+}
 
 async function processFile(filePath, mode, db) {
   const raw = fs.readFileSync(filePath, 'utf8');
   const seed = JSON.parse(raw);
+  const seedData = mapData(seed.data);
 
   const collection = db.collection(seed.collection);
 
   if (mode === 'prune') {
     await collection.deleteMany({});
-    if (seed.data.length > 0) {
-      await collection.insertMany(seed.data);
+    if (seedData.length > 0) {
+      await collection.insertMany(seedData);
     }
-    console.log(`✅ [${seed.collection}] pruned & inserted ${seed.data.length} docs`);
+    console.log(`✅ [${seed.collection}] pruned & inserted ${seedData.length} docs`);
   } else if (mode === 'migrate') {
-    for (const doc of seed.data) {
+    for (const doc of seedData) {
       const exists = await collection.findOne(doc);
       if (!exists) {
         await collection.insertOne(doc);

@@ -2,6 +2,9 @@
   "collection": "role",
   "data": [
     {
+      "_id": {
+        "$oid": "68a3f2f1b3e811435a8ad004"
+      },
       "name": "administrator",
       "description": "admin role with all permissions",
       "permissions": [
@@ -28,6 +31,9 @@
       ]
     },
     {
+      "_id": {
+        "$oid": "68a3f2f1b3e811435a8ad005"
+      },
       "name": "accountant",
       "description": "accountant role with user permissions",
       "permissions": [

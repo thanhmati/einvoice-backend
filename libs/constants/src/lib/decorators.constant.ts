@@ -5,6 +5,7 @@ export enum MetadataKeys {
   PERMISSIONS = 'permissions',
   START_TIME = 'startTime',
   ACCESS_TOKEN = 'accessToken',
+  ROLES = 'roles',
 }
 
 export const EXECUTION_CONTEXT_REQ_INDEX = 0;

@@ -10,6 +10,7 @@ export enum PERMISSION {
   INVOICE_GET_ALL = 'invoice.get_all',
   INVOICE_UPDATE = 'invoice.update',
   INVOICE_DELETE = 'invoice.delete',
+  INVOICE_SEND = 'invoice.send',
 
   /* USER */
   USER_CREATE = 'user.create',

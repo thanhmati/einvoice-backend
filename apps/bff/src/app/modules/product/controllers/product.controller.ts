@@ -9,6 +9,8 @@ import { ProcessID } from '@common/decorators/processID.decorator';
 import { map } from 'rxjs';
 import { ResponseDto } from '@common/interfaces/gateway/common/response.interface';
 import { Authorization } from '@common/decorators/authorizer.decorator';
+import { PERMISSION } from '@common/constants/role.constant';
+import { Permissions } from '@common/decorators/permission.decorator';
 
 @ApiTags('Product')
 @Controller('product')
@@ -23,6 +25,7 @@ export class ProductController {
     summary: 'Create new a product',
   })
   @Authorization({ secured: true })
+  @Permissions(PERMISSION.PRODUCT_CREATE)
   create(@Body() body: CreateProductRequestDto, @ProcessID() processID: string) {
     return this.invoiceClient
       .send<string, CreateProductTcpReq>(TCP_REQUEST_MESSAGE.PRODUCT.CREATE, {
@@ -40,6 +43,7 @@ export class ProductController {
     summary: 'Get all products',
   })
   @Authorization({ secured: true })
+  @Permissions(PERMISSION.PRODUCT_GET_ALL)
   getAll(@ProcessID() processID: string) {
     return this.invoiceClient
       .send<ProductTcpRes[]>(TCP_REQUEST_MESSAGE.PRODUCT.GET_ALL, {
@@ -56,6 +60,7 @@ export class ProductController {
     summary: 'Get a product by id',
   })
   @Authorization({ secured: true })
+  @Permissions(PERMISSION.PRODUCT_GET_BY_ID)
   getById(@Param('id') id: string, @ProcessID() processID: string) {
     return this.invoiceClient
       .send<ProductTcpRes, string>(TCP_REQUEST_MESSAGE.PRODUCT.GET_BY_ID, {

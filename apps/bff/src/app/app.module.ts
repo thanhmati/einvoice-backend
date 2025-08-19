@@ -14,6 +14,7 @@ import { AuthorizerModule } from './modules/authorizer/authorizer.module';
 import { RedisProvider } from '@common/configuration';
 import { PaymentModule } from './modules/payment/payment.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { PermissionGuard } from '@common/guard/permission.guard';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
       useClass: ExceptionInterceptor,
     },
     { provide: APP_GUARD, useClass: UserGuard },
+    { provide: APP_GUARD, useClass: PermissionGuard },
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
