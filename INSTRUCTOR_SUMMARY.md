@@ -4,7 +4,7 @@
 
 Repo này là một **hệ thống E-Invoice hoàn chỉnh** được xây dựng theo **Microservices Architecture** với NestJS. Đây là case study lý tưởng để giảng dạy về:
 
-- ✅ **Microservices Architecture** với 7 services
+- ✅ **Microservices Architecture** với 8 services
 - ✅ **Event-Driven Architecture** với Kafka
 - ✅ **API Gateway Pattern** (BFF)
 - ✅ **Mixed Communication Patterns** (TCP, gRPC, Kafka)
@@ -57,7 +57,7 @@ Repo này là một **hệ thống E-Invoice hoàn chỉnh** được xây dựn
 
 ### **Buổi 1-2: Tổng Quan Kiến Trúc** (4 giờ)
 - Giới thiệu Microservices vs Monolith
-- Phân tích cấu trúc tổng thể (7 services + infrastructure)
+- Phân tích cấu trúc tổng thể (8 services + infrastructure)
 - Demo chạy toàn bộ hệ thống với Docker
 - **Thực hành**: Setup và test API với Swagger UI
 
@@ -121,7 +121,7 @@ cd <repo-name>
 # Install dependencies
 pnpm install
 
-# Start infrastructure services (MongoDB, Kafka, Keycloak, Logging Stack)
+# Start infrastructure services (MongoDB, Kafka, Keycloak, Redis, Logging Stack)
 pnpm docker:start:provider
 
 # Build all services
