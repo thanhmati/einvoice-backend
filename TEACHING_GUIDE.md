@@ -8,16 +8,16 @@
 2. [🏗️ Kiến Trúc Tổng Thể](#️-kiến-trúc-tổng-thể)
 3. [💳 Stripe Payment Integration](#-stripe-payment-integration)
 4. [📊 Centralized Logging Architecture](#-centralized-logging-architecture)
-5. [🧩 Phân Tích Từng Microservice](#-phân-tích-từng-microservice)
-6. [🔧 Shared Libraries Analysis](#-shared-libraries-analysis)
-7. [🔄 Communication Patterns](#-communication-patterns)
-8. [📈 Business Flow Analysis](#-business-flow-analysis)
-9. [🏛️ Architectural Patterns](#️-architectural-patterns)
-10. [🛠️ Deployment & Docker](#️-deployment--docker)
-11. [🔴 Redis Cache Implementation](#-redis-cache-implementation)
-12. [🧪 Bài Tập Thực Hành](#-bài-tập-thực-hành)
-13. [🚀 Advanced Topics](#-advanced-topics)
-14. [📚 Tài Liệu Tham Khảo](#-tài-liệu-tham-khảo)
+5. [🧩 PHẦN 3: PHÂN TÍCH TỪNG MICROSERVICE](#-phần-3-phân-tích-từng-microservice)
+6. [🔧 PHẦN 4: SHARED LIBRARIES ANALYSIS](#-phần-4-shared-libraries-analysis)
+7. [🔄 PHẦN 5: COMMUNICATION PATTERNS](#-phần-5-communication-patterns)
+8. [📈 PHẦN 6: BUSINESS FLOW ANALYSIS](#-phần-6-business-flow-analysis)
+9. [🏛️ PHẦN 7: ARCHITECTURAL PATTERNS](#-phần-7-architectural-patterns)
+10. [🛠️ PHẦN 8: DEPLOYMENT & DOCKER](#-phần-8-deployment--docker)
+11. [🔴 PHẦN 11: REDIS CACHE IMPLEMENTATION](#-phần-11-redis-cache-implementation)
+12. [🧪 PHẦN 9: BÀI TẬP THỰC HÀNH](#-phần-9-bài-tập-thực-hành)
+13. [🚀 PHẦN 10: ADVANCED TOPICS](#-phần-10-advanced-topics)
+14. [📚 PHẦN 12: TÀI LIỆU THAM KHẢO](#-phần-12-tài-liệu-tham-khảo)
 
 ---
 
@@ -509,7 +509,497 @@ pattern_ingester:
 
 ---
 
-## 🔴 Redis Cache Implementation
+## 🧩 PHẦN 3: PHÂN TÍCH TỪNG MICROSERVICE
+
+### 3.1 🌐 BFF (Backend for Frontend) Service
+
+**📍 Vai trò**: API Gateway - điểm tập trung cho frontend
+
+#### 3.1.1 Cấu Trúc Project
+```
+apps/bff/
+├── src/
+│   ├── main.ts              # Entry point
+│   ├── app/
+│   │   ├── app.module.ts    # Root module
+│   │   └── modules/
+│   │       ├── invoice/     # Invoice endpoints
+│   │       ├── product/     # Product endpoints  
+│   │       ├── user/        # User endpoints
+│   │       └── authorizer/  # Auth endpoints
+│   └── configuration/       # BFF-specific config
+```
+
+#### 3.1.2 Main.ts Configuration (Thực tế)
+
+```typescript
+// apps/bff/src/main.ts
+async function bootstrap() {
+  try {
+    const isDev = AppModule.CONFIGURATION.IS_DEV;
+    const globalPrefix = AppModule.CONFIGURATION.GLOBAL_PREFIX;
+    const port = AppModule.CONFIGURATION.APP_CONFIG.PORT || 3000;
+
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+      logger: isDev ? ['error', 'warn', 'log', 'debug', 'verbose'] : ['error', 'warn', 'log'],
+      rawBody: true,
+    });
+
+    app.enableCors({ origin: '*' });
+    app.useBodyParser('json', { limit: '20mb' });
+    app.setGlobalPrefix(globalPrefix);
+    app.useGlobalPipes(new ValidationPipe({ transform: true }));
+
+    const config = new DocumentBuilder()
+      .setTitle('E-bff API')
+      .setDescription('The E-bff API description')
+      .setVersion('1.0.0')
+      .addBearerAuth({ description: 'Default JWT Authorization', type: 'http', in: 'header', scheme: 'bearer', bearerFormat: 'JWT', name: 'Authorization' })
+      .build();
+
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup(`${globalPrefix}/docs`, app, documentFactory, { swaggerOptions: { filter: true } });
+
+    await app.listen(port);
+  } catch (error) {
+    Logger.error(`❌ Application failed to start: ${error}`);
+  }
+}
+```
+
+#### 3.1.3 App Module Structure (Thực tế)
+
+```typescript
+// apps/bff/src/app/app.module.ts
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true, load: [() => ({ ...CONFIGURATION })] }),
+    RedisProvider,
+    ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)]),
+    ProductModule,
+    InvoiceModule,
+    PaymentModule,
+    UserModule,
+    AuthorizerModule,
+    ThrottlerProvider,
+  ],
+  providers: [
+    { provide: APP_INTERCEPTOR, useClass: ExceptionInterceptor },
+    { provide: APP_GUARD, useClass: UserGuard },
+    { provide: APP_GUARD, useClass: PermissionGuard },
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+  ],
+})
+export class AppModule implements NestModule {
+  static CONFIGURATION: TConfiguration = CONFIGURATION;
+
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
+```
+
+---
+
+### 3.2 📄 Invoice Service (Core Business Logic)
+
+**📍 Vai trò**: Xử lý logic nghiệp vụ chính của hóa đơn
+
+#### 3.2.1 Service Structure (Thực tế)
+```
+apps/invoice/src/app/modules/invoice/
+├── controllers/
+│   └── invoice.controller.ts    # TCP Message handlers
+├── services/
+│   └── invoice.service.ts       # Business logic
+├── repositories/
+│   └── invoice.repository.ts    # Data access layer
+├── mappers/
+│   └── index.ts                 # Data transformation
+└── invoice.module.ts            # Module configuration
+```
+
+#### 3.2.2 Invoice Module Configuration
+
+```typescript
+// apps/invoice/src/app/modules/invoice/invoice.module.ts
+@Module({
+  imports: [
+    MongoProvider,
+    MongooseModule.forFeature([InvoiceDestination]),
+    ClientsModule.registerAsync([
+      TcpProvider(TCP_SERVICES.PDF_GENERATOR_SERVICE),
+      TcpProvider(TCP_SERVICES.MEDIA_SERVICE),
+    ]),
+  ],
+  controllers: [InvoiceController],
+  providers: [InvoiceService, InvoiceRepository],
+})
+export class InvoiceModule {}
+```
+
+#### 3.2.3 Business Logic Implementation (Thực tế)
+
+```typescript
+// apps/invoice/src/app/modules/invoice/services/invoice.service.ts
+@Injectable()
+export class InvoiceService {
+  constructor(
+    private readonly invoiceRepository: InvoiceRepository,
+    @Inject(TCP_SERVICES.PDF_GENERATOR_SERVICE) private readonly pdfGeneratorClient: TcpClient,
+    @Inject(TCP_SERVICES.MEDIA_SERVICE) private readonly mediaClient: TcpClient,
+    private readonly KafkaClient: KafkaClient,
+  ) {}
+
+  create(params: CreateInvoiceTcpReq) {
+    const input = invoiceRequestMapping(params);
+    return this.invoiceRepository.create(input);
+  }
+
+  async sendById(params: SendInvoiceTcpReq, processID: string) {
+    const { invoiceId, userId } = params;
+    const invoice = await this.getById(invoiceId);
+    if (invoice.status !== INVOICE_STATUS.CREATED) {
+      throw new BadRequestException(ERROR_CODE.INVOICE_CAN_NOT_BE_SENT);
+    }
+
+    const pdfBase64 = await this.generatorInvoicePdf({ ...invoice.toObject(), status: INVOICE_STATUS.SENT }, invoiceId);
+    const pdfUrl = await this.uploadFile({ fileBase64: pdfBase64, fileName: `invoice-${invoiceId}` }, processID);
+
+    const invoiceSent = await this.invoiceRepository.updateById(invoiceId, {
+      status: INVOICE_STATUS.SENT,
+      fileUrl: pdfUrl,
+      supervisorId: new ObjectId(userId),
+    });
+
+    this.KafkaClient.send<InvoiceSentPayload>(KAFKA_TOPICS.INVOICE.SENT, { id: invoiceId });
+    return invoiceSent;
+  }
+}
+```
+
+#### 3.2.4 TCP Controller (Thực tế)
+
+```typescript
+// apps/invoice/src/app/modules/invoice/controllers/invoice.controller.ts
+@Controller()
+export class InvoiceController {
+  constructor(private readonly invoiceService: InvoiceService) {}
+
+  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.CREATE)
+  create(params: TcpRequest<CreateInvoiceTcpReq>) {
+    return this.invoiceService.create(params.data);
+  }
+
+  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.SEND)
+  send(params: TcpRequest<SendInvoiceTcpReq>) {
+    return this.invoiceService.sendById(params.data, params.processID);
+  }
+}
+```
+
+---
+
+### 3.3 📧 Mail Service (Event-Driven Consumer)
+
+**📍 Vai trò**: Xử lý gửi email và consume Kafka events
+
+#### 3.3.1 Kafka Consumer Setup (Thực tế)
+
+```typescript
+// apps/mail/src/app/app.module.ts
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true, load: [() => ({ ...CONFIGURATION })] }),
+    MailModule,
+    MailTemplateModule,
+    KafkaModule.forConsumerAsync({ groupId: KAFKA_GROUPS.MAIL, serviceName: KAFKA_SERVICES.MAIL }),
+  ],
+})
+export class AppModule {}
+```
+
+#### 3.3.2 Event Handler (Thực tế)
+
+```typescript
+// apps/mail/src/app/modules/mail/services/mail-queue.service.ts
+@Injectable()
+export class MailQueueService {
+  constructor(private readonly mailInvoiceService: MailInvoiceService) {}
+
+  @KafkaHandler(KAFKA_TOPICS.INVOICE.SENT)
+  async eventInvoiceCreated(payload: KafkaPayload<InvoiceSentPayload>) {
+    const { message } = payload;
+    await this.mailInvoiceService.sendInvoiceCreated(message);
+  }
+}
+```
+
+---
+
+## 🔧 PHẦN 4: SHARED LIBRARIES ANALYSIS
+
+### 4.1 📊 Database Schema Design (Thực tế)
+
+```typescript
+// libs/schemas/src/lib/invoice/invoice.schema.ts
+@Schema({ timestamps: true, versionKey: false, collection: 'invoice', toJSON: { virtuals: true } })
+export class Invoice extends BaseSchema {
+  @Prop({ type: Client })
+  client: Client;
+  @Prop({ type: Number }) totalAmount: number;
+  @Prop({ type: Number }) vatAmount: number;
+  @Prop({ type: String, enum: INVOICE_STATUS, default: INVOICE_STATUS.CREATED }) status: INVOICE_STATUS;
+  @Prop({ type: [Item] }) items: Item[];
+  @Prop({ type: ObjectId, ref: 'User', required: false }) supervisorId?: ObjectId;
+  @Prop({ type: String, required: false }) fileUrl?: string;
+}
+```
+
+### 4.2 🔄 Kafka Integration (Thực tế)
+
+```typescript
+// libs/constants/src/lib/kafka.constant.ts
+export const KAFKA_TOPICS = { INVOICE: { SENT: 'invoice.sent' } };
+```
+
+```typescript
+// libs/queue/src/lib/modules/kafka/services/kafka-consumer.service.ts
+@Injectable()
+export class KafkaConsumerService implements OnModuleInit, OnModuleDestroy {
+  // ... auto-discovery and subscription logic using @KafkaHandler metadata
+}
+```
+
+### 4.3 🛡️ Error Handling & Logging (Thực tế)
+
+```typescript
+// libs/interceptors/src/lib/exception.interceptor.ts
+@Injectable()
+export class ExceptionInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
+    const request = context.switchToHttp().getRequest();
+    const processUuid = request[MetadataKeys.PROCESS_ID];
+    const startTime = request[MetadataKeys.START_TIME];
+    return next.handle().pipe(
+      map((data: ResponseDto<unknown>) => {
+        const duration = Date.now() - startTime;
+        data.processID = processUuid;
+        data.duration = `${duration}ms`;
+        return data;
+      }),
+      catchError((error) => {
+        const duration = Date.now() - startTime;
+        const code = error?.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
+        const message = error?.message || HTTP_MESSAGE.INTERNAL_SERVER_ERROR;
+        throw new HttpException(new ResponseDto({ data: null, message, processID: processUuid, statusCode: code, duration: `${duration}ms` }), code);
+      }),
+    );
+  }
+}
+```
+
+---
+
+## 🔄 PHẦN 5: COMMUNICATION PATTERNS
+
+### 5.1 Synchronous Communication (TCP)
+
+```typescript
+// BFF → Invoice Service
+this.invoiceClient.send<string, CreateInvoiceTcpReq>(
+  TCP_REQUEST_MESSAGE.INVOICE.CREATE,
+  { data: body, processID }
+);
+
+// Invoice Service → PDF Generator
+this.pdfGeneratorClient.send<string, InvoiceTcpResponse>(
+  TCP_REQUEST_MESSAGE.PDF_GENERATOR.CREATE_INVOICE_PDF,
+  { data, processID }
+);
+```
+
+### 5.2 gRPC Communication (Authorizer Service)
+
+```typescript
+// BFF → Authorizer Service (gRPC)
+ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)]);
+```
+
+### 5.3 Asynchronous Communication (Kafka)
+
+```typescript
+// Producer (Invoice Service)
+this.KafkaClient.send<InvoiceSentPayload>(KAFKA_TOPICS.INVOICE.SENT, { id: invoiceId });
+
+// Consumer (Mail Service)
+@KafkaHandler(KAFKA_TOPICS.INVOICE.SENT)
+async eventInvoiceCreated(payload: KafkaPayload<InvoiceSentPayload>) {
+  await this.mailInvoiceService.sendInvoiceCreated(payload.message);
+}
+```
+
+---
+
+## 📈 PHẦN 6: BUSINESS FLOW ANALYSIS
+
+### 6.1 Complete Invoice Workflow
+
+```mermaid
+sequenceDiagram
+    participant F as Frontend
+    participant B as BFF
+    participant I as Invoice Service
+    participant P as PDF Generator
+    participant M as Media Service
+    participant K as Kafka
+    participant Mail as Mail Service
+    participant DB as MongoDB
+    participant C as Cloudinary
+
+    Note over F,C: 1. CREATE INVOICE
+    F->>B: POST /api/v1/invoice
+    B->>I: TCP: CREATE_INVOICE
+    I->>DB: Save invoice (status: CREATED)
+    I-->>B: Invoice ID
+    B-->>F: Success Response
+
+    Note over F,C: 2. SEND INVOICE
+    F->>B: POST /api/v1/invoice/:id/send
+    B->>I: TCP: SEND_INVOICE
+
+    Note over I,C: PDF Generation & Upload Flow
+    I->>P: TCP: CREATE_INVOICE_PDF
+    P->>P: Generate HTML from EJS template
+    P->>P: Convert HTML to PDF with Puppeteer
+    P-->>I: PDF Base64
+
+    I->>M: TCP: UPLOAD_FILE
+    M->>C: Upload PDF to Cloudinary
+    C-->>M: Public URL
+    M-->>I: File URL
+
+    Note over I,Mail: Database Update & Event Flow
+    I->>DB: Update status to SENT + fileUrl + supervisorId
+    I->>K: Publish: invoice.sent event
+    I-->>B: Success
+    B-->>F: Success Response
+
+    Note over K,Mail: Async Email Flow
+    K->>Mail: Event: invoice.sent
+    Mail->>I: TCP: GET_INVOICE_BY_ID
+    Mail->>Mail: Render email template
+    Mail->>C: Download PDF attachment
+    Mail->>Mail: Send email via SMTP
+```
+
+---
+
+## 🏛️ PHẦN 7: ARCHITECTURAL PATTERNS
+
+### 7.1 Repository Pattern Implementation
+
+```typescript
+// apps/invoice/src/app/modules/invoice/repositories/invoice.repository.ts
+@Injectable()
+export class InvoiceRepository {
+  constructor(@InjectModel(InvoiceModelName) private model: InvoiceModel) {}
+  create(input: CreateInvoiceInput) { return this.model.create(input); }
+  async getById(id: string) {
+    const invoice = await this.model.findById(id);
+    if (!invoice) { throw new NotFoundException(ERROR_CODE.INVOICE_NOT_FOUND); }
+    return invoice;
+  }
+  updateById(id: string, input: Partial<Invoice>) { return this.model.findByIdAndUpdate(id, input, { new: true }); }
+}
+```
+
+### 7.2 Dependency Injection Pattern
+
+```typescript
+constructor(
+  private readonly invoiceRepository: InvoiceRepository,
+  @Inject(TCP_SERVICES.PDF_GENERATOR_SERVICE) private readonly pdfGeneratorClient: TcpClient,
+  @Inject(TCP_SERVICES.MEDIA_SERVICE) private readonly mediaClient: TcpClient,
+  private readonly KafkaClient: KafkaClient,
+) {}
+```
+
+### 7.3 API Gateway Pattern (BFF)
+
+```typescript
+// BFF acts as single entry point
+Frontend → BFF → { Invoice Service (TCP), User Service (TCP), Authorizer Service (gRPC) }
+```
+
+---
+
+## 🛠️ PHẦN 8: DEPLOYMENT & DOCKER
+
+### 8.1 Docker Compose Structure
+
+#### Infrastructure Services (docker-compose.provider.yaml)
+```yaml
+services:
+  kafka:
+    image: bitnami/kafka:latest
+    ports:
+      - 9092:9092
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+
+  mongodb:
+    image: mongo
+    ports:
+      - '27017:27017'
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.0
+    ports:
+      - '8180:8080'
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+```
+
+#### Application Services (docker-compose.dev.yaml)
+```yaml
+services:
+  bff:
+    image: bff:latest
+    ports:
+      - 3000:3000
+
+  invoice:
+    image: invoice:latest
+
+  # ... other services
+```
+
+### 8.2 Build & Deployment Commands
+
+```bash
+# Build all services
+pnpm nx:run-many -t build
+
+# Build Docker images
+pnpm docker-build
+
+# Start infrastructure
+pnpm docker:start:provider
+
+# Start application services
+pnpm docker:start:dev
+
+# Complete deployment
+pnpm build
+```
+
+---
+
+## 🔴 PHẦN 11: REDIS CACHE IMPLEMENTATION
 
 ### 11.1 Tổng Quan Redis Cache
 
@@ -696,7 +1186,7 @@ const cacheKey = `user-token:${hash}`;
 
 ---
 
-## 🧪 Bài Tập Thực Hành
+## 🧪 PHẦN 9: BÀI TẬP THỰC HÀNH
 
 ### Bài 1: Thêm Invoice Status Mới
 **Mục tiêu**: Thêm status `CANCELLED` cho invoice
@@ -784,7 +1274,7 @@ curl -X POST http://admin:admin@localhost:3001/api/datasources \
 
 ---
 
-## 🚀 Advanced Topics
+## 🚀 PHẦN 10: ADVANCED TOPICS
 
 ### 10.1 Authentication với Keycloak
 
@@ -862,7 +1352,7 @@ export class InvoiceService {
 
 ---
 
-## 📚 Tài Liệu Tham Khảo
+## 📚 PHẦN 12: TÀI LIỆU THAM KHẢO
 
 ### 11.1 Official Documentation
 - [NestJS Documentation](https://docs.nestjs.com/)
