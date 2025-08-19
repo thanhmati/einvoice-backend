@@ -23,7 +23,7 @@ Hệ thống E-Invoice được xây dựng theo mô hình **Microservices Archi
 ├── 📧 Mail Service - Kafka Consumer
 ├── 👤 User Access Service - TCP Microservice
 ├── 🔐 Authorizer Service - gRPC Microservice
-├── 💳 Payment Service - TCP Microservice (Stripe Integration)
+├── 💳 Payment Module (trong Invoice Service) - Stripe Integration
 ├── 🗄️ MongoDB - Port 27017
 ├── 📨 Kafka - Port 9092
 ├── 🔑 Keycloak - Port 8180
@@ -90,7 +90,7 @@ pnpm docker:start:provider
 pnpm build
 
 # 4. Truy cập Swagger API Documentation
-# http://localhost:3300/api/v1/docs
+# http://localhost:3000/api/v1/docs
 ```
 
 ### Cho Học Viên
@@ -130,6 +130,7 @@ pnpm dev-lite
 - **Message Queue**: Kafka
 - **Authentication**: Keycloak
 - **Cache Store**: Redis với @keyv/redis
+- **Rate Limiting**: @nestjs/throttler + @nest-lab/throttler-storage-redis
 - **File Storage**: Cloudinary
 - **PDF Generation**: Puppeteer + EJS
 - **Email**: Nodemailer
@@ -171,6 +172,7 @@ pnpm dev-lite
 - **Log Search**: Loki API tại `http://localhost:3100`
 - **Log Collection**: Promtail agent tự động thu thập logs từ Docker containers
 - **Payment Testing**: Stripe CLI cho webhook testing
+- **Redis Insight**: UI tại `http://localhost:5540` (nếu đã bật `redis-insight`)
 
 ### Xem Sơ Đồ Mermaid
 - **GitHub**: Tự động render Mermaid diagrams

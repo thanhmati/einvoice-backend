@@ -7,7 +7,7 @@ Repo này là một **hệ thống E-Invoice hoàn chỉnh** được xây dựn
 - ✅ **Microservices Architecture** với 7 services
 - ✅ **Event-Driven Architecture** với Kafka
 - ✅ **API Gateway Pattern** (BFF)
-- ✅ **Mixed Communication Patterns** (TCP, gRPC, Kafka)
+- ✅ **Mixed Communication Patterns** (TCP, gRPC, Kafka, Webhook)
 - ✅ **Clean Architecture** với Repository Pattern
 - ✅ **Production-ready practices** (logging, error handling, validation)
 - ✅ **Authentication Integration** với Keycloak
@@ -32,7 +32,7 @@ Repo này là một **hệ thống E-Invoice hoàn chỉnh** được xây dựn
 ├── 📧 Mail Service - Kafka Consumer + TCP Client
 ├── 👤 User Access Service - TCP Microservice
 ├── 🔐 Authorizer Service - gRPC Microservice
-├── 💳 Payment Service - TCP Microservice (Stripe Integration)
+├── 💳 Payment Module (trong Invoice Service) - Stripe Integration
 ├── 🗄️ MongoDB - Port 27017 (Document database)
 ├── 📨 Kafka - Port 9092 (Event streaming)
 ├── 🔑 Keycloak - Port 8180 (Identity & Access Management)
@@ -195,7 +195,7 @@ pnpm dev-lite
 │   ├── services/invoice.service.ts         # Business logic với Kafka integration
 │   ├── controllers/invoice.controller.ts   # TCP message handlers
 │   └── repositories/invoice.repository.ts  # Repository pattern implementation
-├── apps/invoice/src/app/modules/payment/   # Payment service với Stripe integration
+├── apps/invoice/src/app/modules/payment/   # Payment module với Stripe integration
 │   ├── services/payment.service.ts         # Payment logic và webhook handling
 │   ├── services/stripe.service.ts          # Stripe API integration
 │   └── controllers/payment.controller.ts   # TCP payment handlers
@@ -243,6 +243,8 @@ pnpm dev-lite
 - ✅ **Observability** - Process tracking across services
 - ✅ **Payment Integration** - Stripe webhook handling và signature verification
 - ✅ **Email Templates** - Dynamic content với payment links
+- ✅ **Authorization** - PermissionGuard kiểm tra quyền
+- ✅ **Rate Limiting** - ThrottlerGuard + Redis storage
 
 ### **3. Real-World Patterns (Thực Tế)**
 - **API Gateway** (BFF) với authentication guard
