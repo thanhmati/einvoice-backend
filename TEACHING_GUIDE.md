@@ -735,6 +735,68 @@ export class MailQueueService {
 }
 ```
 
+#### 3.3.3 Email Templating (EJS Layout)
+
+```typescript
+// apps/mail/src/app/modules/mail-template/services/mail-template.service.ts
+@Injectable()
+export class MailTemplateService {
+  private readonly templateDir = join(__dirname, 'templates');
+
+  async render(templateName: string, data: any): Promise<string> {
+    const content = await renderFile(join(this.templateDir, `${templateName}.ejs`), data);
+    return renderFile(join(this.templateDir, 'layout.ejs'), { content });
+  }
+}
+```
+
+---
+
+### 3.4 📁 Media Service (Cloudinary Streaming Upload)
+
+**📍 Vai trò**: Nhận file Base64 từ services khác và upload lên Cloudinary theo dạng stream để tối ưu bộ nhớ.
+
+```typescript
+// apps/media/src/app/modules/cloudinary/services/cloudinary.service.ts
+@Injectable()
+export class CloudinaryService {
+  private readonly cloudinary = cloudinary;
+
+  constructor(private readonly config: ConfigService) {
+    this.cloudinary.config({
+      cloud_name: this.config.get('CLOUDINARY_CONFIG.CLOUD_NAME'),
+      api_key: this.config.get('CLOUDINARY_CONFIG.API_KEY'),
+      api_secret: this.config.get('CLOUDINARY_CONFIG.API_SECRET'),
+      secure: true,
+    });
+  }
+
+  uploadBuffer(file: Buffer, fileName: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const uploadStream = this.cloudinary.uploader.upload_stream({
+        resource_type: 'auto',
+        public_id: fileName,
+        folder: 'einvoice',
+      }, (error, result) => {
+        if (error) return reject(error);
+        resolve(result.secure_url);
+      });
+
+      streamifier.createReadStream(file).pipe(uploadStream);
+    });
+  }
+}
+
+// apps/media/src/app/modules/media/services/media.service.ts
+@Injectable()
+export class MediaService {
+  constructor(private readonly cloudinaryService: CloudinaryService) {}
+  uploadFile(params: UploadFileTcpReq) {
+    return this.cloudinaryService.uploadBuffer(Buffer.from(params.fileBase64, 'base64'), params.fileName);
+  }
+}
+```
+
 ---
 
 ## 🔧 PHẦN 4: SHARED LIBRARIES ANALYSIS
@@ -836,6 +898,18 @@ this.KafkaClient.send<InvoiceSentPayload>(KAFKA_TOPICS.INVOICE.SENT, { id: invoi
 @KafkaHandler(KAFKA_TOPICS.INVOICE.SENT)
 async eventInvoiceCreated(payload: KafkaPayload<InvoiceSentPayload>) {
   await this.mailInvoiceService.sendInvoiceCreated(payload.message);
+}
+```
+
+### 5.4 gRPC Contracts (Proto-based)
+
+```proto
+// libs/interfaces/src/lib/proto/authorizer/authorizer.proto
+syntax = "proto3";
+import "user-access.proto";
+
+service KeycloakService {
+  rpc VerifyToken(VerifyTokenRequest) returns (AuthorizeResponse);
 }
 ```
 
@@ -962,6 +1036,21 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+    command: start-dev
+
+  redis:
+    image: redis
+    container_name: redis_server
+    ports:
+      - '6379:6379'
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: redis-insight-ui
+    ports:
+      - '5540:5540'
+    depends_on:
+      - redis
 ```
 
 #### Application Services (docker-compose.dev.yaml)
@@ -1037,6 +1126,22 @@ export const RedisProvider = CacheModule.registerAsync({
     ttl: configService.get('REDIS_CONFIG.TTL'),
   }),
 });
+```
+
+#### 🚦 Rate Limiting bằng Redis Storage
+
+```typescript
+// libs/configuration/src/lib/throttler.config.ts
+export const ThrottlerProvider = ThrottlerModule.forRoot({
+  throttlers: [{ ttl: 60_000, limit: 10 }],
+  errorMessage: 'Too many requests, please try again later',
+  storage: new ThrottlerStorageRedisService(),
+});
+
+// apps/bff/src/app/app.module.ts
+providers: [
+  { provide: APP_GUARD, useClass: ThrottlerGuard },
+];
 ```
 
 #### 🏗️ Integration trong BFF
@@ -1279,7 +1384,7 @@ curl -X POST http://admin:admin@localhost:3001/api/datasources \
 ### 10.1 Authentication với Keycloak
 
 ```typescript
-// User Guard Implementation
+// User Guard Implementation (Keycloak + JWKS + Redis cache)
 @Injectable()
 export class UserGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
@@ -1290,7 +1395,7 @@ export class UserGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     
-    // Verify JWT token with Keycloak
+    // Verify JWT token with Keycloak (gRPC Authorizer) và cache kết quả trong Redis
     return this.verifyKeycloakToken(token);
   }
 }
