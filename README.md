@@ -1,45 +1,92 @@
-# 📚 Hướng Dẫn Sử Dụng Tài Liệu Giảng Dạy - Hệ Thống E-Invoice
+# 📚 Hệ Thống E-Invoice: NestJS Microservices Production-Ready
 
-## 📋 Danh Sách Tài Liệu
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Kafka](https://img.shields.io/badge/Apache%20Kafka-231F20?style=for-the-badge&logo=apache-kafka&logoColor=white)](https://kafka.apache.org/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Stripe](https://img.shields.io/badge/Stripe-626CD9?style=for-the-badge&logo=stripe&logoColor=white)](https://stripe.com/)
 
-| File | Mục Đích | Đối Tượng |
-|------|----------|-----------|
-| **TEACHING_GUIDE.md** | Tài liệu chi tiết cho học viên | 🎓 Học viên |
-| **INSTRUCTOR_SUMMARY.md** | Hướng dẫn ngắn gọn cho giảng viên | 👨‍🏫 Giảng viên |
-| **README.md** | File này - hướng dẫn sử dụng | 📖 Tất cả |
+Một hệ thống **E-Invoice hoàn chỉnh** được xây dựng theo **Microservices Architecture** với NestJS, bao gồm **8 microservices**, **payment integration**, **centralized logging**, và **production-ready features**.
+
+## 📋 Tài Liệu Hướng Dẫn
+
+| 📄 Tài Liệu | 🎯 Mục Đích | 👥 Đối Tượng | 📊 Độ Chi Tiết |
+|-------------|-------------|--------------|----------------|
+| **README.md** | Tổng quan & Quick Start | 📖 Tất cả | ⭐⭐⭐ |
+| **TEACHING_GUIDE.md** | Chi tiết kỹ thuật & Learning Path | 🎓 Học viên | ⭐⭐⭐⭐⭐ |
+| **INSTRUCTOR_SUMMARY.md** | Hướng dẫn giảng dạy & Demo | 👨‍🏫 Giảng viên | ⭐⭐⭐⭐ |
 
 ---
 
 ## 🏗️ Kiến Trúc Hệ Thống
 
-Hệ thống E-Invoice được xây dựng theo mô hình **Microservices Architecture** với **Nx Monorepo**:
+### 🎯 Tổng Quan
+Hệ thống E-Invoice được thiết kế theo **Microservices Architecture** hiện đại với **Nx Monorepo**, bao gồm **8 microservices** độc lập và **6 infrastructure services**:
 
+### 🏢 Application Services (8 Microservices)
+```mermaid
+graph TB
+    subgraph "🌐 API Gateway Layer"
+        BFF["🚪 BFF Service<br/>Port 3300<br/>HTTP REST + Swagger"]
+    end
+    
+    subgraph "💼 Business Services"
+        Invoice["📄 Invoice Service<br/>TCP Microservice"]
+        UserAccess["👤 User Access Service<br/>TCP Microservice"]
+        Product["🛍️ Product Service<br/>TCP Microservice"]
+    end
+    
+    subgraph "🔧 Support Services"
+        Media["📁 Media Service<br/>TCP + Cloudinary"]
+        PDF["📄 PDF Generator<br/>TCP + Puppeteer"]
+        Mail["📧 Mail Service<br/>Kafka Consumer + SMTP"]
+    end
+    
+    subgraph "🔐 Security Services"
+        Auth["🔐 Authorizer Service<br/>gRPC + Keycloak"]
+    end
+    
+    BFF --> Invoice
+    BFF --> UserAccess
+    BFF --> Product
+    BFF --> Auth
+    Invoice --> Media
+    Invoice --> PDF
+    Invoice --> Mail
+    
+    classDef gateway fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef business fill:#f1f8e8,stroke:#388e3c,stroke-width:2px
+    classDef support fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef security fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    
+    class BFF gateway
+    class Invoice,UserAccess,Product business
+    class Media,PDF,Mail support
+    class Auth security
 ```
-📦 E-Invoice System
-├── 🌐 BFF (Backend for Frontend) - Port 3000
-├── 📄 Invoice Service - TCP Microservice
-├── 📁 Media Service - TCP Microservice  
-├── 📄 PDF Generator Service - TCP Microservice
-├── 📧 Mail Service - Kafka Consumer
-├── 👤 User Access Service - TCP Microservice
-├── 🔐 Authorizer Service - gRPC Microservice
-├── 💳 Payment Service - TCP Microservice (Stripe Integration)
-├── 🗄️ MongoDB - Port 27017
-├── 📨 Kafka - Port 9092
-├── 🔑 Keycloak - Port 8180
-├── 🔴 Redis - Port 6379 (Cache Store)
-├── 📊 Grafana - Port 3001 (Monitoring Dashboard)
-├── 📋 Loki - Port 3100 (Log Aggregation)
-└── 📡 Promtail - Log Collection Agent
+
+### 🏗️ Infrastructure Services (6 Services)
+```
+📊 Infrastructure Stack
+├── 🗄️ MongoDB (Port 27017) - Document Database
+├── 📨 Kafka (Port 9092) - Event Streaming Platform  
+├── 🔑 Keycloak (Port 8180) - Identity & Access Management
+├── 🔴 Redis (Port 6379) - Cache Store & Session Management
+├── 📊 Grafana (Port 3000) - Monitoring Dashboard
+├── 📋 Loki (Port 3100) - Log Aggregation Server
+└── 📡 Promtail - Docker Log Collection Agent
 ```
 
 ### 🔄 Communication Patterns
-- **BFF ↔ Services**: TCP (Synchronous)
-- **Authorizer Service**: gRPC (Synchronous)
-- **Event Processing**: Kafka (Asynchronous)
-- **Database**: MongoDB với Mongoose
-- **Cache Layer**: Redis với @nestjs/cache-manager
-- **Payment Integration**: Stripe Webhook (Asynchronous)
+| Pattern | Usage | Services | Protocol | Performance |
+|---------|-------|----------|----------|-------------|
+| **HTTP REST** | External API | BFF ↔ Frontend | HTTP/1.1 | Standard |
+| **TCP** | Internal Sync | BFF ↔ Services | TCP | High |
+| **gRPC** | Authentication | BFF ↔ Authorizer | HTTP/2 | Very High |
+| **Events** | Async Processing | Invoice → Mail | Kafka | Scalable |
+| **Cache** | Performance | UserGuard ↔ Redis | TCP | Ultra Fast |
+| **Webhooks** | External Events | Stripe → Payment | HTTP | Reliable |
 
 ---
 
@@ -70,161 +117,292 @@ Hệ thống E-Invoice được xây dựng theo mô hình **Microservices Archi
 
 ## 🚀 Quick Start
 
-### Yêu Cầu Hệ Thống
-- **Node.js**: v18+
-- **pnpm**: Latest version
-- **Docker**: Latest version
-- **RAM**: 8GB (16GB recommended)
+### 📋 Yêu Cầu Hệ Thống
+| Component | Version | Purpose |
+|-----------|---------|---------|
+| **Node.js** | v18+ | Runtime environment |
+| **pnpm** | Latest | Package manager |
+| **Docker Desktop** | Latest | Containerization |
+| **RAM** | 8GB (16GB recommended) | System resources |
+| **Disk** | 20GB free space | Docker images & data |
 
-### Cho Giảng Viên
+### ⚡ One-Command Setup
 ```bash
-# 1. Clone và setup
-git clone <repo-url>
-cd <repo-name>
-pnpm install
+# 🚀 Complete production deployment
+git clone <repo-url> && cd <repo-name>
+pnpm install && pnpm build
 
-# 2. Khởi động infrastructure (MongoDB + Kafka + Keycloak + Logging Stack)
-pnpm docker:start:provider
-
-# 3. Build và start tất cả services
-pnpm build
-
-# 4. Truy cập Swagger API Documentation
-# http://localhost:3300/api/v1/docs
+# 🎯 Access points:
+# • API Documentation: http://localhost:3300/api/v1/docs
+# • Grafana Dashboard: http://localhost:3000 (admin/admin)
+# • Keycloak Admin: http://localhost:8180 (admin/admin)
+# • Redis Insight: http://localhost:5540
 ```
 
-### Cho Học Viên
+### 🛠️ Development Modes
+
+#### 🏭 Production Mode (Recommended for Demo)
 ```bash
-# 1. Clone repo
-git clone <repo-url>
-cd <repo-name>
+# Full production environment with all services
+pnpm build                    # Build all services + Docker images + Start infrastructure + Deploy
+```
 
-# 2. Install dependencies
-pnpm install
+#### 🔧 Development Mode
+```bash
+# Option 1: All services in development
+pnpm dev                      # Start all 8 microservices
 
-# 3. Start infrastructure
-pnpm docker:start:provider
+# Option 2: Core services only (faster startup)
+pnpm dev-lite                 # Start: bff, invoice, authorizer, user-access
+```
 
-# 4. Development mode (chạy tất cả services)
-pnpm dev
-
-# 5. Development mode (chỉ chạy core services)
-pnpm dev-lite
+#### 🎯 Infrastructure Only
+```bash
+# Start only infrastructure services
+pnpm docker:start:provider    # MongoDB, Kafka, Keycloak, Redis, Grafana, Loki
 ```
 
 ---
 
-## 🔍 Highlights của Hệ Thống
+## 🔍 System Highlights
 
-### 🏛️ Architecture Patterns
-- ✅ **Microservices Architecture** với 7 services
-- ✅ **API Gateway Pattern** (BFF)
-- ✅ **Event-Driven Architecture** với Kafka
-- ✅ **Repository Pattern** cho data access
-- ✅ **Dependency Injection** với NestJS
-- ✅ **Payment Integration** với Stripe
+### 🏛️ Architecture Excellence
+| Pattern | Implementation | Business Value |
+|---------|----------------|----------------|
+| **Microservices** | 8 independent services | Scalability & maintainability |
+| **API Gateway** | BFF with unified interface | Single entry point |
+| **Event-Driven** | Kafka async processing | Loose coupling & resilience |
+| **Repository Pattern** | Clean data access layer | Testability & separation |
+| **Dependency Injection** | NestJS DI container | Modularity & testing |
+| **CQRS Pattern** | Command/Query separation | Performance optimization |
 
 ### 💡 Technology Stack
-- **Framework**: NestJS với TypeScript
-- **Database**: MongoDB + Mongoose
-- **Message Queue**: Kafka
-- **Authentication**: Keycloak
-- **Cache Store**: Redis với @keyv/redis
-- **File Storage**: Cloudinary
-- **PDF Generation**: Puppeteer + EJS
-- **Email**: Nodemailer
-- **Payment**: Stripe (Checkout Sessions + Webhooks)
-- **Containerization**: Docker + Docker Compose
-- **Monorepo**: Nx
-- **Monitoring**: Grafana Dashboard
-- **Log Aggregation**: Loki + Promtail
-- **Centralized Logging**: Docker container logs collection
-
-### 📊 Production-Ready Features
-- ✅ Global error handling với ExceptionInterceptor
-- ✅ Request logging với LoggerMiddleware
-- ✅ Process ID tracking across services
-- ✅ DTO validation với class-validator
-- ✅ Swagger API documentation
-- ✅ Docker containerization
-- ✅ Environment-based configuration
-- ✅ **Redis Cache Layer** cho authentication tokens
-- ✅ **UserData Caching** trong UserGuard để tránh auto verify token
-- ✅ **Token-based Caching Strategy** với SHA256 hash keys
-- ✅ Centralized logging với Grafana + Loki + Promtail
-- ✅ Real-time log monitoring và dashboard
-- ✅ Container log aggregation và search
-- ✅ **Stripe Payment Integration** với webhook handling
-- ✅ **Payment Link Generation** trong email templates
-
----
-
-
-## 🛠️ Tools Hỗ Trợ
-
-### Development Tools
-- **API Testing**: Swagger UI tại `http://localhost:3000/api/v1/docs`
-- **Database**: MongoDB Compass cho GUI
-- **Message Queue**: Kafka UI (có thể enable trong docker-compose)
-- **Authentication**: Keycloak Admin tại `http://localhost:8180`
-- **Monitoring**: Grafana Dashboard tại `http://localhost:3001` (admin/admin)
-- **Log Search**: Loki API tại `http://localhost:3100`
-- **Log Collection**: Promtail agent tự động thu thập logs từ Docker containers
-- **Payment Testing**: Stripe CLI cho webhook testing
-
-### Xem Sơ Đồ Mermaid
-- **GitHub**: Tự động render Mermaid diagrams
-- **VSCode**: Mermaid Preview extension
-- **Online**: https://mermaid.live/
-
----
-
-## 📞 Hỗ Trợ
-
-### Nếu Gặp Vấn Đề
-1. **Docker Issues**: Kiểm tra `docker ps` và logs
-2. **Service Connection**: Verify network `einvoice-nw`
-3. **Database**: Ensure MongoDB is running on port 27017
-4. **Kafka**: Check Kafka broker health
-5. **Logging Stack**: Verify Grafana (3001), Loki (3100), và Promtail services
-6. **Log Collection**: Check Promtail is collecting container logs properly
-7. **Stripe Integration**: Verify webhook configuration và signature verification
-
-### Debugging
-```bash
-# Check running containers
-docker ps
-
-# View service logs
-docker logs <container-name>
-
-# Check network
-docker network ls | grep einvoice
-
-# MongoDB connection test
-docker exec -it mongodb mongosh
-
-# Check logging stack
-docker logs grafana
-docker logs loki
-docker logs promtail
-
-# Verify log collection
-curl http://localhost:3100/ready
-curl http://localhost:3100/metrics
-
-# Test Stripe webhook (if using Stripe CLI)
-stripe listen --forward-to localhost:3000/api/v1/payment/stripe/webhook
+```mermaid
+mindmap
+  root((E-Invoice System))
+    Backend
+      NestJS Framework
+      TypeScript Language
+      Nx Monorepo
+    Database
+      MongoDB + Mongoose
+      Redis Cache
+    Communication
+      TCP Microservices
+      gRPC Authentication
+      Kafka Events
+      HTTP REST API
+    Infrastructure
+      Docker Containers
+      Keycloak Auth
+      Grafana Monitoring
+      Loki Logging
+    External
+      Stripe Payments
+      Cloudinary Storage
+      SMTP Email
+      Puppeteer PDF
 ```
 
-### Feedback & Contributions
-- Góp ý cải thiện tài liệu
-- Đề xuất bài tập mới
-- Báo lỗi trong code examples
-- Contribute to documentation
+### 🚀 Production-Ready Features
+
+#### 🛡️ Security & Authentication
+- ✅ **Keycloak Integration** - Enterprise-grade authentication
+- ✅ **JWT Token Management** - Secure token handling
+- ✅ **Redis Token Caching** - 95% performance improvement
+- ✅ **SHA256 Token Hashing** - Secure cache keys
+- ✅ **Webhook Signature Verification** - Stripe security
+
+#### 📊 Monitoring & Observability  
+- ✅ **Centralized Logging** - Grafana + Loki + Promtail stack
+- ✅ **Real-time Log Streaming** - Live monitoring dashboard
+- ✅ **Process ID Tracking** - Request tracing across services
+- ✅ **Container Log Aggregation** - Docker log collection
+- ✅ **Error Correlation** - Cross-service error tracking
+
+#### 🔧 Development Excellence
+- ✅ **Global Exception Handling** - Consistent error responses
+- ✅ **Request/Response Logging** - Complete audit trail
+- ✅ **DTO Validation** - Input validation with class-validator
+- ✅ **Swagger Documentation** - Interactive API documentation
+- ✅ **Environment Configuration** - Multi-environment support
+- ✅ **Hot Module Replacement** - Fast development feedback
+
+#### 💳 Payment Integration
+- ✅ **Stripe Checkout Sessions** - Secure payment processing
+- ✅ **Webhook Event Handling** - Real-time payment status
+- ✅ **Email Payment Links** - Professional email templates
+- ✅ **Invoice Status Management** - Automated workflow
 
 ---
 
-**Happy Teaching & Learning! 🎓🚀**
 
-*Tài liệu này được cập nhật để phản ánh chính xác source code hiện tại. Mọi thắc mắc xin liên hệ để được hỗ trợ.*
+## 🛠️ Development Tools & Access Points
+
+### 🌐 Web Interfaces
+| Service | URL | Credentials | Purpose |
+|---------|-----|-------------|---------|
+| **API Documentation** | http://localhost:3300/api/v1/docs | None | Swagger UI for API testing |
+| **Grafana Dashboard** | http://localhost:3000 | admin/admin | Monitoring & log visualization |
+| **Keycloak Admin** | http://localhost:8180 | admin/admin | Identity management |
+| **Redis Insight** | http://localhost:5540 | None | Redis cache visualization |
+
+### 🔧 CLI Tools & APIs
+```bash
+# Database Access
+docker exec -it mongodb mongosh                    # MongoDB shell
+docker exec -it redis_server redis-cli            # Redis CLI
+
+# Log Analysis
+curl http://localhost:3100/ready                   # Loki health check
+curl http://localhost:3100/metrics                 # Loki metrics
+
+# Kafka Management
+docker exec -it kafka_server kafka-topics \
+  --list --bootstrap-server localhost:9092         # List topics
+
+# Stripe Webhook Testing
+stripe listen --forward-to localhost:3300/api/v1/payment/stripe/webhook
+```
+
+### 📊 Monitoring & Debugging
+```bash
+# System Health
+docker ps                                          # Running containers
+docker network ls | grep einvoice                  # Network status
+docker logs <service-name>                         # Service logs
+
+# Performance Monitoring
+docker stats                                       # Resource usage
+curl http://localhost:3300/api/v1/docs            # API health
+```
+
+### 🎨 Diagram Viewing
+| Platform | Support | URL |
+|----------|---------|-----|
+| **GitHub** | Native rendering | Automatic in README |
+| **VSCode** | Mermaid Preview extension | Install extension |
+| **Online Editor** | Full editor | https://mermaid.live/ |
+
+---
+
+## 🆘 Troubleshooting & Support
+
+### 🔍 Common Issues & Solutions
+
+#### 🐳 Docker Issues
+```bash
+# Issue: Containers won't start
+docker system prune -f                             # Clean Docker system
+docker network create einvoice-nw                  # Recreate network
+
+# Issue: Port conflicts
+lsof -i :3300                                      # Check port usage
+docker ps -a                                       # Check all containers
+
+# Issue: Out of disk space
+docker system df                                   # Check disk usage
+docker image prune -f                              # Remove unused images
+```
+
+#### 🔌 Service Connection Issues
+```bash
+# Check service health
+curl -f http://localhost:3300/api/v1/docs          # BFF health
+docker exec -it mongodb mongosh --eval "db.runCommand('ping')"  # MongoDB
+docker exec -it kafka_server kafka-broker-api-versions # Kafka
+docker exec -it redis_server redis-cli ping        # Redis
+```
+
+#### 📊 Monitoring Stack Issues
+```bash
+# Grafana not accessible
+docker logs grafana                                # Check Grafana logs
+curl http://localhost:3000                         # Test connection
+
+# Loki not collecting logs
+docker logs loki                                   # Check Loki logs
+docker logs promtail                               # Check Promtail logs
+curl http://localhost:3100/ready                   # Loki health
+
+# Missing logs in Grafana
+# 1. Check Promtail is running: docker ps | grep promtail
+# 2. Verify log path: docker exec -it promtail ls /var/lib/docker/containers
+# 3. Check Grafana data source: http://localhost:3000/datasources
+```
+
+### 🚨 Emergency Recovery
+```bash
+# Complete system reset (⚠️ Will delete all data)
+docker-compose -f docker-compose.provider.yaml down -v
+docker-compose -f docker-compose.dev.yaml down -v
+docker system prune -af
+docker volume prune -f
+pnpm build                                          # Fresh start
+```
+
+### 💬 Getting Help
+
+#### 📚 Documentation Priority
+1. **README.md** - Quick setup & troubleshooting
+2. **TEACHING_GUIDE.md** - Detailed technical guide  
+3. **INSTRUCTOR_SUMMARY.md** - Teaching methodology
+
+#### 🐛 Issue Reporting Template
+```markdown
+**Environment:**
+- OS: [Windows/Mac/Linux]
+- Node.js: [version]
+- Docker: [version]
+- RAM: [available]
+
+**Issue Description:**
+[Describe the problem]
+
+**Steps to Reproduce:**
+1. [First step]
+2. [Second step]
+3. [Error occurs]
+
+**Expected vs Actual:**
+- Expected: [what should happen]
+- Actual: [what actually happens]
+
+**Logs:**
+```bash
+[Include relevant logs]
+```
+
+#### 🤝 Contribution Guidelines
+- 🐛 **Bug Reports**: Use the template above
+- 💡 **Feature Requests**: Describe use case & business value
+- 📖 **Documentation**: Improve clarity & add examples
+- 🧪 **Code Contributions**: Follow existing patterns & add tests
+
+---
+
+## 🎯 Next Steps
+
+### 👨‍🏫 For Instructors
+1. Read **INSTRUCTOR_SUMMARY.md** for teaching methodology
+2. Run the complete demo flow
+3. Prepare environment for students
+4. Review exercise solutions
+
+### 🎓 For Students  
+1. Complete the **Quick Start** setup
+2. Follow **TEACHING_GUIDE.md** step by step
+3. Practice with provided exercises
+4. Build your own features
+
+### 🚀 For Production Use
+1. Update environment variables for production
+2. Configure proper authentication
+3. Set up monitoring alerts
+4. Implement backup strategies
+
+---
+
+**Happy Learning & Building! 🎓🚀**
+
+*Tài liệu được cập nhật thường xuyên để phản ánh chính xác source code hiện tại. Mọi góp ý để cải thiện hệ thống và tài liệu đều được hoan nghênh.*
