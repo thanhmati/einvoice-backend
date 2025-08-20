@@ -15,31 +15,33 @@
 Hệ thống E-Invoice được xây dựng theo mô hình **Microservices Architecture** với **Nx Monorepo**:
 
 ```
-📦 E-Invoice System
-├── 🌐 BFF (Backend for Frontend) - Port 3000
-├── 📄 Invoice Service - TCP Microservice
-├── 📁 Media Service - TCP Microservice  
-├── 📄 PDF Generator Service - TCP Microservice
-├── 📧 Mail Service - Kafka Consumer
-├── 👤 User Access Service - TCP Microservice
-├── 🔐 Authorizer Service - gRPC Microservice
-├── 💳 Payment Service - TCP Microservice (Stripe Integration)
-├── 🗄️ MongoDB - Port 27017
-├── 📨 Kafka - Port 9092
-├── 🔑 Keycloak - Port 8180
-├── 🔴 Redis - Port 6379 (Cache Store)
-├── 📊 Grafana - Port 3001 (Monitoring Dashboard)
-├── 📋 Loki - Port 3100 (Log Aggregation)
-└── 📡 Promtail - Log Collection Agent
+📦 E-Invoice System (Nx Monorepo)
+├── 🌐 BFF (Backend for Frontend) - Port 3300 (HTTP REST API + Swagger)
+├── 📄 Invoice Service - TCP Microservice (Core Business Logic)
+├── 📁 Media Service - TCP Microservice (Cloudinary Integration)
+├── 📄 PDF Generator Service - TCP Microservice (Puppeteer + EJS)
+├── 📧 Mail Service - Kafka Consumer + TCP Client (Email Processing)
+├── 👤 User Access Service - TCP Microservice (User Management)
+├── 🔐 Authorizer Service - gRPC Microservice (Keycloak Integration)
+├── 🗄️ MongoDB - Port 27017 (Document Database)
+├── 📨 Kafka - Port 9092 (Event Streaming Platform)
+├── 🔑 Keycloak - Port 8180 (Identity & Access Management)
+├── 🔴 Redis - Port 6379 (Cache Store & Session Management)
+├── 🔍 Redis Insight - Port 5540 (Redis Management UI)
+├── 📊 Grafana - Port 3000 (Monitoring Dashboard)
+├── 📋 Loki - Port 3100 (Log Aggregation Server)
+└── 📡 Promtail - Log Collection Agent (Docker Container Logs)
 ```
 
 ### 🔄 Communication Patterns
-- **BFF ↔ Services**: TCP (Synchronous)
-- **Authorizer Service**: gRPC (Synchronous)
-- **Event Processing**: Kafka (Asynchronous)
-- **Database**: MongoDB với Mongoose
-- **Cache Layer**: Redis với @nestjs/cache-manager
-- **Payment Integration**: Stripe Webhook (Asynchronous)
+- **BFF ↔ Services**: TCP (Synchronous Communication)
+- **BFF ↔ Authorizer**: gRPC (Authentication Service)
+- **Invoice → Kafka**: Event Publishing (Asynchronous)
+- **Mail ← Kafka**: Event Consumption (Asynchronous)
+- **Payment ↔ Stripe**: Webhook Handling (Asynchronous)
+- **Database**: MongoDB với Mongoose ODM
+- **Cache Layer**: Redis với @nestjs/cache-manager (UserGuard Caching)
+- **Log Collection**: Promtail → Loki → Grafana Stack
 
 ---
 
@@ -83,14 +85,17 @@ git clone <repo-url>
 cd <repo-name>
 pnpm install
 
-# 2. Khởi động infrastructure (MongoDB + Kafka + Keycloak + Logging Stack)
+# 2. Khởi động infrastructure (MongoDB + Kafka + Keycloak + Redis + Logging Stack)
 pnpm docker:start:provider
 
 # 3. Build và start tất cả services
 pnpm build
 
-# 4. Truy cập Swagger API Documentation
-# http://localhost:3300/api/v1/docs
+# 4. Truy cập các giao diện:
+# - Swagger API: http://localhost:3300/api/v1/docs
+# - Grafana Dashboard: http://localhost:3000 (admin/admin)
+# - Keycloak Admin: http://localhost:8180 (admin/admin)
+# - Redis Insight: http://localhost:5540
 ```
 
 ### Cho Học Viên
@@ -117,45 +122,78 @@ pnpm dev-lite
 ## 🔍 Highlights của Hệ Thống
 
 ### 🏛️ Architecture Patterns
-- ✅ **Microservices Architecture** với 7 services
-- ✅ **API Gateway Pattern** (BFF)
-- ✅ **Event-Driven Architecture** với Kafka
-- ✅ **Repository Pattern** cho data access
-- ✅ **Dependency Injection** với NestJS
-- ✅ **Payment Integration** với Stripe
+- ✅ **Microservices Architecture** với 7 microservices độc lập
+- ✅ **API Gateway Pattern** (BFF) làm single entry point
+- ✅ **Event-Driven Architecture** với Kafka message streaming
+- ✅ **Repository Pattern** cho clean data access layer
+- ✅ **Dependency Injection** với NestJS DI container
+- ✅ **CQRS Pattern** với separate read/write operations
+- ✅ **Saga Pattern** cho distributed transactions
+- ✅ **Cache-Aside Pattern** với Redis caching strategy
 
 ### 💡 Technology Stack
-- **Framework**: NestJS với TypeScript
-- **Database**: MongoDB + Mongoose
-- **Message Queue**: Kafka
-- **Authentication**: Keycloak
-- **Cache Store**: Redis với @keyv/redis
-- **File Storage**: Cloudinary
-- **PDF Generation**: Puppeteer + EJS
-- **Email**: Nodemailer
-- **Payment**: Stripe (Checkout Sessions + Webhooks)
+
+#### **Core Framework & Language**
+- **Framework**: NestJS v11+ với TypeScript 5.8+
+- **Runtime**: Node.js v18+ với Express.js backend
+- **Package Manager**: pnpm với Nx Monorepo v21+
+
+#### **Database & Storage**
+- **Primary Database**: MongoDB v6+ với Mongoose ODM v8+
+- **Cache Store**: Redis v7+ với @nestjs/cache-manager
+- **File Storage**: Cloudinary (Cloud-based media storage)
+
+#### **Communication & Messaging**
+- **Message Queue**: Kafka (bitnami/kafka) với custom decorators
+- **Synchronous**: TCP microservices communication
+- **Authentication**: gRPC với Keycloak integration
+- **API Documentation**: Swagger/OpenAPI v3
+
+#### **Payment & Email**
+- **Payment Gateway**: Stripe v18+ (Checkout Sessions + Webhooks)
+- **Email Service**: Nodemailer với EJS templating
+- **PDF Generation**: Puppeteer v24+ với EJS templates
+
+#### **DevOps & Monitoring**
 - **Containerization**: Docker + Docker Compose
-- **Monorepo**: Nx
-- **Monitoring**: Grafana Dashboard
-- **Log Aggregation**: Loki + Promtail
-- **Centralized Logging**: Docker container logs collection
+- **Monitoring Stack**: Grafana + Loki + Promtail
+- **Log Aggregation**: Centralized Docker container logs
+- **Identity Management**: Keycloak v25.0.0
+- **Redis Management**: Redis Insight UI
 
 ### 📊 Production-Ready Features
-- ✅ Global error handling với ExceptionInterceptor
-- ✅ Request logging với LoggerMiddleware
-- ✅ Process ID tracking across services
-- ✅ DTO validation với class-validator
-- ✅ Swagger API documentation
-- ✅ Docker containerization
-- ✅ Environment-based configuration
-- ✅ **Redis Cache Layer** cho authentication tokens
-- ✅ **UserData Caching** trong UserGuard để tránh auto verify token
-- ✅ **Token-based Caching Strategy** với SHA256 hash keys
-- ✅ Centralized logging với Grafana + Loki + Promtail
-- ✅ Real-time log monitoring và dashboard
-- ✅ Container log aggregation và search
-- ✅ **Stripe Payment Integration** với webhook handling
-- ✅ **Payment Link Generation** trong email templates
+
+#### **Security & Authentication**
+- ✅ **JWT Authentication** với Keycloak integration
+- ✅ **Redis Cache Layer** cho authentication tokens (30min TTL)
+- ✅ **Token Security** với SHA256 hashing cho cache keys
+- ✅ **UserGuard Caching** tránh redundant Keycloak calls
+- ✅ **Webhook Security** với Stripe signature verification
+
+#### **Error Handling & Logging**
+- ✅ **Global Exception Handling** với ExceptionInterceptor
+- ✅ **Request Logging** với LoggerMiddleware + process ID tracking
+- ✅ **Centralized Logging** với Grafana + Loki + Promtail stack
+- ✅ **Real-time Log Monitoring** với dashboard và search capabilities
+- ✅ **Container Log Aggregation** từ tất cả microservices
+
+#### **Validation & Documentation**
+- ✅ **DTO Validation** với class-validator decorators
+- ✅ **Swagger API Documentation** với Bearer Auth support
+- ✅ **Environment-based Configuration** với validation
+- ✅ **Type Safety** với TypeScript strict mode
+
+#### **Performance & Scalability**
+- ✅ **Redis Caching Strategy** với cache-first approach
+- ✅ **Connection Pooling** cho MongoDB và Redis
+- ✅ **Docker Containerization** cho horizontal scaling
+- ✅ **Microservices Architecture** cho independent scaling
+
+#### **Payment & Business Logic**
+- ✅ **Stripe Payment Integration** với Checkout Sessions
+- ✅ **Webhook Handling** cho payment status updates
+- ✅ **Payment Link Generation** trong professional email templates
+- ✅ **Invoice Status Management** với business rule validation
 
 ---
 
@@ -163,14 +201,27 @@ pnpm dev-lite
 ## 🛠️ Tools Hỗ Trợ
 
 ### Development Tools
-- **API Testing**: Swagger UI tại `http://localhost:3000/api/v1/docs`
-- **Database**: MongoDB Compass cho GUI
-- **Message Queue**: Kafka UI (có thể enable trong docker-compose)
-- **Authentication**: Keycloak Admin tại `http://localhost:8180`
-- **Monitoring**: Grafana Dashboard tại `http://localhost:3001` (admin/admin)
-- **Log Search**: Loki API tại `http://localhost:3100`
-- **Log Collection**: Promtail agent tự động thu thập logs từ Docker containers
-- **Payment Testing**: Stripe CLI cho webhook testing
+
+#### **API & Testing**
+- **API Documentation**: Swagger UI tại `http://localhost:3300/api/v1/docs`
+- **API Testing**: Postman/Insomnia với Bearer token authentication
+- **Payment Testing**: Stripe CLI cho webhook testing và simulation
+
+#### **Database & Cache Management**
+- **MongoDB GUI**: MongoDB Compass tại `mongodb://localhost:27017`
+- **Redis Management**: Redis Insight UI tại `http://localhost:5540`
+- **Database CLI**: Docker exec commands cho direct access
+
+#### **Monitoring & Logging**
+- **Grafana Dashboard**: `http://localhost:3000` (admin/admin)
+- **Loki API**: `http://localhost:3100` cho direct log queries
+- **Log Collection**: Promtail agent tự động thu thập container logs
+- **Real-time Monitoring**: Live log streaming trong Grafana
+
+#### **Identity & Security**
+- **Keycloak Admin**: `http://localhost:8180` (admin/admin)
+- **JWT Token Testing**: Keycloak token generation và validation
+- **Cache Monitoring**: Redis commands cho cache inspection
 
 ### Xem Sơ Đồ Mermaid
 - **GitHub**: Tự động render Mermaid diagrams
@@ -191,20 +242,38 @@ pnpm dev-lite
 7. **Stripe Integration**: Verify webhook configuration và signature verification
 
 ### Debugging
+
+#### **Container & Network Debugging**
 ```bash
 # Check running containers
 docker ps
+docker compose -f docker-compose.provider.yaml ps
+docker compose -f docker-compose.dev.yaml ps
 
 # View service logs
-docker logs <container-name>
+docker logs <container-name> --follow
+docker logs bff --tail 100
+docker logs invoice --tail 100
 
-# Check network
+# Check network connectivity
 docker network ls | grep einvoice
+docker network inspect einvoice-nw
+```
 
+#### **Database & Cache Debugging**
+```bash
 # MongoDB connection test
 docker exec -it mongodb mongosh
+# Use: show dbs; use invoice; show collections;
 
-# Check logging stack
+# Redis connection test
+docker exec -it redis_server redis-cli
+# Use: KEYS *; GET user-token:*; TTL user-token:*
+```
+
+#### **Logging Stack Debugging**
+```bash
+# Check logging stack health
 docker logs grafana
 docker logs loki
 docker logs promtail
@@ -212,9 +281,24 @@ docker logs promtail
 # Verify log collection
 curl http://localhost:3100/ready
 curl http://localhost:3100/metrics
+curl http://localhost:3100/loki/api/v1/labels
 
-# Test Stripe webhook (if using Stripe CLI)
-stripe listen --forward-to localhost:3000/api/v1/payment/stripe/webhook
+# Test log queries
+curl -G "http://localhost:3100/loki/api/v1/query" \
+  --data-urlencode 'query={app="bff"}'
+```
+
+#### **Payment & Webhook Debugging**
+```bash
+# Test Stripe webhook locally
+stripe listen --forward-to localhost:3300/api/v1/payment/stripe/webhook
+
+# Check payment service logs
+docker logs invoice | grep -i stripe
+docker logs invoice | grep -i payment
+
+# Verify webhook signature
+# Check STRIPE_WEBHOOK_SECRET trong environment
 ```
 
 ### Feedback & Contributions

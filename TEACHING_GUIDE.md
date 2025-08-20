@@ -79,20 +79,21 @@ Hệ thống được thiết kế theo mô hình **Microservices Architecture**
 
 ```
 📦 E-Invoice System (Nx Monorepo)
-├── 🌐 BFF (Backend for Frontend) - Port 3000 (HTTP REST API)
-├── 📄 Invoice Service - TCP Microservice
-├── 📁 Media Service - TCP Microservice
-├── 📄 PDF Generator Service - TCP Microservice
-├── 📧 Mail Service - Kafka Consumer + TCP Client
-├── 👤 User Access Service - TCP Microservice
-├── 🔐 Authorizer Service - gRPC Microservice
-├── 🗄️ MongoDB - Port 27017
-├── 📨 Kafka - Port 9092
-├── 🔑 Keycloak - Port 8180 (Authentication Server)
-├── 🔴 Redis - Port 6379 (Cache Store)
-├── 📊 Grafana - Port 3001 (Monitoring Dashboard)
+├── 🌐 BFF (Backend for Frontend) - Port 3300 (HTTP REST API + Swagger)
+├── 📄 Invoice Service - TCP Microservice (Core Business Logic)
+├── 📁 Media Service - TCP Microservice (Cloudinary Integration)
+├── 📄 PDF Generator Service - TCP Microservice (Puppeteer + EJS)
+├── 📧 Mail Service - Kafka Consumer + TCP Client (Email Processing)
+├── 👤 User Access Service - TCP Microservice (User Management)
+├── 🔐 Authorizer Service - gRPC Microservice (Keycloak Integration)
+├── 🗄️ MongoDB - Port 27017 (Document Database)
+├── 📨 Kafka - Port 9092 (Event Streaming Platform)
+├── 🔑 Keycloak - Port 8180 (Identity & Access Management)
+├── 🔴 Redis - Port 6379 (Cache Store & Session Management)
+├── 🔍 Redis Insight - Port 5540 (Redis Management UI)
+├── 📊 Grafana - Port 3000 (Monitoring Dashboard)
 ├── 📋 Loki - Port 3100 (Log Aggregation Server)
-└── 📡 Promtail - Log Collection Agent
+└── 📡 Promtail - Log Collection Agent (Docker Container Logs)
 ```
 
 ### 1.2 Sơ Đồ Tổng Thể Hệ Thống
@@ -105,7 +106,7 @@ config:
   layout: dagre
 ---
 flowchart TB
-    Client["🌐 Client/Frontend"] --> BFF["🚪 BFF Service<br>:3000 (HTTP)"]
+    Client["🌐 Client/Frontend"] --> BFF["🚪 BFF Service<br>:3300 (HTTP)"]
     BFF -- Guard Check --> UserGuard["🛡️ UserGuard<br>(Cache Layer)"]
     UserGuard -- gRPC: Authentication --> Auth["🔐 Authorizer<br>(gRPC Service)"]
     BFF -- TCP: CRUD Invoice --> Invoice["📄 Invoice Service<br>(TCP Microservice)"]
@@ -118,19 +119,19 @@ flowchart TB
     Kafka -. 📨 Consume Events .-> Mail["📧 Mail Service<br>(Kafka Consumer)"]
     Invoice -- Read/Write --> MongoDB[("🗄️ MongoDB<br>:27017")]
     UserAccess -- Read/Write --> MongoDB
-    UserGuard -- Token Cache --> Redis["🔴 Redis<br>:6379"]
-    Media -- Upload Files --> Cloudinary["☁️ Cloudinary"]
-    PDF -- HTML to PDF --> Puppeteer["🎭 Puppeteer Engine"]
-    Mail -- Send Email --> SMTP["📮 SMTP Server"]
-    Auth -- User Management --> Keycloak["🔑 Keycloak<br>:8180"]
-    Payment -- Payment Processing --> Stripe["💳 Stripe<br>(Payment Gateway)"]
+    UserGuard -- Token Cache --> Redis["🔴 Redis<br>:6379<br>(30min TTL)"]
+    Media -- Upload Files --> Cloudinary["☁️ Cloudinary<br>(Cloud Storage)"]
+    PDF -- HTML to PDF --> Puppeteer["🎭 Puppeteer Engine<br>(PDF Generation)"]
+    Mail -- Send Email --> SMTP["📮 SMTP Server<br>(Nodemailer)"]
+    Auth -- User Management --> Keycloak["🔑 Keycloak<br>:8180<br>(JWT Provider)"]
+    Payment -- Payment Processing --> Stripe["💳 Stripe<br>(Payment Gateway)<br>Checkout + Webhooks"]
     BFF -. Container Logs .-> Promtail["📡 Promtail<br>(Log Agent)"]
     Invoice -. Container Logs .-> Promtail
     UserAccess -. Container Logs .-> Promtail
     Mail -. Container Logs .-> Promtail
     Payment -. Container Logs .-> Promtail
-    Promtail -- Ship Logs --> Loki["📋 Loki<br>:3100"]
-    Loki -- Query Logs --> Grafana["📊 Grafana<br>:3001"]
+    Promtail -- Ship Logs --> Loki["📋 Loki<br>:3100<br>(Log Storage)"]
+    Loki -- Query Logs --> Grafana["📊 Grafana<br>:3000<br>(Dashboard)"]
      Client:::externalBox
      BFF:::serviceBox
      UserGuard:::cacheBox
