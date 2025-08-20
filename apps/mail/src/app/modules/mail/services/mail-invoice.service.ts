@@ -1,4 +1,4 @@
-import { TCP_SERVICES } from '@common/configuration';
+import { TCP_SERVICES } from '@common/configuration/tcp.config';
 import { InvoiceSentPayload } from '@common/interfaces/queue/invoice';
 import { Inject, Injectable } from '@nestjs/common';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';

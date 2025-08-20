@@ -34,6 +34,13 @@
           "buildTarget": "authorizer:build:production"
         }
       }
+    },
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "commands": ["docker build -f apps/authorizer/Dockerfile . -t authorizer:latest"]
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-import { TCP_SERVICES } from '@common/configuration';
+import { TCP_SERVICES } from '@common/configuration/tcp.config';
 import { ResponseDto } from '@common/interfaces/gateway/common/response.interface';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { Body, Controller, Inject, Post } from '@nestjs/common';

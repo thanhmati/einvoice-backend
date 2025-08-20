@@ -21,24 +21,28 @@ export class GrpcConfiguration {
     this.GRPC_AUTHORIZER_SERVICE = GrpcConfiguration.setValue({
       key: GRPC_SERVICES.AUTHORIZER_SERVICE,
       protoPath: ['./proto/authorizer.proto'],
-      port: 5100,
+      port: Number(process.env['GRPC_AUTHORIZER_SERVICE_PORT']) || 5100,
+      host: process.env['AUTHORIZER_SERVICE_HOST'] || '127.0.0.1',
     });
 
     this.GRPC_USER_ACCESS_SERVICE = GrpcConfiguration.setValue({
       key: GRPC_SERVICES.USER_ACCESS_SERVICE,
       protoPath: ['./proto/user-access.proto'],
-      port: 5101,
+      port: Number(process.env['GRPC_USER_ACCESS_SERVICE_PORT']) || 5100,
+      host: process.env['USER_ACCESS_SERVICE_HOST'] || '127.0.0.1',
     });
   }
 
   private static setValue({
     key,
     protoPath,
-    port,
+    port = 5100,
+    host = '127.0.0.1',
   }: {
     key: GRPC_SERVICES;
     protoPath: string | string[];
-    port: number;
+    port?: number;
+    host?: string;
   }): GrpcOptions & { name: string } {
     return {
       name: key,
@@ -48,7 +52,7 @@ export class GrpcConfiguration {
         protoPath: Array.isArray(protoPath)
           ? protoPath.map((path) => join(__dirname, path))
           : join(__dirname, protoPath),
-        url: `127.0.0.1:${port}`,
+        url: `${host}:${port}`,
       },
     };
   }

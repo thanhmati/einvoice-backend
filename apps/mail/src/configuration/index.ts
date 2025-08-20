@@ -1,12 +1,10 @@
-import {
-  BaseConfiguration,
-  AppConfiguration,
-  MailConfiguration,
-  KafkaConfiguration,
-  TcpConfiguration,
-} from '@common/configuration';
 import { ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { BaseConfiguration } from '@common/configuration/base.config';
+import { AppConfiguration } from '@common/configuration/app.config';
+import { MailConfiguration } from '@common/configuration/mail.config';
+import { KafkaConfiguration } from '@common/configuration/kafka.config';
+import { TcpConfiguration } from '@common/configuration/tcp.config';
 
 class Configuration extends BaseConfiguration {
   @ValidateNested()

@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import jwksRsa, { JwksClient } from 'jwks-rsa';
 import jwt, { Jwt, JwtPayload } from 'jsonwebtoken';
 import { AuthorizeResponse } from '@common/interfaces/grpc/authorizer';
-import { GRPC_SERVICES } from '@common/configuration';
+import { GRPC_SERVICES } from '@common/configuration/grpc.config';
 import { ClientGrpc } from '@nestjs/microservices';
 import { UserAccessService } from '@common/interfaces/grpc/user-access';
 import { firstValueFrom, map } from 'rxjs';

@@ -45,6 +45,13 @@
       "options": {
         "command": "node tools/seed.js apps/user-access/src/app/seeder migrate"
       }
+    },
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "commands": ["docker build -f apps/user-access/Dockerfile . -t user-access:latest"]
+      }
     }
   }
 }

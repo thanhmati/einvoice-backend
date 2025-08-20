@@ -13,7 +13,7 @@ importers:
         version: 1.13.4
       '@keyv/redis':
         specifier: ^5.1.0
-        version: 5.1.0(keyv@5.5.0)
+        version: 5.1.1(keyv@5.5.0)
       '@nest-lab/throttler-storage-redis':
         specifier: ^1.1.0
         version: 1.1.0(@nestjs/common@11.1.4(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.4)(@nestjs/throttler@6.4.0(@nestjs/common@11.1.4(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.4)(reflect-metadata@0.2.2))(ioredis@5.7.0)(reflect-metadata@0.2.2)
@@ -1195,8 +1195,8 @@ packages:
     peerDependencies:
       tslib: '2'
 
-  '@keyv/redis@5.1.0':
-    resolution: {integrity: sha512-89qUAT0+5m3/w/n438yR8fmrWvy0cWTbwp+hKAQrw52otaKalogag+Cj3uOUV4qAly5iusmeCSD/hyepFsHgdw==}
+  '@keyv/redis@5.1.1':
+    resolution: {integrity: sha512-bPypEnO2uSDjrgDP2whyewZ2R8aAJvoLM2440J1omjpJnzv1Awzs3RIztQGoDafNhPe0dZeI+44XKCdSiWkgTg==}
     engines: {node: '>= 18'}
     peerDependencies:
       keyv: ^5.5.0
@@ -1694,8 +1694,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  '@redis/client@5.8.0':
-    resolution: {integrity: sha512-ywZjKGoSSAECGYOd9bJpws6d4867SN686obUWT/sRmo1c/Q8V+jWyInvlqwKa0BOvTHHwYeB2WFUEvd6PADeOQ==}
+  '@redis/client@5.8.1':
+    resolution: {integrity: sha512-hD5Tvv7G0t8b3w8ao3kQ4jEPUmUUC6pqA18c8ciYF5xZGfUGBg0olQHW46v6qSt4O5bxOuB3uV7pM6H5wEjBwA==}
     engines: {node: '>= 18'}
 
   '@scarf/scarf@1.4.0':
@@ -7849,9 +7849,9 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@keyv/redis@5.1.0(keyv@5.5.0)':
+  '@keyv/redis@5.1.1(keyv@5.5.0)':
     dependencies:
-      '@redis/client': 5.8.0
+      '@redis/client': 5.8.1
       cluster-key-slot: 1.1.2
       hookified: 1.11.0
       keyv: 5.5.0
@@ -8486,7 +8486,7 @@ snapshots:
       - bare-buffer
       - supports-color
 
-  '@redis/client@5.8.0':
+  '@redis/client@5.8.1':
     dependencies:
       cluster-key-slot: 1.1.2
 

@@ -4,7 +4,7 @@ import { MailTemplateModule } from '../mail-template/mail-template.module';
 import { MailQueueService } from './services/mail-queue.service';
 import { MailInvoiceService } from './services/mail-invoice.service';
 import { ClientsModule } from '@nestjs/microservices';
-import { TCP_SERVICES, TcpProvider } from '@common/configuration';
+import { TCP_SERVICES, TcpProvider } from '@common/configuration/tcp.config';
 
 @Module({
   imports: [MailTemplateModule, ClientsModule.registerAsync([TcpProvider(TCP_SERVICES.INVOICE_SERVICE)])],

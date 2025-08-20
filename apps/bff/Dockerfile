@@ -11,6 +11,6 @@ FROM base AS prod-deps
 COPY /dist/apps/bff /app
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod
 RUN pnpm install tslib
-EXPOSE 3000
+EXPOSE 3300
 
 CMD ["node", "main.js"]

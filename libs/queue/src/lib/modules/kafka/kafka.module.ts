@@ -52,6 +52,7 @@ export class KafkaModule {
           provide: KAFKA_CONSUMER_OPTIONS,
           useFactory: (configService: ConfigService): KafkaConsumerOptions => {
             const url: string[] = options?.url || [configService.get<string>('KAFKA_CONFIG.URL') || ''];
+
             return {
               url,
               serviceName: options?.serviceName || hostname() || '',

@@ -3,7 +3,7 @@ import { UserRepository } from '../repositories/user.repository';
 import { CreateUserTcpReq } from '@common/interfaces/tcp/user';
 import { createUserRequestMapping } from '../mappers';
 import { ERROR_CODE } from '@common/constants/enums/error-code.enum';
-import { TCP_SERVICES } from '@common/configuration';
+import { TCP_SERVICES } from '@common/configuration/tcp.config';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { CreateKeycloakUserTcpReq } from '@common/interfaces/tcp/authorizer';
 import { firstValueFrom, map } from 'rxjs';

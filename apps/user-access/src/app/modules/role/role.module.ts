@@ -1,4 +1,4 @@
-import { MongoProvider } from '@common/configuration';
+import { MongoProvider } from '@common/configuration/mongo.config';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RoleDestination } from '@common/schemas/role.schema';

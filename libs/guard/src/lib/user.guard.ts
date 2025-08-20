@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthorizedResult, KeycloakService } from '@common/interfaces/grpc/authorizer';
-import { GRPC_SERVICES } from '@common/configuration';
+import { GRPC_SERVICES } from '@common/configuration/grpc.config';
 import { ClientGrpc } from '@nestjs/microservices';
 import { Reflector } from '@nestjs/core';
 import { AuthorizationOptions } from '@common/interfaces/common/authorizer.interface';

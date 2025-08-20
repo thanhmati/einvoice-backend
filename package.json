@@ -11,7 +11,8 @@
     "docker-build": "pnpm nx:run-many --target=docker-build --verbose",
     "docker:start:provider": "docker compose -f docker-compose.provider.yaml up -d",
     "docker:start:dev": "docker compose -f docker-compose.dev.yaml up -d",
-    "build": "pnpm nx:run-many -t build && pnpm docker-build && pnpm docker:start:provider && pnpm docker:start:dev",
+    "docker:stop:dev": "docker compose -f docker-compose.dev.yaml down",
+    "build": "pnpm nx:reset && pnpm nx:run-many -t build --no-cache && pnpm docker-build && pnpm docker:start:provider && pnpm docker:stop:dev && pnpm docker:start:dev",
     "dev": "pnpm nx:reset && pnpm nx:run-many -t serve",
     "dev-lite": "pnpm dev --projects=bff,invoice,authorizer,user-access",
     "prepare": "husky"

@@ -13,6 +13,7 @@
         "invoice.get_all",
         "invoice.update",
         "invoice.delete",
+        "invoice.send",
         "user.create",
         "user.get_by_id",
         "user.get_all",

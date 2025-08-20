@@ -10,7 +10,7 @@ import {
 import { createCheckoutSessionMapping, invoiceRequestMapping } from '../mappers';
 import { ERROR_CODE } from '@common/constants/enums/error-code.enum';
 import { INVOICE_STATUS } from '@common/constants/invoice.constant';
-import { TCP_SERVICES } from '@common/configuration';
+import { TCP_SERVICES } from '@common/configuration/tcp.config';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enums/tcp-request-message.enum';
 import { firstValueFrom, map } from 'rxjs';

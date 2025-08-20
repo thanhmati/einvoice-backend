@@ -1,12 +1,10 @@
-import {
-  BaseConfiguration,
-  AppConfiguration,
-  MongoConfiguration,
-  TcpConfiguration,
-  GrpcConfiguration,
-} from '@common/configuration';
 import { ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { BaseConfiguration } from '@common/configuration/base.config';
+import { AppConfiguration } from '@common/configuration/app.config';
+import { MongoConfiguration } from '@common/configuration/mongo.config';
+import { TcpConfiguration } from '@common/configuration/tcp.config';
+import { GrpcConfiguration } from '@common/configuration/grpc.config';
 
 class Configuration extends BaseConfiguration {
   @ValidateNested()

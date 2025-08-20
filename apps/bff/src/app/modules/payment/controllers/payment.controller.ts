@@ -1,4 +1,4 @@
-import { TCP_SERVICES } from '@common/configuration';
+import { TCP_SERVICES } from '@common/configuration/tcp.config';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enums/tcp-request-message.enum';
 import { ProcessID } from '@common/decorators/processID.decorator';
 import { ResponseDto } from '@common/interfaces/gateway/common/response.interface';

@@ -8,7 +8,7 @@ import {
   PaginateInvoiceRequestDto,
   UpdateInvoiceRequestDto,
 } from '@common/interfaces/gateway/dto/invoice';
-import { TCP_SERVICES } from '@common/configuration';
+import { TCP_SERVICES } from '@common/configuration/tcp.config';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import {
   CreateInvoiceTcpReq,

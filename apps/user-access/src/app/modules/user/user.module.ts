@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UserRepository } from './repositories/user.repository';
-import { MongoProvider, TCP_SERVICES, TcpProvider } from '@common/configuration';
+import { TCP_SERVICES, TcpProvider } from '@common/configuration/tcp.config';
+import { MongoProvider } from '@common/configuration/mongo.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserDestination } from '@common/schemas/user.schema';
 import { UserService } from './services/user.service';

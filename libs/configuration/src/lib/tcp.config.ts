@@ -37,20 +37,20 @@ export class TcpConfiguration {
   TCP_AUTHORIZER_SERVICE: TcpClientOptions;
 
   constructor() {
-    this.TCP_INVOICE_SERVICE = TcpConfiguration.setValue(3201);
-    this.TCP_PDF_GENERATOR_SERVICE = TcpConfiguration.setValue(3202);
-    this.TCP_MEDIA_SERVICE = TcpConfiguration.setValue(3203);
-    this.TCP_MAIL_SERVICE = TcpConfiguration.setValue(3204);
-    this.TCP_USER_SERVICE = TcpConfiguration.setValue(3205);
-    this.TCP_AUTHORIZER_SERVICE = TcpConfiguration.setValue(3206);
+    Object.entries(TCP_SERVICES).forEach(([key, service]) => {
+      const port = Number(process.env[`${service}_PORT`]);
+      const host = process.env[`${key}_HOST`];
+
+      this[service] = TcpConfiguration.setValue(port, host);
+    });
   }
 
-  private static setValue(port?: number): TcpClientOptions {
+  private static setValue(port?: number, host?: string): TcpClientOptions {
     return {
       transport: Transport.TCP,
       options: {
         port: port || 3200,
-        host: '127.0.0.1',
+        host: host || '127.0.0.1',
       },
     };
   }

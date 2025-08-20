@@ -14,7 +14,7 @@ async function bootstrap() {
   try {
     const isDev = AppModule.CONFIGURATION.IS_DEV;
     const globalPrefix = AppModule.CONFIGURATION.GLOBAL_PREFIX;
-    const port = AppModule.CONFIGURATION.APP_CONFIG.PORT || 3000;
+    const port = AppModule.CONFIGURATION.APP_CONFIG.PORT || 3300;
 
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: isDev ? ['error', 'warn', 'log', 'debug', 'verbose'] : ['error', 'warn', 'log'],

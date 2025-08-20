@@ -17,7 +17,7 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "@common/configuration": ["libs/configuration/src/index.ts"],
+      "@common/configuration/*": ["libs/configuration/src/lib/*"],
       "@common/constants/*": ["libs/constants/src/lib/*"],
       "@common/decorators/*": ["libs/decorators/src/lib/*"],
       "@common/gRPC/*": ["libs/gRPC/src/lib/*"],

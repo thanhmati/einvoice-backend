@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { MongoProvider } from '@common/configuration';
+import { MongoProvider } from '@common/configuration/mongo.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProductDestination } from '@common/schemas/product.schema';
 import { ProductController } from './controllers/product.controller';
@@ -11,4 +11,4 @@ import { ProductRepository } from './repositories/product.repository';
   controllers: [ProductController],
   providers: [ProductService, ProductRepository],
 })
-export class ProductModule { }
+export class ProductModule {}
