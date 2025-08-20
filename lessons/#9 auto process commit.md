@@ -44,7 +44,26 @@
 ## 3️⃣ Giới thiệu về Commitlint
 ### ❓ Commitlint là gì?
 - Commitlint giúp **kiểm tra commit message** theo một quy tắc nhất định.  
-- Thường kết hợp với **Conventional Commits** để tạo Git history rõ ràng, dễ dùng với **semantic release** hoặc **changelog tự động**.  
+- Thường kết hợp với **Conventional Commits** để tạo Git history rõ ràng, dễ dùng với **semantic release** hoặc **changelog tự động**.
+
+### ❗ Thực trạng commit message hiện nay
+- Trong nhiều dự án, commit message thường **không thống nhất**, ví dụ:  
+```text
+fix bug
+update invoice
+add feature login
+```
+### ❗ Vấn đề gặp phải
+- Lịch sử git khó đọc, không biết commit nào sửa bug, commit nào thêm tính năng.  
+- Khó tự động tạo **CHANGELOG** hoặc thực hiện **Semantic Release**.  
+- Team lớn → commit message lộn xộn, gây khó khăn khi review hoặc rollback code.  
+
+### 🔑 Giải pháp
+- Sử dụng **Commitlint + Husky** để bắt buộc commit message theo chuẩn.  
+- Kết hợp với **Conventional Commits** để:  
+  - Phân loại commit: `feat`, `fix`, `chore`, `refactor`…  
+  - Tự động tạo changelog và versioning.
+
 
 ### ⚡ Conventional Commit Format:
 ```text
