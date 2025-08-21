@@ -4,40 +4,88 @@
 
 ## 🎯 Giới Thiệu Khóa Học
 
-Chào mừng các bạn đến với khóa học **"Khoá Học NestJS Microservices Thực Chiến: Từ Zero Đến Hero"**. Khóa học này sẽ hướng dẫn các bạn phân tích và hiểu sâu một hệ thống thực tế được xây dựng bằng **NestJS**, **MongoDB**, **Kafka**, **Keycloak** và **Docker**.
+Chào mừng các bạn đến với **"NestJS Microservices Thực Chiến: Production-Ready E-Invoice System"** - một khóa học toàn diện về xây dựng hệ thống microservices thực tế với **8 services**, **payment integration**, **centralized logging**, và **production deployment**.
 
 ### 🎓 Đối Tượng Học Viên
-- Backend Developer muốn nâng cao kỹ năng với NestJS Microservices
-- Fullstack Developer cần hiểu và triển khai kiến trúc microservices trong thực tế
-- Sinh viên / Lập trình viên muốn học các công nghệ như Kafka, Keycloak, Redis, Stripe, Docker
-- Người đang tìm hiểu Event-Driven Architecture và Saga Pattern
-- Developer muốn triển khai hệ thống production-ready với logging & monitoring chuyên nghiệp
-- Ai yêu thích học qua dự án thực chiến thay vì lý thuyết thuần túy
 
-### 🏆 Mục Tiêu Học Tập
-Sau khóa học, học viên sẽ:
+| 👥 Đối Tượng | 📊 Level | 🎯 Mục Tiêu | 💼 Ứng Dụng |
+|-------------|---------|------------|-------------|
+| **Backend Developer** | Intermediate+ | Nâng cao kỹ năng Microservices | Senior Developer role |
+| **Fullstack Developer** | Intermediate | Hiểu architecture phức tạp | Solution Architect |
+| **DevOps Engineer** | Beginner+ | Container orchestration | Production deployment |
+| **Tech Lead** | Advanced | System design patterns | Team leadership |
+| **Students/Graduates** | Intermediate | Real-world experience | Industry readiness |
 
-1. Hiểu rõ kiến trúc **Microservices** và **Event-Driven Architecture**
-2. Tổ chức mã nguồn theo kiến trúc monorepo với Nx
-3. Nắm vững cách thiết kế và implement **API Gateway Pattern** (BFF)
-4. Tích hợp Stripe để xử lý thanh toán trực tuyến an toàn
-5. Biết cách sử dụng **Kafka** cho async communication
-6. Áp dụng được các **Design Patterns**: Repository, DI, Factory
-7. Implement được **Error Handling**, **Logging**, **Validation** trong microservices
-8. Thiết kế database schema với **MongoDB** và **Mongoose**
-9. Tích hợp **Keycloak** cho authentication và authorization
-10. Thiết lập dashboard giám sát bằng Grafana
-11. Tập trung và quản lý log với Loki, thu thập log container bằng Promtail
-12. Container hóa và triển khai hệ thống với Docker và Docker Compose
+### 🏆 Learning Outcomes
 
-### 🛠️ Yêu cầu hoặc điều kiện tiên quyết để tham gia khóa học
-- Kiến thức cơ bản về JavaScript hoặc TypeScript
-- Hiểu các khái niệm REST API và HTTP
-- Có kinh nghiệm với Node.js (Express.js hoặc NestJS cơ bản là một lợi thế)
-- Kiến thức cơ bản về MongoDB hoặc cơ sở dữ liệu bất kỳ
-- Biết sử dụng Docker ở mức cơ bản (pull, run container)
-- Môi trường phát triển đã cài đặt: Node.js, npm hoặc yarn, Docker Desktop
-- Tinh thần sẵn sàng học các công nghệ mới và thực hành trên dự án thực tế
+#### 🔧 Technical Skills
+Sau khóa học, bạn sẽ **thành thạo**:
+
+```mermaid
+mindmap
+  root((Skills Mastered))
+    Architecture
+      Microservices Design
+      API Gateway Pattern
+      Event-Driven Architecture
+      CQRS Implementation
+    Development
+      NestJS Advanced
+      TypeScript Patterns
+      Nx Monorepo
+      Docker Containerization
+    Integration
+      Stripe Payments
+      Kafka Events
+      Redis Caching
+      Keycloak Authentication
+    Production
+      Monitoring Setup
+      Centralized Logging
+      Error Handling
+      Performance Optimization
+```
+
+#### 🎯 Practical Achievements
+- ✅ **Build 8 production-ready microservices** from scratch
+- ✅ **Implement complete payment flow** with Stripe integration
+- ✅ **Set up enterprise monitoring** with Grafana + Loki stack
+- ✅ **Deploy scalable architecture** with Docker Compose
+- ✅ **Handle real business logic** with invoice management
+- ✅ **Master async communication** with Kafka events
+- ✅ **Implement security patterns** with JWT + Redis caching
+
+### 🛠️ Prerequisites & Preparation
+
+#### ✅ Required Knowledge
+| Technology | Level | Verification |
+|------------|-------|--------------|
+| **JavaScript/TypeScript** | Intermediate | Can write classes, async/await, modules |
+| **Node.js & npm** | Basic | Can install packages, run scripts |
+| **REST APIs** | Basic | Understand HTTP methods, status codes |
+| **Docker** | Basic | Can run containers, basic commands |
+| **Git** | Basic | Clone, commit, push operations |
+
+#### 🚀 Recommended Setup
+```bash
+# Environment Check
+node --version          # v18+ required
+npm --version           # v8+ required  
+docker --version        # v20+ recommended
+git --version           # v2.30+ recommended
+
+# Recommended VS Code Extensions
+code --install-extension ms-vscode.vscode-typescript-next
+code --install-extension bradlc.vscode-tailwindcss
+code --install-extension ms-vscode.vscode-json
+code --install-extension bierner.markdown-mermaid
+```
+
+#### 💡 Nice to Have
+- MongoDB/NoSQL database experience
+- Basic understanding of microservices concepts  
+- Familiarity with payment systems
+- Experience with monitoring tools
 ## 📌 Tương tác với Giảng viên
 
 Khóa học không chỉ dừng lại ở video lý thuyết – bạn sẽ luôn có **sự đồng hành trực tiếp từ giảng viên** trong suốt quá trình học.
@@ -71,28 +119,81 @@ Giảng viên sẽ luôn theo sát để bạn không chỉ **hoàn thành khóa
 
 ---
 
-## 🏗️ PHẦN 1: TỔNG QUAN KIẾN TRÚC
+## 🏗️ PHẦN 1: SYSTEM ARCHITECTURE DEEP DIVE
 
-### 1.1 Kiến Trúc Tổng Thể
+### 1.1 Architecture Overview
 
-Hệ thống được thiết kế theo mô hình **Microservices Architecture** với **Nx Monorepo**, bao gồm:
+Hệ thống E-Invoice được thiết kế theo **Modern Microservices Architecture** với **Nx Monorepo**, triển khai **14 components** bao gồm **8 microservices** và **6 infrastructure services**:
 
+#### 🏢 Application Layer (8 Microservices)
+```mermaid
+graph TB
+    subgraph "🌐 API Gateway Layer"
+        BFF["🚪 BFF Service<br/>Port 3300<br/>• HTTP REST API<br/>• Swagger Documentation<br/>• Global Guards & Interceptors"]
+    end
+    
+    subgraph "💼 Core Business Services"
+        Invoice["📄 Invoice Service<br/>• Business Logic<br/>• Payment Integration<br/>• Status Management<br/>• Kafka Producer"]
+        UserAccess["👤 User Access Service<br/>• User Management<br/>• Profile Operations<br/>• Data Validation"]
+        Product["🛍️ Product Service<br/>• Product Catalog<br/>• Inventory Management<br/>• Pricing Logic"]
+    end
+    
+    subgraph "🔧 Supporting Services"
+        Media["📁 Media Service<br/>• File Upload<br/>• Cloudinary Integration<br/>• Image Processing"]
+        PDF["📄 PDF Generator<br/>• Template Rendering<br/>• Puppeteer Engine<br/>• EJS Templates"]
+        Mail["📧 Mail Service<br/>• Email Templates<br/>• SMTP Integration<br/>• Kafka Consumer"]
+    end
+    
+    subgraph "🔐 Security & Auth"
+        Auth["🔐 Authorizer Service<br/>• gRPC Authentication<br/>• JWT Validation<br/>• Keycloak Integration"]
+    end
+    
+    BFF --> Invoice
+    BFF --> UserAccess  
+    BFF --> Product
+    BFF --> Auth
+    Invoice --> Media
+    Invoice --> PDF
+    Invoice --> Mail
+    
+    classDef gateway fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
+    classDef business fill:#f1f8e8,stroke:#388e3c,stroke-width:2px
+    classDef support fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef security fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    
+    class BFF gateway
+    class Invoice,UserAccess,Product business
+    class Media,PDF,Mail support
+    class Auth security
 ```
-📦 E-Invoice System (Nx Monorepo)
-├── 🌐 BFF (Backend for Frontend) - Port 3000 (HTTP REST API)
-├── 📄 Invoice Service - TCP Microservice
-├── 📁 Media Service - TCP Microservice
-├── 📄 PDF Generator Service - TCP Microservice
-├── 📧 Mail Service - Kafka Consumer + TCP Client
-├── 👤 User Access Service - TCP Microservice
-├── 🔐 Authorizer Service - gRPC Microservice
-├── 🗄️ MongoDB - Port 27017
-├── 📨 Kafka - Port 9092
-├── 🔑 Keycloak - Port 8180 (Authentication Server)
-├── 🔴 Redis - Port 6379 (Cache Store)
-├── 📊 Grafana - Port 3001 (Monitoring Dashboard)
-├── 📋 Loki - Port 3100 (Log Aggregation Server)
-└── 📡 Promtail - Log Collection Agent
+
+#### 🏗️ Infrastructure Layer (6 Services)
+```
+📊 Production Infrastructure Stack
+├── 🗄️ MongoDB (Port 27017)
+│   ├── Document Database
+│   ├── Replica Set Ready
+│   └── Mongoose ODM
+├── 📨 Kafka (Port 9092, 29092)
+│   ├── Event Streaming Platform
+│   ├── Producer/Consumer Pattern
+│   └── Auto Topic Creation
+├── 🔑 Keycloak (Port 8180)
+│   ├── Identity & Access Management
+│   ├── OAuth 2.0 / OpenID Connect
+│   └── User Federation
+├── 🔴 Redis (Port 6379)
+│   ├── Cache Store & Session Management
+│   ├── Token Caching (95% performance boost)
+│   └── Redis Insight UI (Port 5540)
+├── 📊 Grafana (Port 3000)
+│   ├── Monitoring Dashboard
+│   ├── Log Visualization
+│   └── Alerting System
+└── 📋 Loki + Promtail (Port 3100)
+    ├── Log Aggregation Server
+    ├── LogQL Query Language
+    └── Docker Log Collection
 ```
 
 ### 1.2 Sơ Đồ Tổng Thể Hệ Thống
@@ -263,73 +364,149 @@ sequenceDiagram
     end
 ```
 
-### 1.4 Service Communication Matrix
+### 1.2 Service Communication Matrix
 
-| From Service | To Service | Protocol | Purpose | Response Time |
-|--------------|------------|----------|---------|---------------|
-| **BFF** → Invoice | TCP | CRUD operations | Synchronous |
-| **BFF** → User Access | TCP | User management | Synchronous |
-| **BFF** → Authorizer | gRPC | Authentication | Synchronous |
-| **BFF** → Payment | HTTP | Webhook handling | Asynchronous |
-| **Invoice** → PDF Generator | TCP | Generate PDF | Synchronous |
-| **Invoice** → Media | TCP | Upload files | Synchronous |
-| **Invoice** → Payment | TCP | Create checkout session | Synchronous |
-| **Payment** → Stripe | HTTP | Payment processing | Asynchronous |
-| **Invoice** → Kafka | Event | Async notifications | Fire & Forget |
-| **Mail** → Invoice | TCP | Get invoice data | Synchronous |
-| **Mail** ← Kafka | Event | Consume events | Async |
+| 🔄 Communication | Services | Protocol | Pattern | Performance | Use Case |
+|------------------|----------|----------|---------|-------------|----------|
+| **HTTP REST** | Frontend ↔ BFF | HTTP/1.1 | Request/Response | Standard | External API |
+| **TCP** | BFF ↔ Business Services | TCP | RPC | High | Internal sync calls |
+| **gRPC** | BFF ↔ Authorizer | HTTP/2 | RPC | Very High | Authentication |
+| **Kafka Events** | Invoice → Mail | TCP | Pub/Sub | Scalable | Async processing |
+| **Redis Cache** | UserGuard ↔ Redis | TCP | Key/Value | Ultra Fast | Token caching |
+| **HTTP Webhooks** | Stripe → BFF | HTTP | Event-driven | Reliable | External events |
+| **Database** | Services ↔ MongoDB | TCP | Query/Command | Optimized | Data persistence |
 
-### 1.5 Technology Stack
+### 1.3 Technology Stack & Justification
 
-| Layer | Technology | Purpose |
-|-------|------------|---------|
-| **Framework** | NestJS | Microservices framework |
-| **Language** | TypeScript | Type-safe development |
-| **Database** | MongoDB + Mongoose | Document database |
-| **Message Queue** | Kafka | Event-driven communication |
-| **Authentication** | Keycloak | Identity & Access Management |
-| **File Storage** | Cloudinary | Media file storage |
-| **PDF Generation** | Puppeteer + EJS | PDF creation |
-| **Email** | Nodemailer | Email delivery |
-| **Payment** | Stripe | Payment processing |
-| **Containerization** | Docker + Docker Compose | Deployment |
-| **Monorepo** | Nx | Code organization |
-| **Monitoring** | Grafana | Dashboard & Visualization |
-| **Log Aggregation** | Loki | Centralized log storage |
-| **Log Collection** | Promtail | Docker container log shipping |
+#### 🏗️ Core Framework
+```mermaid
+graph LR
+    subgraph Backend Framework
+        NestJS["🏠 NestJS"]
+        TypeScript["📝 TypeScript"]
+        Nx["📦 Nx Monorepo"]
+    end
+    
+    subgraph Communication Layer
+        TCP["🔌 TCP"]
+        gRPC["⚡ gRPC"]
+        Kafka["📨 Kafka"]
+    end
+    
+    subgraph Data Layer
+        MongoDB["🗄️ MongoDB"]
+        Redis["🔴 Redis"]
+    end
+    
+    classDef framework fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef communication fill:#f1f8e8,stroke:#388e3c,stroke-width:2px
+    classDef data fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    
+    class NestJS,TypeScript,Nx framework
+    class TCP,gRPC,Kafka communication
+    class MongoDB,Redis data
+```
+
+#### 🛠️ Technology Decisions
+
+| Technology | Why Chosen | Alternatives | Trade-offs |
+|------------|------------|--------------|------------|
+| **NestJS** | Enterprise framework, great for microservices | Express, Fastify | Learning curve vs features |
+| **MongoDB** | Flexible schema, good for invoices | PostgreSQL, MySQL | Consistency vs flexibility |
+| **Kafka** | High-throughput events | RabbitMQ, Redis Pub/Sub | Complexity vs scalability |
+| **Docker** | Consistent environments | VM, bare metal | Resource overhead vs portability |
+| **Keycloak** | Enterprise auth solution | Auth0, Firebase | Setup complexity vs features |
+| **Stripe** | Best payment UX | PayPal, Square | Fees vs developer experience |
 
 ---
 
-## 💳 PHẦN 1.5: STRIPE PAYMENT INTEGRATION
+## 💳 PHẦN 2: STRIPE PAYMENT INTEGRATION DEEP DIVE
 
-### 1.5.1 Tổng Quan Payment Flow
+### 2.1 Complete Payment Architecture
 
-Hệ thống tích hợp **Stripe** để xử lý thanh toán với flow hoàn chỉnh:
+Hệ thống implement **end-to-end payment flow** với **Stripe Checkout Sessions**, **webhook handling**, và **automated status management**:
 
 ```mermaid
-graph LR
-    %% Invoice Flow
-    A[📄 Create Invoice] --> B[📤 Send Invoice]
-    B --> C[💳 Create Payment Link]
-    C --> D[📧 Send Email with Payment Link]
-    D --> E[👤 Customer Clicks Link]
-    E --> F[💳 Stripe Checkout]
-    F --> G[✅ Payment Success]
-    G --> H[📨 Stripe Webhook]
-    H --> I[🔄 Update Invoice Status]
+sequenceDiagram
+    participant Customer as 👤 Customer
+    participant Email as 📧 Email
+    participant Stripe as 💳 Stripe
+    participant BFF as 🚪 BFF
+    participant Invoice as 📄 Invoice Service
+    participant DB as 🗄️ Database
     
-    %% Status Transitions
-    J[📊 Invoice Status Flow]
-    J --> K[CREATED]
-    K --> L[SENT]
-    L --> M[PAID]
+    Note over Customer,DB: 💳 COMPLETE PAYMENT FLOW
     
-    %% Styling
-    classDef flowBox fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
-    classDef statusBox fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    rect rgb(240, 248, 255)
+        Note over Invoice,Email: 1. Invoice Creation & Email
+        Invoice->>Stripe: Create Checkout Session
+        Stripe-->>Invoice: Payment URL + Session ID
+        Invoice->>Email: Send email with payment link
+        Email->>Customer: 📧 Professional invoice email
+    end
     
-    class A,B,C,D,E,F,G,H,I flowBox
-    class J,K,L,M statusBox
+    rect rgb(255, 248, 240)
+        Note over Customer,Stripe: 2. Customer Payment Process
+        Customer->>Stripe: Click payment link
+        Stripe->>Stripe: Process payment securely
+        Customer->>Stripe: Complete payment
+        Stripe->>Stripe: Payment successful
+    end
+    
+    rect rgb(248, 255, 248)
+        Note over Stripe,DB: 3. Webhook & Status Update
+        Stripe->>BFF: POST /payment/stripe/webhook
+        BFF->>BFF: Verify webhook signature
+        BFF->>Invoice: Extract invoice ID from metadata
+        Invoice->>DB: UPDATE status = 'PAID'
+        BFF-->>Stripe: 200 OK (webhook confirmed)
+    end
+```
+
+### 2.2 Payment Service Architecture
+
+#### 🏗️ Service Structure
+```
+apps/invoice/src/app/modules/payment/
+├── controllers/
+│   └── payment.controller.ts       # TCP message handlers
+├── services/
+│   ├── payment.service.ts          # Business logic & webhook processing
+│   └── stripe.service.ts           # Stripe API integration
+└── payment.module.ts               # Module configuration
+```
+
+#### 💡 Key Implementation Details
+```typescript
+// Stripe Service - Checkout Session Creation
+@Injectable()
+export class StripeService {
+  async createCheckoutSession(data: CreateCheckoutSessionRequest) {
+    const session = await this.stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: data.lineItems.map(item => ({
+        price_data: {
+          currency: 'usd',
+          product_data: { name: item.name },
+          unit_amount: item.price * 100, // Convert to cents
+        },
+        quantity: item.quantity,
+      })),
+      mode: 'payment',
+      customer_email: data.clientEmail,
+      success_url: `${this.configService.get('STRIPE_CONFIG.SUCCESS_URL')}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: this.configService.get('STRIPE_CONFIG.CANCEL_URL'),
+      metadata: {
+        invoiceId: data.invoiceId, // 🔑 Critical for webhook processing
+      },
+    });
+
+    return {
+      url: session.url,        // Payment link for email
+      sessionId: session.id,   // For tracking
+    };
+  }
+}
 ```
 
 ### 1.5.2 Payment Service Architecture
