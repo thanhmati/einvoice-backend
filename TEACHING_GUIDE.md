@@ -381,21 +381,21 @@ sequenceDiagram
 #### 🏗️ Core Framework
 ```mermaid
 graph LR
-    subgraph "Backend Framework"
-        NestJS["🏠 NestJS<br/>• Decorator-based<br/>• Dependency Injection<br/>• Microservices Support"]
-        TypeScript["📝 TypeScript<br/>• Type Safety<br/>• Better IDE Support<br/>• Enterprise Ready"]
-        Nx["📦 Nx Monorepo<br/>• Code Sharing<br/>• Build Optimization<br/>• Dependency Graph"]
+    subgraph Backend Framework
+        NestJS["🏠 NestJS"]
+        TypeScript["📝 TypeScript"]
+        Nx["📦 Nx Monorepo"]
     end
     
-    subgraph "Communication Layer"
-        TCP["🔌 TCP<br/>• High Performance<br/>• Bidirectional<br/>• Connection Pooling"]
-        gRPC["⚡ gRPC<br/>• HTTP/2 Based<br/>• Binary Protocol<br/>• Type Safety"]
-        Kafka["📨 Kafka<br/>• Event Streaming<br/>• High Throughput<br/>• Fault Tolerant"]
+    subgraph Communication Layer
+        TCP["🔌 TCP"]
+        gRPC["⚡ gRPC"]
+        Kafka["📨 Kafka"]
     end
     
-    subgraph "Data Layer"
-        MongoDB["🗄️ MongoDB<br/>• Document Database<br/>• Flexible Schema<br/>• Horizontal Scaling"]
-        Redis["🔴 Redis<br/>• In-Memory Cache<br/>• Sub-millisecond<br/>• Data Structures"]
+    subgraph Data Layer
+        MongoDB["🗄️ MongoDB"]
+        Redis["🔴 Redis"]
     end
     
     classDef framework fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
@@ -403,7 +403,7 @@ graph LR
     classDef data fill:#fff3e0,stroke:#f57c00,stroke-width:2px
     
     class NestJS,TypeScript,Nx framework
-    class TCP,gRPC,Kafka communication  
+    class TCP,gRPC,Kafka communication
     class MongoDB,Redis data
 ```
 
