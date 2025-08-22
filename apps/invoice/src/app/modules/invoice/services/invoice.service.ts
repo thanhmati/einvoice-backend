@@ -20,6 +20,7 @@ import { InvoiceSentPayload } from '@common/interfaces/queue/invoice';
 import { KAFKA_TOPICS } from '@common/constants/kafka.constant';
 import { ObjectId } from 'mongodb';
 import { PaymentService } from '../../payment/services/payment.service';
+import { OutboxRepository } from '../repositories/outbox.repository';
 
 @Injectable()
 export class InvoiceService {
@@ -29,6 +30,7 @@ export class InvoiceService {
     @Inject(TCP_SERVICES.MEDIA_SERVICE) private readonly mediaClient: TcpClient,
     private readonly KafkaClient: KafkaClient,
     @Inject(forwardRef(() => PaymentService)) private readonly paymentService: PaymentService,
+    private readonly outboxRepository: OutboxRepository,
   ) {}
 
   create(params: CreateInvoiceTcpReq) {
@@ -94,9 +96,15 @@ export class InvoiceService {
       supervisorId: new ObjectId(userId),
     });
 
-    this.KafkaClient.send<InvoiceSentPayload>(KAFKA_TOPICS.INVOICE.SENT, {
-      id: invoiceId,
-      paymentLink: checkoutSession.url,
+    await this.outboxRepository.create({
+      aggregateId: invoiceId,
+      aggregateType: 'invoice',
+      eventType: 'invoice.sent',
+      topic: KAFKA_TOPICS.INVOICE.SENT,
+      payload: {
+        id: invoiceId,
+        paymentLink: checkoutSession.url,
+      },
     });
 
     return invoiceSent;

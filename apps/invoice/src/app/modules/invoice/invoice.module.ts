@@ -8,11 +8,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { InvoiceDestination } from '@common/schemas/invoice/invoice.schema';
 import { ClientsModule } from '@nestjs/microservices';
 import { PaymentModule } from '../payment/payment.module';
+import { OutboxDestination } from '@common/schemas/outbox.schema';
+import { InvoiceSagaDestination } from '@common/schemas/invoice/invoice-saga.schema';
+import { OutboxRepository } from './repositories/outbox.repository';
+import { OutboxRelayService } from './services/outbox-relay.service';
 
 @Module({
   imports: [
     MongoProvider,
-    MongooseModule.forFeature([InvoiceDestination]),
+    MongooseModule.forFeature([InvoiceDestination, OutboxDestination, InvoiceSagaDestination]),
     ClientsModule.registerAsync([
       TcpProvider(TCP_SERVICES.PDF_GENERATOR_SERVICE),
       TcpProvider(TCP_SERVICES.MEDIA_SERVICE),
@@ -20,7 +24,7 @@ import { PaymentModule } from '../payment/payment.module';
     forwardRef(() => PaymentModule),
   ],
   controllers: [InvoiceController],
-  providers: [InvoiceService, InvoiceRepository],
+  providers: [InvoiceService, InvoiceRepository, OutboxRepository, OutboxRelayService],
   exports: [InvoiceService],
 })
 export class InvoiceModule {}
