@@ -9,9 +9,9 @@ import { AppModule } from './app/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const globalPrefix = 'api';
+  const globalPrefix = AppModule.CONFIGURATION.GLOBAL_PREFIX;
   app.setGlobalPrefix(globalPrefix);
-  const port = process.env.PORT || 3000;
+  const port = AppModule.CONFIGURATION.PORT;
   await app.listen(port);
   Logger.log(
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
