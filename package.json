@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "nx:reset": "nx reset",
+    "nx:run-many": "nx run-many",
+    "dev": "pnpm nx:reset && pnpm nx:run-many -t serve",
+    "dev-lite": "pnpm dev --projects=bff"
   },
   "private": true,
   "dependencies": {
@@ -15,6 +19,7 @@
     "axios": "^1.6.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "express": "^5.1.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0"
   },
@@ -36,6 +41,7 @@
     "@swc-node/register": "~1.9.1",
     "@swc/core": "~1.5.7",
     "@swc/helpers": "~0.5.11",
+    "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
     "@types/node": "~18.16.9",
     "eslint": "^9.8.0",
