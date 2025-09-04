@@ -84,3 +84,80 @@ interval(1000).pipe(take(3)).subscribe(console.log);
 // Output: 0, 1, 2 (mỗi giây một số)
 
 ```
+## 4. Operators
+- **Operators** là các hàm dùng để **xử lý dữ liệu** trong pipeline (thông qua `pipe()`).  
+- Các nhóm chính:
+  - **Biến đổi** (map, mergeMap, switchMap).  
+  - **Lọc** (filter, take, first).  
+  - **Kết hợp** (merge, concat, combineLatest).  
+  - **Xử lý lỗi** (catchError, retry).  
+
+### Ví dụ phổ biến
+
+#### map() – biến đổi dữ liệu
+```ts
+import { of } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+of(1, 2, 3).pipe(
+  map(x => x * 2)
+).subscribe(console.log);
+// Output: 2, 4, 6
+```
+- filter() – lọc dữ liệu
+```ts
+import { of } from 'rxjs';
+import { filter } from 'rxjs/operators';
+
+of(1, 2, 3, 4).pipe(
+  filter(x => x % 2 === 0)
+).subscribe(console.log);
+// Output: 2, 4
+
+```
+mergeMap() – xử lý bất đồng bộ lồng nhau
+```ts
+import { from } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
+
+from([1, 2]).pipe(
+  mergeMap(x => from([x * 10, x * 20]))
+).subscribe(console.log);
+// Output: 10, 20, 20, 40
+
+```
+catchError() – xử lý lỗi
+```ts
+import { throwError, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
+throwError(() => new Error('Oops')).pipe(
+  catchError(err => of('Recovered!'))
+).subscribe(console.log);
+// Output: "Recovered!"
+
+```
+## 5. Best Practices
+1. Luôn **unsubscribe** khi không còn cần thiết (tránh rò rỉ bộ nhớ).  
+   - Ví dụ: dùng `take()`, `first()`, hoặc lưu `subscription` để hủy thủ công.  
+2. Dùng **pipe + operators** thay vì xử lý trực tiếp trong `subscribe()`.  
+3. Quản lý lỗi bằng **catchError()** thay vì để app crash.  
+4. Dùng **take() / first()** để giới hạn số lần emit khi chỉ cần giá trị đầu tiên.  
+5. Kết hợp với async/await khi làm việc với Observable bằng:
+   ```ts
+   import { firstValueFrom } from 'rxjs';
+
+   const result = await firstValueFrom(of('Hello RxJS'));
+   console.log(result); // "Hello RxJS"
+```
+## 6. Kết luận
+- **RxJS** giúp làm việc với dữ liệu bất đồng bộ một cách gọn gàng, mạnh mẽ.  
+- Các khái niệm cần nắm:  
+  - Observable, Observer, Subscription.  
+  - Cách tạo Observable (`of`, `from`, `interval`).  
+  - Operators phổ biến (`map`, `filter`, `mergeMap`, `catchError`).  
+- Đây là nền tảng để đi xa hơn:  
+  - WebSocket, Stream API.  
+  - Các framework frontend (Angular, React, Vue).  
+  - Backend reactive (NestJS, microservices).  
+
