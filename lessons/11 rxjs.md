@@ -149,7 +149,8 @@ throwError(() => new Error('Oops')).pipe(
 
    const result = await firstValueFrom(of('Hello RxJS'));
    console.log(result); // "Hello RxJS"
-```
+   ```
+
 ## 6. Kết luận
 - **RxJS** giúp làm việc với dữ liệu bất đồng bộ một cách gọn gàng, mạnh mẽ.  
 - Các khái niệm cần nắm:  
