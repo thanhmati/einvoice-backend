@@ -1,8 +1,7 @@
 # 📚 Tài Liệu Giảng Dạy: Khoá Học NestJS Microservices Thực Chiến: Từ Zero Đến Hero
 
-[![course thumbnail](https://res.cloudinary.com/djvmkh4cs/image/upload/v1754804493/Course_thumbnail_ej2mgk.png "course thumbnail")](https://res.cloudinary.com/djvmkh4cs/image/upload/v1754804493/Course_thumbnail_ej2mgk.png "course thumbnail")
-
 ## 🎯 Giới Thiệu Khóa Học
+<img width="1536" height="1024" alt="Dragon and Microservices Interface Design" src="https://github.com/user-attachments/assets/66c3545f-d6f7-4aaf-8789-2be3ad64fa7f" />
 
 Chào mừng các bạn đến với **"NestJS Microservices Thực Chiến: Production-Ready E-Invoice System"** - một khóa học toàn diện về xây dựng hệ thống microservices thực tế với **8 services**, **payment integration**, **centralized logging**, và **production deployment**.
 
