@@ -17,12 +17,8 @@ node_modules
 .settings/
 *.sublime-workspace
 
+temp_auto_push.bat
 # IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
 
 # misc
 /.sass-cache
@@ -42,3 +38,5 @@ Thumbs.db
 .nx/workspace-data
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
+.gitignore
+branch_structure.json
