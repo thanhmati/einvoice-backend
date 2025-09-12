@@ -1,4 +1,5 @@
 # 📚 Tài Liệu Giảng Dạy: Khoá Học NestJS Microservices Thực Chiến: Từ Zero Đến Hero
+
 <img width="1536" height="1024" alt="Dragon and Microservices Interface Design" src="https://github.com/user-attachments/assets/66c3545f-d6f7-4aaf-8789-2be3ad64fa7f" />
 
 ## 🎯 Giới Thiệu Khóa Học
@@ -7,17 +8,18 @@ Chào mừng các bạn đến với **"NestJS Microservices Thực Chiến: Pro
 
 ### 🎓 Đối Tượng Học Viên
 
-| 👥 Đối Tượng | 📊 Level | 🎯 Mục Tiêu | 💼 Ứng Dụng |
-|-------------|---------|------------|-------------|
-| **Backend Developer** | Intermediate+ | Nâng cao kỹ năng Microservices | Senior Developer role |
-| **Fullstack Developer** | Intermediate | Hiểu architecture phức tạp | Solution Architect |
-| **DevOps Engineer** | Beginner+ | Container orchestration | Production deployment |
-| **Tech Lead** | Advanced | System design patterns | Team leadership |
-| **Students/Graduates** | Intermediate | Real-world experience | Industry readiness |
+| 👥 Đối Tượng            | 📊 Level      | 🎯 Mục Tiêu                    | 💼 Ứng Dụng           |
+| ----------------------- | ------------- | ------------------------------ | --------------------- |
+| **Backend Developer**   | Intermediate+ | Nâng cao kỹ năng Microservices | Senior Developer role |
+| **Fullstack Developer** | Intermediate  | Hiểu architecture phức tạp     | Solution Architect    |
+| **DevOps Engineer**     | Beginner+     | Container orchestration        | Production deployment |
+| **Tech Lead**           | Advanced      | System design patterns         | Team leadership       |
+| **Students/Graduates**  | Intermediate  | Real-world experience          | Industry readiness    |
 
 ### 🏆 Learning Outcomes
 
 #### 🔧 Technical Skills
+
 Sau khóa học, bạn sẽ **thành thạo**:
 
 ```mermaid
@@ -46,6 +48,7 @@ mindmap
 ```
 
 #### 🎯 Practical Achievements
+
 - ✅ **Build 8 production-ready microservices** from scratch
 - ✅ **Implement complete payment flow** with Stripe integration
 - ✅ **Set up enterprise monitoring** with Grafana + Loki stack
@@ -57,19 +60,21 @@ mindmap
 ### 🛠️ Prerequisites & Preparation
 
 #### ✅ Required Knowledge
-| Technology | Level | Verification |
-|------------|-------|--------------|
+
+| Technology                | Level        | Verification                            |
+| ------------------------- | ------------ | --------------------------------------- |
 | **JavaScript/TypeScript** | Intermediate | Can write classes, async/await, modules |
-| **Node.js & npm** | Basic | Can install packages, run scripts |
-| **REST APIs** | Basic | Understand HTTP methods, status codes |
-| **Docker** | Basic | Can run containers, basic commands |
-| **Git** | Basic | Clone, commit, push operations |
+| **Node.js & npm**         | Basic        | Can install packages, run scripts       |
+| **REST APIs**             | Basic        | Understand HTTP methods, status codes   |
+| **Docker**                | Basic        | Can run containers, basic commands      |
+| **Git**                   | Basic        | Clone, commit, push operations          |
 
 #### 🚀 Recommended Setup
+
 ```bash
 # Environment Check
 node --version          # v18+ required
-npm --version           # v8+ required  
+npm --version           # v8+ required
 docker --version        # v20+ recommended
 git --version           # v2.30+ recommended
 
@@ -81,40 +86,46 @@ code --install-extension bierner.markdown-mermaid
 ```
 
 #### 💡 Nice to Have
+
 - MongoDB/NoSQL database experience
-- Basic understanding of microservices concepts  
+- Basic understanding of microservices concepts
 - Familiarity with payment systems
 - Experience with monitoring tools
+
 ## 📌 Tương tác với Giảng viên
 
 Khóa học không chỉ dừng lại ở video lý thuyết – bạn sẽ luôn có **sự đồng hành trực tiếp từ giảng viên** trong suốt quá trình học.
 
 ### 💬 Hỏi – Đáp nhanh chóng
+
 - Đặt câu hỏi trực tiếp bên dưới mỗi bài học hoặc trong mục Q&A.
 - Nhận phản hồi nhanh chóng và giải thích rõ ràng từ khái niệm cơ bản đến kỹ thuật nâng cao.
 
 ### 🛠 Hỗ trợ xử lý lỗi
+
 - Mô tả vấn đề và đính kèm code khi gặp lỗi.
 - Giảng viên sẽ hướng dẫn từng bước để khắc phục và giải thích nguyên nhân.
 
 ### 🤝 Trao đổi cùng cộng đồng học viên
+
 - Tham gia **group riêng** để thảo luận, chia sẻ kinh nghiệm và học hỏi lẫn nhau.
 - Kết nối với các học viên khác đang làm trong ngành.
-  
+
 ### 🌐 Liên hệ & Kết nối
+
 Nếu bạn cần hỗ trợ hoặc muốn kết nối thêm ngoài khóa học, có thể liên hệ qua:
 
-- 📧 **Email:** [dotanthanhvlog@gmail.com](mailto:dotanthanhvlog@gmail.com)  
-- 💼 **LinkedIn:** [https://www.linkedin.com/in/thanh270600/](https://www.linkedin.com/in/thanh270600/)  
-- 🐙 **GitHub:** [https://github.com/thanhmati](https://github.com/thanhmati)  
-- 📺 **YouTube:** [https://www.youtube.com/@laptrinhfullstack](https://www.youtube.com/@laptrinhfullstack)  
+- 📧 **Email:** [dotanthanhvlog@gmail.com](mailto:dotanthanhvlog@gmail.com)
+- 💼 **LinkedIn:** [https://www.linkedin.com/in/thanh270600/](https://www.linkedin.com/in/thanh270600/)
+- 🐙 **GitHub:** [https://github.com/thanhmati](https://github.com/thanhmati)
+- 📺 **YouTube:** [https://www.youtube.com/@laptrinhfullstack](https://www.youtube.com/@laptrinhfullstack)
 - 💬 **Facebook Group:** [https://www.facebook.com/groups/ltfullstack](https://www.facebook.com/groups/ltfullstack)
-- 📞 **Zalo** 0762216048 
+- 📞 **Zalo** 0762216048
 
 ---
 
-> 💡 **Phương châm:** *“Học thật – Làm thật”*  
-Giảng viên sẽ luôn theo sát để bạn không chỉ **hoàn thành khóa học**, mà còn **tự tin triển khai dự án thực tế**.
+> 💡 **Phương châm:** _“Học thật – Làm thật”_  
+> Giảng viên sẽ luôn theo sát để bạn không chỉ **hoàn thành khóa học**, mà còn **tự tin triển khai dự án thực tế**.
 
 ---
 
@@ -125,54 +136,60 @@ Giảng viên sẽ luôn theo sát để bạn không chỉ **hoàn thành khóa
 Hệ thống E-Invoice được thiết kế theo **Modern Microservices Architecture** với **Nx Monorepo**, triển khai **14 components** bao gồm **8 microservices** và **6 infrastructure services**:
 
 #### 🏢 Application Layer (8 Microservices)
+
 ```mermaid
 graph TB
     subgraph "🌐 API Gateway Layer"
         BFF["🚪 BFF Service<br/>Port 3300<br/>• HTTP REST API<br/>• Swagger Documentation<br/>• Global Guards & Interceptors"]
     end
-    
+
     subgraph "💼 Core Business Services"
         Invoice["📄 Invoice Service<br/>• Business Logic<br/>• Payment Integration<br/>• Status Management<br/>• Kafka Producer"]
         UserAccess["👤 User Access Service<br/>• User Management<br/>• Profile Operations<br/>• Data Validation"]
         Product["🛍️ Product Service<br/>• Product Catalog<br/>• Inventory Management<br/>• Pricing Logic"]
     end
-    
+
     subgraph "🔧 Supporting Services"
         Media["📁 Media Service<br/>• File Upload<br/>• Cloudinary Integration<br/>• Image Processing"]
         PDF["📄 PDF Generator<br/>• Template Rendering<br/>• Puppeteer Engine<br/>• EJS Templates"]
         Mail["📧 Mail Service<br/>• Email Templates<br/>• SMTP Integration<br/>• Kafka Consumer"]
     end
-    
+
     subgraph "🔐 Security & Auth"
         Auth["🔐 Authorizer Service<br/>• gRPC Authentication<br/>• JWT Validation<br/>• Keycloak Integration"]
     end
-    
+
     BFF --> Invoice
-    BFF --> UserAccess  
+    BFF --> UserAccess
     BFF --> Product
     BFF --> Auth
     Invoice --> Media
     Invoice --> PDF
     Invoice --> Mail
-    
+
     classDef gateway fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
     classDef business fill:#f1f8e8,stroke:#388e3c,stroke-width:2px
     classDef support fill:#fff3e0,stroke:#f57c00,stroke-width:2px
     classDef security fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-    
+
     class BFF gateway
     class Invoice,UserAccess,Product business
     class Media,PDF,Mail support
     class Auth security
 ```
 
-#### 🏗️ Infrastructure Layer (6 Services)
+#### 🏗️ Infrastructure Layer (7 Services)
+
 ```
 📊 Production Infrastructure Stack
 ├── 🗄️ MongoDB (Port 27017)
 │   ├── Document Database
 │   ├── Replica Set Ready
 │   └── Mongoose ODM
+├── 🗄️ Postgres (Port 5432)
+│   ├── Relational Database
+│   ├── ACID Transactions
+│   └── TypeORM ORM
 ├── 📨 Kafka (Port 9092, 29092)
 │   ├── Event Streaming Platform
 │   ├── Producer/Consumer Pattern
@@ -209,6 +226,7 @@ flowchart TB
     BFF -- Guard Check --> UserGuard["🛡️ UserGuard<br>(Cache Layer)"]
     UserGuard -- gRPC: Authentication --> Auth["🔐 Authorizer<br>(gRPC Service)"]
     BFF -- TCP: CRUD Invoice --> Invoice["📄 Invoice Service<br>(TCP Microservice)"]
+    BFF -- TCP: CRUD Product --> Product["📄 Product Service<br>(TCP Microservice)"]
     BFF -- TCP: User Management --> UserAccess["👤 User Access<br>(TCP Microservice)"]
     BFF -- HTTP: Webhook --> Payment["💳 Payment Service<br>(Stripe Integration)"]
     Invoice -- TCP: Generate PDF --> PDF["📄 PDF Generator<br>(TCP Microservice)"]
@@ -217,6 +235,7 @@ flowchart TB
     Invoice -. "📨 Event: invoice.sent" .-> Kafka(("🔄 Kafka<br>:9092"))
     Kafka -. 📨 Consume Events .-> Mail["📧 Mail Service<br>(Kafka Consumer)"]
     Invoice -- Read/Write --> MongoDB[("🗄️ MongoDB<br>:27017")]
+    Product -- Read/Write --> PostgresDB[("🗄️ PostgresDB<br>:5432")]
     UserAccess -- Read/Write --> MongoDB
     UserGuard -- Token Cache --> Redis["🔴 Redis<br>:6379"]
     Media -- Upload Files --> Cloudinary["☁️ Cloudinary"]
@@ -243,6 +262,7 @@ flowchart TB
      Mail:::serviceBox
      Kafka:::eventBox
      MongoDB:::dbBox
+     PostgresDB:::dbBox
      Redis:::cacheBox
      Cloudinary:::externalBox
      Puppeteer:::externalBox
@@ -296,32 +316,32 @@ sequenceDiagram
         Note over C,SMTP: 📤 Phase 2: Send Invoice (Trigger PDF, Email & Payment)
         C->>B: POST /api/v1/invoice/:id/send
         B->>I: TCP: SEND_INVOICE
-        
+
         %% PDF Generation
         Note over I,P: 🎨 PDF Generation Sub-flow
         I->>P: TCP: CREATE_INVOICE_PDF
         P->>P: Render EJS template with invoice data
         P->>P: Convert HTML → PDF (Puppeteer)
         P-->>I: PDF Base64 string
-        
+
         %% File Upload
         Note over I,Cloud: ☁️ File Upload Sub-flow
         I->>M: TCP: UPLOAD_FILE (PDF Base64)
         M->>Cloud: Upload PDF to Cloudinary
         Cloud-->>M: Public URL
         M-->>I: File URL
-        
+
         %% Payment Session Creation
         Note over I,Stripe: 💳 Payment Session Sub-flow
         I->>Pay: TCP: CREATE_CHECKOUT_SESSION
         Pay->>Stripe: Create Checkout Session
         Stripe-->>Pay: Payment URL & Session ID
         Pay-->>I: Payment Link
-        
+
         %% Update Database
         I->>DB: UPDATE invoice SET status='SENT', fileUrl='...', supervisorId
         DB-->>I: Invoice updated
-        
+
         %% Kafka Event with Payment Link
         Note over I,Mail: 📨 Async Event Processing
         I->>K: PUBLISH: invoice.sent event (with payment link)
@@ -337,7 +357,7 @@ sequenceDiagram
         I->>DB: SELECT invoice details
         DB-->>I: Invoice with fileUrl
         I-->>Mail: Complete invoice data with payment link
-        
+
         Mail->>Mail: Render email template with payment link
         Mail->>Cloud: Download PDF from URL
         Cloud-->>Mail: PDF file
@@ -365,19 +385,20 @@ sequenceDiagram
 
 ### 1.2 Service Communication Matrix
 
-| 🔄 Communication | Services | Protocol | Pattern | Performance | Use Case |
-|------------------|----------|----------|---------|-------------|----------|
-| **HTTP REST** | Frontend ↔ BFF | HTTP/1.1 | Request/Response | Standard | External API |
-| **TCP** | BFF ↔ Business Services | TCP | RPC | High | Internal sync calls |
-| **gRPC** | BFF ↔ Authorizer | HTTP/2 | RPC | Very High | Authentication |
-| **Kafka Events** | Invoice → Mail | TCP | Pub/Sub | Scalable | Async processing |
-| **Redis Cache** | UserGuard ↔ Redis | TCP | Key/Value | Ultra Fast | Token caching |
-| **HTTP Webhooks** | Stripe → BFF | HTTP | Event-driven | Reliable | External events |
-| **Database** | Services ↔ MongoDB | TCP | Query/Command | Optimized | Data persistence |
+| 🔄 Communication  | Services                 | Protocol | Pattern          | Performance | Use Case            |
+| ----------------- | ------------------------ | -------- | ---------------- | ----------- | ------------------- |
+| **HTTP REST**     | Frontend ↔ BFF          | HTTP/1.1 | Request/Response | Standard    | External API        |
+| **TCP**           | BFF ↔ Business Services | TCP      | RPC              | High        | Internal sync calls |
+| **gRPC**          | BFF ↔ Authorizer        | HTTP/2   | RPC              | Very High   | Authentication      |
+| **Kafka Events**  | Invoice → Mail           | TCP      | Pub/Sub          | Scalable    | Async processing    |
+| **Redis Cache**   | UserGuard ↔ Redis       | TCP      | Key/Value        | Ultra Fast  | Token caching       |
+| **HTTP Webhooks** | Stripe → BFF             | HTTP     | Event-driven     | Reliable    | External events     |
+| **Database**      | Services ↔ MongoDB, PostgresDB      | TCP      | Query/Command    | Optimized   | Data persistence    |
 
 ### 1.3 Technology Stack & Justification
 
 #### 🏗️ Core Framework
+
 ```mermaid
 graph LR
     subgraph Backend Framework
@@ -385,37 +406,39 @@ graph LR
         TypeScript["📝 TypeScript"]
         Nx["📦 Nx Monorepo"]
     end
-    
+
     subgraph Communication Layer
         TCP["🔌 TCP"]
         gRPC["⚡ gRPC"]
         Kafka["📨 Kafka"]
     end
-    
+
     subgraph Data Layer
         MongoDB["🗄️ MongoDB"]
+        PostgresDB["🗄️ PostgresDB"]
         Redis["🔴 Redis"]
     end
-    
+
     classDef framework fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
     classDef communication fill:#f1f8e8,stroke:#388e3c,stroke-width:2px
     classDef data fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    
+
     class NestJS,TypeScript,Nx framework
     class TCP,gRPC,Kafka communication
-    class MongoDB,Redis data
+    class MongoDB,Redis data,PostgresDB
 ```
 
 #### 🛠️ Technology Decisions
 
-| Technology | Why Chosen | Alternatives | Trade-offs |
-|------------|------------|--------------|------------|
-| **NestJS** | Enterprise framework, great for microservices | Express, Fastify | Learning curve vs features |
-| **MongoDB** | Flexible schema, good for invoices | PostgreSQL, MySQL | Consistency vs flexibility |
-| **Kafka** | High-throughput events | RabbitMQ, Redis Pub/Sub | Complexity vs scalability |
-| **Docker** | Consistent environments | VM, bare metal | Resource overhead vs portability |
-| **Keycloak** | Enterprise auth solution | Auth0, Firebase | Setup complexity vs features |
-| **Stripe** | Best payment UX | PayPal, Square | Fees vs developer experience |
+| Technology   | Why Chosen                                    | Alternatives            | Trade-offs                       |
+| ------------ | --------------------------------------------- | ----------------------- | -------------------------------- |
+| **NestJS**   | Enterprise framework, great for microservices | Express, Fastify        | Learning curve vs features       |
+| **MongoDB**  | Flexible schema, good for invoices            | PostgreSQL, MySQL       | Consistency vs flexibility       |
+| **Postgres** | Strong relational model, ACID transactions        | MySQL, MariaDB          | Rigid schema vs data integrity & analytics |
+| **Kafka**    | High-throughput events                        | RabbitMQ, Redis Pub/Sub | Complexity vs scalability        |
+| **Docker**   | Consistent environments                       | VM, bare metal          | Resource overhead vs portability |
+| **Keycloak** | Enterprise auth solution                      | Auth0, Firebase         | Setup complexity vs features     |
+| **Stripe**   | Best payment UX                               | PayPal, Square          | Fees vs developer experience     |
 
 ---
 
@@ -433,9 +456,9 @@ sequenceDiagram
     participant BFF as 🚪 BFF
     participant Invoice as 📄 Invoice Service
     participant DB as 🗄️ Database
-    
+
     Note over Customer,DB: 💳 COMPLETE PAYMENT FLOW
-    
+
     rect rgb(240, 248, 255)
         Note over Invoice,Email: 1. Invoice Creation & Email
         Invoice->>Stripe: Create Checkout Session
@@ -443,7 +466,7 @@ sequenceDiagram
         Invoice->>Email: Send email with payment link
         Email->>Customer: 📧 Professional invoice email
     end
-    
+
     rect rgb(255, 248, 240)
         Note over Customer,Stripe: 2. Customer Payment Process
         Customer->>Stripe: Click payment link
@@ -451,7 +474,7 @@ sequenceDiagram
         Customer->>Stripe: Complete payment
         Stripe->>Stripe: Payment successful
     end
-    
+
     rect rgb(248, 255, 248)
         Note over Stripe,DB: 3. Webhook & Status Update
         Stripe->>BFF: POST /payment/stripe/webhook
@@ -465,6 +488,7 @@ sequenceDiagram
 ### 2.2 Payment Service Architecture
 
 #### 🏗️ Service Structure
+
 ```
 apps/invoice/src/app/modules/payment/
 ├── controllers/
@@ -476,6 +500,7 @@ apps/invoice/src/app/modules/payment/
 ```
 
 #### 💡 Key Implementation Details
+
 ```typescript
 // Stripe Service - Checkout Session Creation
 @Injectable()
@@ -483,7 +508,7 @@ export class StripeService {
   async createCheckoutSession(data: CreateCheckoutSessionRequest) {
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: data.lineItems.map(item => ({
+      line_items: data.lineItems.map((item) => ({
         price_data: {
           currency: 'usd',
           product_data: { name: item.name },
@@ -501,8 +526,8 @@ export class StripeService {
     });
 
     return {
-      url: session.url,        // Payment link for email
-      sessionId: session.id,   // For tracking
+      url: session.url, // Payment link for email
+      sessionId: session.id, // For tracking
     };
   }
 }
@@ -553,11 +578,7 @@ export class StripeService {
   }
 
   verifyWebhookSignature(body: Buffer, signature: string) {
-    return this.stripe.webhooks.constructEvent(
-      body, 
-      signature, 
-      this.configService.get('STRIPE_CONFIG.WEBHOOK_SECRET')
-    );
+    return this.stripe.webhooks.constructEvent(body, signature, this.configService.get('STRIPE_CONFIG.WEBHOOK_SECRET'));
   }
 }
 ```
@@ -573,10 +594,7 @@ export class PaymentService {
   async stripeWebhook(data: StripeWebhookTcpReq) {
     const { rawBodyBase64, signature } = data;
 
-    const event = this.stripeService.verifyWebhookSignature(
-      Buffer.from(rawBodyBase64, 'base64'), 
-      signature
-    );
+    const event = this.stripeService.verifyWebhookSignature(Buffer.from(rawBodyBase64, 'base64'), signature);
 
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -602,18 +620,18 @@ export class PaymentService {
 <!-- apps/mail/src/app/modules/mail-template/templates/invoice.ejs -->
 <h2>Xin chào <%= clientName %>,</h2>
 
-<p>Bạn nhận được hóa đơn từ <strong><%= senderName %></strong> với mã số hóa đơn <strong><%= invoiceCode %></strong>.</p>
+<p>
+  Bạn nhận được hóa đơn từ <strong><%= senderName %></strong> với mã số hóa đơn <strong><%= invoiceCode %></strong>.
+</p>
 
 <p>Vui lòng xem chi tiết hóa đơn trong tập tin PDF đính kèm.</p>
 
 <% if (paymentLink) { %>
-  <p>Để thuận tiện cho việc thanh toán, bạn có thể nhấn vào liên kết bên dưới để thanh toán trực tuyến:</p>
+<p>Để thuận tiện cho việc thanh toán, bạn có thể nhấn vào liên kết bên dưới để thanh toán trực tuyến:</p>
 
-  <p>
-    <a href="<%= paymentLink %>" target="_blank" style="color: #2196F3; font-weight: bold;">
-      👉 Thanh toán ngay
-    </a>
-  </p>
+<p>
+  <a href="<%= paymentLink %>" target="_blank" style="color: #2196F3; font-weight: bold;"> 👉 Thanh toán ngay </a>
+</p>
 <% } %>
 
 <p>Nếu bạn có bất kỳ câu hỏi nào, xin vui lòng liên hệ lại với chúng tôi.</p>
@@ -645,6 +663,7 @@ export class StripeConfiguration {
 ```
 
 **🔧 Environment Variables:**
+
 ```bash
 # Stripe Configuration
 STRIPE_SECRET_KEY=sk_test_...
@@ -656,12 +675,14 @@ STRIPE_CANCEL_URL=http://localhost:3000/payment/cancel
 ### 1.5.6 Security Features
 
 **🛡️ Webhook Security:**
+
 - **Signature Verification**: Verify webhook signature với Stripe secret
 - **Event Validation**: Validate event type và data structure
 - **Metadata Validation**: Ensure invoice ID exists trong metadata
 - **Error Handling**: Graceful handling của invalid webhooks
 
 **🔐 Payment Security:**
+
 - **HTTPS Only**: Tất cả payment requests qua HTTPS
 - **Token-based**: Không lưu trữ sensitive payment data
 - **PCI Compliance**: Stripe handles PCI compliance
@@ -682,35 +703,35 @@ graph TB
     Invoice["📄 Invoice Service"]
     Mail["📧 Mail Service"]
     UserAccess["👤 User Access Service"]
-    
+
     %% Docker Layer
     Docker["🐳 Docker Engine<br/>/var/lib/docker/containers"]
-    
+
     %% Logging Stack
     Promtail["📡 Promtail<br/>Log Collection Agent"]
     Loki["📋 Loki<br/>:3100<br/>Log Aggregation Server"]
     Grafana["📊 Grafana<br/>:3001<br/>Dashboard & Visualization"]
-    
+
     %% Log Flow
     BFF -->|"Container Logs"| Docker
     Invoice -->|"Container Logs"| Docker
     Mail -->|"Container Logs"| Docker
     UserAccess -->|"Container Logs"| Docker
     Payment -->|"Container Logs"| Docker
-    
+
     Docker -->|"File System"| Promtail
     Promtail -->|"HTTP Push API"| Loki
     Loki -->|"LogQL Queries"| Grafana
-    
+
     %% User Access
     User["👨‍💻 Developer/DevOps"] -->|"Web UI"| Grafana
     User -->|"Direct API"| Loki
-    
+
     %% Styling
     classDef serviceBox fill:#e1f5fe,stroke:#01579b,stroke-width:2px
     classDef logBox fill:#fff3e0,stroke:#e65100,stroke-width:2px
     classDef userBox fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    
+
     class BFF,Invoice,Mail,UserAccess,Payment serviceBox
     class Docker,Promtail,Loki,Grafana logBox
     class User userBox
@@ -758,6 +779,7 @@ scrape_configs:
 ```
 
 **💡 Key Features:**
+
 - **Docker Service Discovery**: Tự động phát hiện containers
 - **Label Extraction**: Gán labels từ container metadata
 - **Selective Collection**: Chỉ thu thập logs từ invoice và bff services
@@ -802,6 +824,7 @@ pattern_ingester:
 ```
 
 **💡 Key Features:**
+
 - **Filesystem Storage**: Local storage cho development
 - **TSDB Schema**: Time-series database cho efficient querying
 - **Pattern Ingester**: Tự động extract patterns từ logs
@@ -812,6 +835,7 @@ pattern_ingester:
 **📍 Vai trò**: Dashboard và visualization cho logs
 
 #### 2.4.1 Loki Data Source Setup
+
 ```json
 {
   "name": "Loki",
@@ -823,6 +847,7 @@ pattern_ingester:
 ```
 
 #### 2.4.2 LogQL Query Examples
+
 ```logql
 # Tất cả logs từ BFF service
 {app="bff"}
@@ -891,12 +916,14 @@ sequenceDiagram
 ### 2.6 Practical Benefits
 
 #### 2.6.1 For Development
+
 - **Centralized View**: Tất cả service logs ở một nơi
 - **Real-time Monitoring**: Live log streaming
 - **Process Tracking**: Follow request flow across services
 - **Error Debugging**: Quick error identification và context
 
 #### 2.6.2 For Production
+
 - **Log Aggregation**: Thu thập logs từ multiple instances
 - **Search & Filter**: Powerful LogQL queries
 - **Alerting**: Grafana alerts based on log patterns
@@ -911,6 +938,7 @@ sequenceDiagram
 **📍 Vai trò**: API Gateway - điểm tập trung cho frontend
 
 #### 3.1.1 Cấu Trúc Project
+
 ```
 apps/bff/
 ├── src/
@@ -919,7 +947,7 @@ apps/bff/
 │   │   ├── app.module.ts    # Root module
 │   │   └── modules/
 │   │       ├── invoice/     # Invoice endpoints
-│   │       ├── product/     # Product endpoints  
+│   │       ├── product/     # Product endpoints
 │   │       ├── user/        # User endpoints
 │   │       └── authorizer/  # Auth endpoints
 │   └── configuration/       # BFF-specific config
@@ -982,7 +1010,7 @@ async function bootstrap() {
     }),
     ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)]),
     ProductModule,
-    InvoiceModule, 
+    InvoiceModule,
     UserModule,
     AuthorizerModule,
   ],
@@ -1004,6 +1032,7 @@ export class AppModule implements NestModule {
 ```
 
 **💡 Key Features:**
+
 1. **Global Guards**: UserGuard cho authentication
 2. **Global Interceptors**: ExceptionInterceptor cho error handling
 3. **Global Middleware**: LoggerMiddleware cho request logging
@@ -1017,6 +1046,7 @@ export class AppModule implements NestModule {
 **📍 Vai trò**: Xử lý logic nghiệp vụ chính của hóa đơn
 
 #### 3.2.1 Service Structure (Thực tế)
+
 ```
 apps/invoice/src/app/modules/invoice/
 ├── controllers/
@@ -1072,23 +1102,17 @@ export class InvoiceService {
   async sendById(params: SendInvoiceTcpReq, processID: string) {
     const { invoiceId, userId } = params;
     const invoice = await this.getById(invoiceId);
-    
+
     // Business rule validation
     if (invoice.status !== INVOICE_STATUS.CREATED) {
       throw new BadRequestException(ERROR_CODE.INVOICE_CAN_NOT_BE_SENT);
     }
 
     // Generate PDF via PDF Generator Service
-    const pdfBase64 = await this.generatorInvoicePdf(
-      { ...invoice.toObject(), status: INVOICE_STATUS.SENT }, 
-      invoiceId
-    );
-    
+    const pdfBase64 = await this.generatorInvoicePdf({ ...invoice.toObject(), status: INVOICE_STATUS.SENT }, invoiceId);
+
     // Upload file via Media Service
-    const pdfUrl = await this.uploadFile(
-      { fileBase64: pdfBase64, fileName: `invoice-${invoiceId}` }, 
-      processID
-    );
+    const pdfUrl = await this.uploadFile({ fileBase64: pdfBase64, fileName: `invoice-${invoiceId}` }, processID);
 
     // Update invoice status and add supervisor
     const invoiceSent = await this.invoiceRepository.updateById(invoiceId, {
@@ -1098,10 +1122,7 @@ export class InvoiceService {
     });
 
     // Emit Kafka event for async processing
-    this.KafkaClient.send<InvoiceSentPayload>(
-      KAFKA_TOPICS.INVOICE.SENT, 
-      { id: invoiceId }
-    );
+    this.KafkaClient.send<InvoiceSentPayload>(KAFKA_TOPICS.INVOICE.SENT, { id: invoiceId });
 
     return invoiceSent;
   }
@@ -1154,9 +1175,9 @@ export class InvoiceController {
     MailModule,
     MailTemplateModule,
     // Kafka Consumer configuration
-    KafkaModule.forConsumerAsync({ 
-      groupId: KAFKA_GROUPS.MAIL, 
-      serviceName: KAFKA_SERVICES.MAIL 
+    KafkaModule.forConsumerAsync({
+      groupId: KAFKA_GROUPS.MAIL,
+      serviceName: KAFKA_SERVICES.MAIL,
     }),
   ],
 })
@@ -1196,7 +1217,7 @@ export class MailInvoiceService {
 
     // 1. Get invoice details from Invoice Service via TCP
     const invoice = await this.getInvoiceById(invoiceId);
-    
+
     // 2. Render email template
     const html = await this.mailTemplateService.render('invoice', {
       clientName: invoice.client.name,
@@ -1256,10 +1277,10 @@ export class Invoice extends BaseSchema {
   @Prop({ type: Number })
   vatAmount: number;
 
-  @Prop({ 
-    type: String, 
-    enum: INVOICE_STATUS, 
-    default: INVOICE_STATUS.CREATED 
+  @Prop({
+    type: String,
+    enum: INVOICE_STATUS,
+    default: INVOICE_STATUS.CREATED,
   })
   status: INVOICE_STATUS;
 
@@ -1321,14 +1342,16 @@ export class KafkaConsumerService implements OnModuleInit, OnModuleDestroy {
     await this.consumer.connect();
 
     // Auto-discover handlers with @KafkaHandler decorator
-    const providers = this.discoveryService.getProviders()
+    const providers = this.discoveryService
+      .getProviders()
       .filter((wrapper) => wrapper.instance && typeof wrapper.instance === 'object');
 
     for (const wrapper of providers) {
       const { instance } = wrapper;
       const prototype = Object.getPrototypeOf(instance);
-      const methodNames = Object.getOwnPropertyNames(prototype)
-        .filter((method) => typeof instance[method] === 'function' && method !== 'constructor');
+      const methodNames = Object.getOwnPropertyNames(prototype).filter(
+        (method) => typeof instance[method] === 'function' && method !== 'constructor',
+      );
 
       for (const methodName of methodNames) {
         const handler = instance[methodName];
@@ -1408,22 +1431,18 @@ export class LoggerMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     const processId = getProcessId();
     const startTime = Date.now();
-    
+
     // Set metadata for tracking
     req[MetadataKeys.PROCESS_ID] = processId;
     req[MetadataKeys.START_TIME] = startTime;
-    
-    Logger.log(
-      `HTTP » Start process '${processId}' » path: '${req.originalUrl}' » method: '${req.method}'`
-    );
+
+    Logger.log(`HTTP » Start process '${processId}' » path: '${req.originalUrl}' » method: '${req.method}'`);
 
     // Override response để log completion
     const originalSend = res.send.bind(res);
     res.send = (body: any): Response => {
       const durationMs = Date.now() - startTime;
-      Logger.log(
-        `HTTP » End process '${processId}' » method: '${req.method}' » after: '${durationMs}ms'`
-      );
+      Logger.log(`HTTP » End process '${processId}' » method: '${req.method}' » after: '${durationMs}ms'`);
       return originalSend(body);
     };
 
@@ -1440,23 +1459,20 @@ export class LoggerMiddleware implements NestMiddleware {
 
 ```typescript
 // BFF → Invoice Service
-this.invoiceClient.send<string, CreateInvoiceTcpReq>(
-  TCP_REQUEST_MESSAGE.INVOICE.CREATE, 
-  { data: body, processID }
-)
+this.invoiceClient.send<string, CreateInvoiceTcpReq>(TCP_REQUEST_MESSAGE.INVOICE.CREATE, { data: body, processID });
 
 // Invoice Service → PDF Generator
-this.pdfGeneratorClient.send<string, InvoiceTcpResponse>(
-  TCP_REQUEST_MESSAGE.PDF_GENERATOR.CREATE_INVOICE_PDF,
-  { data, processID }
-)
+this.pdfGeneratorClient.send<string, InvoiceTcpResponse>(TCP_REQUEST_MESSAGE.PDF_GENERATOR.CREATE_INVOICE_PDF, {
+  data,
+  processID,
+});
 ```
 
 ### 5.2 gRPC Communication (Authorizer Service)
 
 ```typescript
 // BFF → Authorizer Service (gRPC)
-ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)])
+ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)]);
 ```
 
 ### 5.3 Asynchronous Communication (Kafka)
@@ -1464,7 +1480,7 @@ ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)])
 ```typescript
 // Producer (Invoice Service)
 this.KafkaClient.send<InvoiceSentPayload>(
-  KAFKA_TOPICS.INVOICE.SENT, 
+  KAFKA_TOPICS.INVOICE.SENT,
   { id: invoiceId }
 )
 
@@ -1503,24 +1519,24 @@ sequenceDiagram
     Note over F,C: 2. SEND INVOICE
     F->>B: POST /api/v1/invoice/:id/send
     B->>I: TCP: SEND_INVOICE
-    
+
     Note over I,C: PDF Generation & Upload Flow
     I->>P: TCP: CREATE_INVOICE_PDF
     P->>P: Generate HTML from EJS template
     P->>P: Convert HTML to PDF with Puppeteer
     P-->>I: PDF Base64
-    
+
     I->>M: TCP: UPLOAD_FILE
     M->>C: Upload PDF to Cloudinary
     C-->>M: Public URL
     M-->>I: File URL
-    
+
     Note over I,Mail: Database Update & Event Flow
     I->>DB: Update status to SENT + fileUrl + supervisorId
     I->>K: Publish: invoice.sent event
     I-->>B: Success
     B-->>F: Success Response
-    
+
     Note over K,Mail: Async Email Flow
     K->>Mail: Event: invoice.sent
     Mail->>I: TCP: GET_INVOICE_BY_ID
@@ -1535,22 +1551,22 @@ sequenceDiagram
 graph LR
     %% Event Producer
     InvoiceService[📄 Invoice Service] -->|Publish| Topic[📨 invoice.sent]
-    
+
     %% Kafka Broker
     Topic --> KafkaBroker((🔄 Kafka Broker))
-    
+
     %% Event Consumer
     KafkaBroker --> MailConsumer[📧 Mail Service<br/>Group: mail]
-    
+
     %% Consumer Actions
     MailConsumer -->|Send Email| EmailAction[📮 Email with PDF Attachment]
-    
+
     %% Styling
     classDef producer fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
     classDef topic fill:#f1f8e8,stroke:#388e3c,stroke-width:2px
     classDef consumer fill:#fff3e0,stroke:#f57c00,stroke-width:2px
     classDef action fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-    
+
     class InvoiceService producer
     class Topic,KafkaBroker topic
     class MailConsumer consumer
@@ -1567,9 +1583,7 @@ graph LR
 // apps/invoice/src/app/modules/invoice/repositories/invoice.repository.ts
 @Injectable()
 export class InvoiceRepository {
-  constructor(
-    @InjectModel(InvoiceModelName) private model: InvoiceModel
-  ) {}
+  constructor(@InjectModel(InvoiceModelName) private model: InvoiceModel) {}
 
   create(input: CreateInvoiceInput) {
     return this.model.create(input);
@@ -1623,6 +1637,7 @@ Frontend → BFF → {
 ### 8.1 Docker Compose Structure
 
 #### Infrastructure Services (docker-compose.provider.yaml)
+
 ```yaml
 services:
   kafka:
@@ -1655,6 +1670,7 @@ services:
 ```
 
 #### Application Services (docker-compose.dev.yaml)
+
 ```yaml
 services:
   bff:
@@ -1698,15 +1714,18 @@ pnpm build
 ## 🧪 PHẦN 9: BÀI TẬP THỰC HÀNH
 
 ### Bài 1: Thêm Invoice Status Mới
+
 **Mục tiêu**: Thêm status `CANCELLED` cho invoice
 
 **Yêu cầu**:
+
 1. Update `INVOICE_STATUS` enum
 2. Implement `cancelById` method
 3. Add business validation
 4. Test với Swagger UI
 
 **Code Template**:
+
 ```typescript
 // libs/constants/src/lib/invoice.constant.ts
 export enum INVOICE_STATUS {
@@ -1719,12 +1738,12 @@ export enum INVOICE_STATUS {
 // apps/invoice/src/app/modules/invoice/services/invoice.service.ts
 async cancelById(id: string) {
   const invoice = await this.getById(id);
-  
+
   // TODO: Add business validation
   if (invoice.status === INVOICE_STATUS.SENT) {
     throw new BadRequestException('Cannot cancel sent invoice');
   }
-  
+
   return this.invoiceRepository.updateById(id, {
     status: INVOICE_STATUS.CANCELLED
   });
@@ -1732,42 +1751,51 @@ async cancelById(id: string) {
 ```
 
 ### Bài 2: Implement Notification Service
+
 **Mục tiêu**: Tạo service mới để handle notifications
 
 **Yêu cầu**:
+
 1. Tạo Notification Service
 2. Subscribe Kafka event `invoice.sent`
 3. Gửi notification cho supervisor
 4. Lưu notification history
 
 ### Bài 3: Add Request Validation
+
 **Mục tiêu**: Enhance DTO validation
 
 **Yêu cầu**:
+
 1. Add custom validators
 2. Implement business rule validation
 3. Return detailed error messages
 4. Test validation scenarios
 
 ### Bài 4: Implement Health Checks
+
 **Mục tiêu**: Add health monitoring
 
 **Yêu cầu**:
+
 1. Add health check endpoints
 2. Check database connectivity
 3. Check Kafka connectivity
 4. Return service status
 
 ### Bài 5: Centralized Logging Setup
+
 **Mục tiêu**: Enable và configure Grafana + Loki + Promtail
 
 **Yêu cầu**:
+
 1. Uncomment logging services trong docker-compose.provider.yaml
 2. Configure Grafana data source cho Loki
 3. Tạo dashboard để monitor application logs
 4. Setup log alerts cho error patterns
 
 **Code Template**:
+
 ```bash
 # Enable logging stack
 docker-compose -f docker-compose.provider.yaml up -d grafana loki promtail
@@ -1794,11 +1822,11 @@ export class UserGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
-    
+
     if (!token) {
       throw new UnauthorizedException();
     }
-    
+
     // Verify JWT token with Keycloak
     return this.verifyKeycloakToken(token);
   }
@@ -1868,12 +1896,13 @@ export class InvoiceService {
 Hệ thống đã implement **Redis Cache Layer** để tối ưu hóa performance, đặc biệt cho **authentication process**. Cache được sử dụng chính trong **UserGuard** để tránh việc verify token với Keycloak liên tục.
 
 #### 🎯 Lý Do Implement Cache
+
 ```typescript
 // Vấn đề: Mỗi request đều phải verify token với Keycloak
 // ❌ Without Cache
 BFF Request → UserGuard → Keycloak gRPC → Verify Token → Return UserData
 
-// ✅ With Redis Cache  
+// ✅ With Redis Cache
 BFF Request → UserGuard → Check Redis → Return Cached UserData (if exists)
                       ↘ Cache Miss → Keycloak gRPC → Cache Result → Return UserData
 ```
@@ -1881,32 +1910,32 @@ BFF Request → UserGuard → Check Redis → Return Cached UserData (if exists)
 ### 11.2 Architecture & Configuration
 
 #### 🔧 Redis Configuration
+
 ```typescript
 // libs/configuration/src/lib/redis.config.ts
 export class RedisConfiguration {
-  HOST: string;        // Default: 'redis'
-  PORT: number;        // Default: 6379  
-  TTL: number;         // Default: 30 * 60000 (30 minutes)
+  HOST: string; // Default: 'redis'
+  PORT: number; // Default: 6379
+  TTL: number; // Default: 30 * 60000 (30 minutes)
 }
 
 export const RedisProvider = CacheModule.registerAsync({
   imports: [ConfigModule],
   inject: [ConfigService],
   useFactory: async (configService: ConfigService) => ({
-    stores: [
-      createKeyv(`redis://${configService.get('REDIS_CONFIG.HOST')}:${configService.get('REDIS_CONFIG.PORT')}`),
-    ],
+    stores: [createKeyv(`redis://${configService.get('REDIS_CONFIG.HOST')}:${configService.get('REDIS_CONFIG.PORT')}`)],
     ttl: configService.get('REDIS_CONFIG.TTL'),
   }),
 });
 ```
 
 #### 🏗️ Integration trong BFF
+
 ```typescript
 // apps/bff/src/app/app.module.ts
 @Module({
   imports: [
-    RedisProvider,  // ← Redis Cache Module
+    RedisProvider, // ← Redis Cache Module
     // ... other imports
   ],
   providers: [
@@ -1919,6 +1948,7 @@ export class AppModule {}
 ### 11.3 UserGuard Cache Implementation
 
 #### 🛡️ Cache Strategy trong UserGuard
+
 ```typescript
 // libs/guard/src/lib/user.guard.ts
 @Injectable()
@@ -1958,13 +1988,13 @@ export class UserGuard implements CanActivate {
                 }
 
                 setUserData(req, data);
-                
+
                 // Cache the result for 30 minutes
                 this.cacheManager.set(cacheKey, data, 30 * 60 * 1000);
 
                 observer.next(true);
                 observer.complete();
-              })
+              }),
             )
             .subscribe();
         }
@@ -1980,14 +2010,14 @@ export class UserGuard implements CanActivate {
 sequenceDiagram
     participant Client
     participant BFF
-    participant UserGuard  
+    participant UserGuard
     participant Redis
     participant Keycloak
 
     Client->>BFF: HTTP Request with Token
     BFF->>UserGuard: canActivate()
     UserGuard->>UserGuard: generateTokenCacheKey(token)
-    
+
     alt Cache HIT
         UserGuard->>Redis: get(cacheKey)
         Redis-->>UserGuard: cached userData
@@ -2007,6 +2037,7 @@ sequenceDiagram
 ### 11.5 Security Considerations
 
 #### 🔐 Token Security
+
 ```typescript
 // ✅ Security Best Practices
 1. **Hash Token**: SHA256 hash thay vì lưu raw token
@@ -2017,15 +2048,16 @@ sequenceDiagram
    - Tránh stale data
    - Sync với Keycloak token expiry
 
-3. **Namespace Keys**: Prefix `user-token:` 
+3. **Namespace Keys**: Prefix `user-token:`
    - Tránh key collision với cache khác
    - Dễ dàng monitor và debug
 ```
 
 #### 🎯 Cache Key Strategy
+
 ```typescript
 // Cache Key Format: user-token:{sha256_hash}
-const token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...";
+const token = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...';
 const hash = crypto.createHash('sha256').update(token).digest('hex');
 const cacheKey = `user-token:${hash}`;
 // Result: "user-token:a1b2c3d4e5f6..."
@@ -2034,10 +2066,11 @@ const cacheKey = `user-token:${hash}`;
 ### 11.6 Performance Metrics
 
 #### 📊 Expected Performance Gains
+
 ```typescript
 // Without Cache (mỗi request)
 - Keycloak gRPC call: ~50-100ms
-- Network latency: ~10-20ms  
+- Network latency: ~10-20ms
 - Total per request: ~60-120ms
 
 // With Cache (cache hit)
@@ -2049,6 +2082,7 @@ const cacheKey = `user-token:${hash}`;
 ### 11.7 Monitoring & Debugging
 
 #### 🔍 Debug Commands
+
 ```bash
 # Connect to Redis container
 docker exec -it redis_server redis-cli
@@ -2067,20 +2101,22 @@ MONITOR
 ```
 
 #### 📈 Metrics to Track
+
 - Cache hit ratio
-- Average response time  
+- Average response time
 - Keycloak request reduction
 - Memory usage
 
 ### 11.8 Thực Hành: Testing Cache
 
 #### 🧪 Test Cache Behavior
+
 ```bash
 # 1. First request (cache miss)
 curl -H "Authorization: Bearer YOUR_TOKEN" \
   http://localhost:3000/api/v1/invoice
 
-# 2. Second request (cache hit - should be faster)  
+# 2. Second request (cache hit - should be faster)
 curl -H "Authorization: Bearer YOUR_TOKEN" \
   http://localhost:3000/api/v1/invoice
 
@@ -2095,6 +2131,7 @@ docker exec -it redis_server redis-cli
 ## 📚 PHẦN 12: TÀI LIỆU THAM KHẢO
 
 ### 11.1 Official Documentation
+
 - [NestJS Documentation](https://docs.nestjs.com/)
 - [MongoDB Manual](https://docs.mongodb.com/manual/)
 - [Kafka Documentation](https://kafka.apache.org/documentation/)
@@ -2102,10 +2139,12 @@ docker exec -it redis_server redis-cli
 - [Docker Documentation](https://docs.docker.com/)
 
 ### 11.2 Design Patterns
+
 - [Microservices Patterns](https://microservices.io/patterns/)
 - [Enterprise Integration Patterns](https://www.enterpriseintegrationpatterns.com/)
 
 ### 11.3 Best Practices
+
 - [12-Factor App](https://12factor.net/)
 - [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 
@@ -2116,6 +2155,7 @@ docker exec -it redis_server redis-cli
 Hệ thống E-Invoice này là một ví dụ tuyệt vời về **Production-Ready Microservices Architecture**. Các điểm nổi bật:
 
 ### ✅ Strengths
+
 1. **Well-structured**: Clear separation of concerns với Nx monorepo
 2. **Scalable**: Each service can scale independently
 3. **Maintainable**: Clean code với proper abstractions
@@ -2124,6 +2164,7 @@ Hệ thống E-Invoice này là một ví dụ tuyệt vời về **Production-R
 6. **Production-ready**: Docker containerization và proper configuration
 
 ### 🔄 Architecture Highlights
+
 - **7 Microservices** với vai trò rõ ràng
 - **Mixed Communication**: TCP (sync), gRPC (auth), Kafka (async)
 - **Event-Driven**: Kafka cho decoupled communication
@@ -2132,6 +2173,7 @@ Hệ thống E-Invoice này là một ví dụ tuyệt vời về **Production-R
 - **Performance Optimization**: Redis caching cho authentication tokens
 
 ### 🎯 Key Takeaways
+
 - **Microservices** cần cân nhắc trade-offs giữa complexity và benefits
 - **Event-Driven Architecture** giúp decouple services nhưng tăng complexity
 - **Proper error handling** và **logging** rất quan trọng trong distributed systems
@@ -2142,4 +2184,4 @@ Hệ thống E-Invoice này là một ví dụ tuyệt vời về **Production-R
 
 **Happy Learning! 🚀**
 
-*Tài liệu này được cập nhật để phản ánh chính xác source code hiện tại. Mọi góp ý xin liên hệ để cải thiện chất lượng nội dung.*
+_Tài liệu này được cập nhật để phản ánh chính xác source code hiện tại. Mọi góp ý xin liên hệ để cải thiện chất lượng nội dung._
