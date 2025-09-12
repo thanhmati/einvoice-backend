@@ -35,6 +35,9 @@ class ItemResponseDto {
 }
 
 export class InvoiceResponseDto extends BaseResponseDto {
+  @ApiProperty()
+  id: string;
+
   @ApiProperty({ type: ClientResponseDto })
   client: ClientResponseDto;
 

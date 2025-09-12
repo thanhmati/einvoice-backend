@@ -11,7 +11,7 @@ import { ProductService } from '../services/product.service';
 @UseInterceptors(TcpLoggingInterceptor)
 @Controller()
 export class ProductController {
-  constructor(private readonly productService: ProductService) { }
+  constructor(private readonly productService: ProductService) {}
 
   @MessagePattern(TCP_REQUEST_MESSAGE.PRODUCT.CREATE)
   async create(@RequestParams() params: CreateProductTcpReq): Promise<Response<string>> {
@@ -26,7 +26,7 @@ export class ProductController {
   }
 
   @MessagePattern(TCP_REQUEST_MESSAGE.PRODUCT.GET_BY_ID)
-  async getById(@RequestParams() id: string): Promise<Response<ProductTcpRes>> {
+  async getById(@RequestParams() id: number): Promise<Response<ProductTcpRes>> {
     const result = await this.productService.getById(id);
     return Response.success<ProductTcpRes>(result);
   }

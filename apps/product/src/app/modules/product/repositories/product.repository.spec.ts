@@ -75,14 +75,14 @@ describe('ProductRepository', () => {
       const productData = { sku: 'sku', name: 'name' };
       (model.findById as jest.Mock).mockResolvedValue(productData);
 
-      const foundProduct = await repository.findById('id');
+      const foundProduct = await repository.findById(1);
       expect(foundProduct).toEqual(productData);
     });
 
     it('should return null if product is not found', async () => {
       (model.findById as jest.Mock).mockResolvedValue(null);
 
-      const foundProduct = await repository.findById('id');
+      const foundProduct = await repository.findById(1);
       expect(foundProduct).toBeNull();
     });
   });

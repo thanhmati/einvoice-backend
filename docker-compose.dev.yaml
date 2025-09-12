@@ -31,6 +31,14 @@ services:
     env_file:
       - .env.prod
 
+  product:
+    container_name: product
+    image: product:latest
+    networks:
+      - einvoice-nw
+    env_file:
+      - .env.prod
+
   mail:
     container_name: mail
     image: mail:latest

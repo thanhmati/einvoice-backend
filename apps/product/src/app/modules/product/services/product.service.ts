@@ -5,7 +5,7 @@ import { ERROR_CODE } from '@common/constants/enums/error-code.enum';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly productRepository: ProductRepository) { }
+  constructor(private readonly productRepository: ProductRepository) {}
 
   async create(data: CreateProductTcpReq) {
     const { sku, name } = data;
@@ -23,7 +23,7 @@ export class ProductService {
     return this.productRepository.findAll();
   }
 
-  async getById(id: string) {
+  async getById(id: number) {
     return this.productRepository.findById(id);
   }
 }

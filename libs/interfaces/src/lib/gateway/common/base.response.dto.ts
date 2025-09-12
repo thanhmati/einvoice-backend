@@ -1,16 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { ObjectId } from 'mongodb';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class BaseResponseDto {
-  @ApiProperty()
-  id: string;
-
-  @ApiProperty({ type: String })
-  _id: ObjectId;
-
   @ApiProperty()
   createdAt: Date;
 
   @ApiProperty()
   updatedAt: Date;
+
+  @ApiPropertyOptional({ nullable: true })
+  deletedAt?: Date;
 }

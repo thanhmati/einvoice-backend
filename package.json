@@ -14,7 +14,7 @@
     "docker:stop:dev": "docker compose -f docker-compose.dev.yaml down",
     "build": "pnpm nx:reset && pnpm nx:run-many -t build --no-cache && pnpm docker-build && pnpm docker:start:provider && pnpm docker:stop:dev && pnpm docker:start:dev",
     "dev": "pnpm nx:reset && pnpm nx:run-many -t serve",
-    "dev-lite": "pnpm dev --projects=bff,invoice,authorizer,user-access",
+    "dev-lite": "pnpm dev --projects=bff,authorizer,user-access,product,invoice",
     "prepare": "husky"
   },
   "private": true,
@@ -31,6 +31,7 @@
     "@nestjs/platform-express": "^11.1.4",
     "@nestjs/swagger": "^11.2.0",
     "@nestjs/throttler": "^6.4.0",
+    "@nestjs/typeorm": "^11.0.0",
     "axios": "^1.10.0",
     "cache-manager": "^7.1.0",
     "class-transformer": "^0.5.1",
@@ -50,6 +51,7 @@
     "rxjs": "^7.8.2",
     "streamifier": "^0.1.1",
     "stripe": "^18.4.0",
+    "typeorm": "^0.3.26",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

@@ -9,6 +9,7 @@ export enum TCP_SERVICES {
   MAIL_SERVICE = 'TCP_MAIL_SERVICE',
   USER_SERVICE = 'TCP_USER_SERVICE',
   AUTHORIZER_SERVICE = 'TCP_AUTHORIZER_SERVICE',
+  PRODUCT_SERVICE = 'TCP_PRODUCT_SERVICE',
 }
 
 export class TcpConfiguration {
@@ -35,6 +36,10 @@ export class TcpConfiguration {
   @IsObject()
   @IsNotEmpty()
   TCP_AUTHORIZER_SERVICE: TcpClientOptions;
+
+  @IsObject()
+  @IsNotEmpty()
+  TCP_PRODUCT_SERVICE: TcpClientOptions;
 
   constructor() {
     Object.entries(TCP_SERVICES).forEach(([key, service]) => {

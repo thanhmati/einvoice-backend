@@ -6,6 +6,7 @@ import { KafkaConfiguration } from '@common/configuration/kafka.config';
 import { MongoConfiguration } from '@common/configuration/mongo.config';
 import { StripeConfiguration } from '@common/configuration/stripe.config';
 import { TcpConfiguration } from '@common/configuration/tcp.config';
+import { TypeOrmConfiguration } from '@common/configuration/type-orm.config';
 
 class Configuration extends BaseConfiguration {
   @ValidateNested()
@@ -27,6 +28,10 @@ class Configuration extends BaseConfiguration {
   @ValidateNested()
   @Type(() => StripeConfiguration)
   STRIPE_CONFIG = new StripeConfiguration();
+
+  @ValidateNested()
+  @Type(() => TypeOrmConfiguration)
+  TYPEORM_CONFIG = new TypeOrmConfiguration();
 }
 
 export const CONFIGURATION = new Configuration();

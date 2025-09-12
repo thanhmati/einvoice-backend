@@ -15,7 +15,7 @@ import { Permissions } from '@common/decorators/permission.decorator';
 @ApiTags('Product')
 @Controller('product')
 export class ProductController {
-  constructor(@Inject(TCP_SERVICES.INVOICE_SERVICE) private readonly invoiceClient: TcpClient) {}
+  constructor(@Inject(TCP_SERVICES.PRODUCT_SERVICE) private readonly productClient: TcpClient) {}
 
   @Post()
   @ApiOkResponse({
@@ -27,7 +27,7 @@ export class ProductController {
   @Authorization({ secured: true })
   @Permissions(PERMISSION.PRODUCT_CREATE)
   create(@Body() body: CreateProductRequestDto, @ProcessID() processID: string) {
-    return this.invoiceClient
+    return this.productClient
       .send<string, CreateProductTcpReq>(TCP_REQUEST_MESSAGE.PRODUCT.CREATE, {
         data: body,
         processID,
@@ -45,7 +45,7 @@ export class ProductController {
   @Authorization({ secured: true })
   @Permissions(PERMISSION.PRODUCT_GET_ALL)
   getAll(@ProcessID() processID: string) {
-    return this.invoiceClient
+    return this.productClient
       .send<ProductTcpRes[]>(TCP_REQUEST_MESSAGE.PRODUCT.GET_ALL, {
         processID,
       })
@@ -62,9 +62,9 @@ export class ProductController {
   @Authorization({ secured: true })
   @Permissions(PERMISSION.PRODUCT_GET_BY_ID)
   getById(@Param('id') id: string, @ProcessID() processID: string) {
-    return this.invoiceClient
-      .send<ProductTcpRes, string>(TCP_REQUEST_MESSAGE.PRODUCT.GET_BY_ID, {
-        data: id,
+    return this.productClient
+      .send<ProductTcpRes, number>(TCP_REQUEST_MESSAGE.PRODUCT.GET_BY_ID, {
+        data: Number(id),
         processID,
       })
       .pipe(map((data) => new ResponseDto(data)));
