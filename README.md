@@ -70,6 +70,7 @@ graph TB
 ```
 📊 Infrastructure Stack
 ├── 🗄️ MongoDB (Port 27017) - Document Database
+├── 🗄️ PostgreSQL (Port 5432) - Relational Database for Product Service
 ├── 📨 Kafka (Port 9092) - Event Streaming Platform  
 ├── 🔑 Keycloak (Port 8180) - Identity & Access Management
 ├── 🔴 Redis (Port 6379) - Cache Store & Session Management
@@ -159,7 +160,7 @@ pnpm dev-lite                 # Start: bff, invoice, authorizer, user-access
 #### 🎯 Infrastructure Only
 ```bash
 # Start only infrastructure services
-pnpm docker:start:provider    # MongoDB, Kafka, Keycloak, Redis, Grafana, Loki
+pnpm docker:start:provider    # MongoDB, Postgres, Kafka, Keycloak, Redis, Grafana, Loki
 ```
 
 ---
@@ -186,6 +187,7 @@ mindmap
       Nx Monorepo
     Database
       MongoDB + Mongoose
+      PostgreSQL + TypeORM
       Redis Cache
     Communication
       TCP Microservices
