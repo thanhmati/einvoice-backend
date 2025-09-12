@@ -1,8 +1,9 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ResponseDto } from '@common/interfaces/gateway/response.interface';
-import { firstValueFrom, map } from 'rxjs';
+import { map } from 'rxjs';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
+import { ProcessId } from '@common/decorators/processId.decorator';
 
 @Controller('app')
 export class AppController {
@@ -18,9 +19,9 @@ export class AppController {
   }
 
   @Get('invoice')
-  async getInvoice() {
+  async getInvoice(@ProcessId() processId: string) {
     return this.invoiceClient
-      .send<string, number>('get_invoice', { processId: '1232', data: 1 })
+      .send<string, number>('get_invoice', { processId, data: 1 })
       .pipe(map((data) => new ResponseDto<string>(data)));
   }
 }
