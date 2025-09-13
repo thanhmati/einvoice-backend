@@ -49,24 +49,8 @@ sequenceDiagram
 
 ---
 
-## 4. Transaction Management (Saga Pattern)
 
-```mermaid
-sequenceDiagram
-  participant OrderService
-  participant PaymentService
-  participant InventoryService
-
-  OrderService->>PaymentService: Reserve Payment
-  PaymentService-->>OrderService: Payment Reserved
-  OrderService->>InventoryService: Reserve Stock
-  InventoryService-->>OrderService: Stock Reserved
-  Note right of OrderService: Nếu Inventory fail → Cancel Payment
-```
-
----
-
-## 5. SQL vs NoSQL trong Microservice
+## 4. SQL vs NoSQL trong Microservice
 
 | Use Case              | SQL (Postgres/MySQL)         | NoSQL (MongoDB, DynamoDB)         |
 |------------------------|------------------------------|-----------------------------------|
@@ -79,7 +63,7 @@ sequenceDiagram
 
 ---
 
-## 6. Case Studies in Real Projects
+## 5. Case Studies in Real Projects
 
 ### 🛒 Case 1: E-commerce Checkout
 - **Services**: `CartService`, `OrderService`, `PaymentService`, `InventoryService`.
@@ -114,7 +98,7 @@ sequenceDiagram
 
 ---
 
-## 7. Hands-on Exercise
+## 6. Hands-on Exercise
 
 🎓 **Bài tập:**  
 1. Với hệ thống E-commerce: chọn database phù hợp cho `CustomerService`, `OrderService`, `PaymentService`.  
