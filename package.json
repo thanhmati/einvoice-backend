@@ -6,7 +6,7 @@
     "prepare": "husky",
     "nx:reset": "nx reset",
     "nx:run-many": "nx run-many",
-    "dev": "pnpm nx:reset && pnpm nx:run-many -t serve",
+    "dev": "node init && pnpm nx:reset && pnpm nx:run-many -t serve",
     "dev-lite": "pnpm dev --projects=bff"
   },
   "private": true,
@@ -15,12 +15,14 @@
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.0",
     "@nestjs/microservices": "^11.1.6",
+    "@nestjs/mongoose": "^11.0.3",
     "@nestjs/platform-express": "^11.0.0",
     "@nestjs/swagger": "^11.2.0",
     "axios": "^1.6.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "express": "^5.1.0",
+    "mongoose": "^8.18.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
     "uuid": "^11.1.0"
