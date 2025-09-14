@@ -1,0 +1,14 @@
+name: einvoice-provider
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - ./docker/docker_data/mongodb_data:/data/db
+    restart: unless-stopped
