@@ -1,5 +1,5 @@
-import { Controller, Get, UseInterceptors } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, UseInterceptors } from '@nestjs/common';
+import { InvoiceService } from '../services/invoice.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { TcpLoggingInterceptor } from '@common/interceptors/tcpLogging.interceptor';
 import { Response } from '@common/interfaces/tcp/common/response.interface';
@@ -8,13 +8,8 @@ import { ProcessId } from '@common/decorators/processId.decorator';
 
 @Controller()
 @UseInterceptors(TcpLoggingInterceptor)
-export class AppController {
-  constructor(private readonly appService: AppService) {}
-
-  @Get()
-  getData() {
-    return this.appService.getData();
-  }
+export class InvoiceController {
+  constructor(private readonly invoiceService: InvoiceService) {}
 
   @MessagePattern('get_invoice')
   getInvoice(@RequestParams() invoiceId: number, @ProcessId() processId: string): Response<string> {
