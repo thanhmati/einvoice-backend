@@ -1,5 +1,10 @@
 name: einvoice-provider
 
+networks:
+  einvoice-nw:
+    driver: bridge
+    name: einvoice-nw
+
 services:
   mongodb:
     image: mongo
@@ -12,3 +17,36 @@ services:
     volumes:
       - ./docker/docker_data/mongodb_data:/data/db
     restart: unless-stopped
+    networks:
+      - einvoice-nw
+
+  postgres:
+    image: postgres
+    container_name: postgres_server
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: einvoice-app
+    ports:
+      - '5432:5432'
+    networks:
+      - einvoice-nw
+    volumes:
+      - ./docker/docker_data/postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_ui
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - '5050:80'
+    depends_on:
+      - postgres
+    networks:
+      - einvoice-nw
+    volumes:
+      - ./docker/docker_data/pgadmin_data:/var/lib/pgadmin
