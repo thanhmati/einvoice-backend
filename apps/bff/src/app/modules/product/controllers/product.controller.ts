@@ -10,7 +10,7 @@ import { TCP_REQUEST_MESSSAGE } from '@common/constants/enum/tcp-request-message
 import { map } from 'rxjs';
 
 @ApiTags('Product')
-@Controller()
+@Controller('product')
 export class ProductController {
   constructor(@Inject(TCP_SERVICES.PRODUCT_SERVICE) private readonly productClient: TcpClient) {}
 
