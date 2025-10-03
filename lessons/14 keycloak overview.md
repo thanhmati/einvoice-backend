@@ -84,13 +84,20 @@ File `docker-compose.yml`:
 version: '3'
 services:
   keycloak:
-    image: quay.io/keycloak/keycloak:24.0
-    command: start-dev
-    environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
+    image: quay.io/keycloak/keycloak:25.0.0
+    container_name: keycloak-25.0.0
     ports:
-      - "8080:8080"
+      - '8180:8080'
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+    command: start-dev
+    restart: unless-stopped
+    volumes:
+      - ./docker/docker_data/keycloak_data:/opt/keycloak/data
+    networks:
+      - einvoice-nw
 ```
 
 Chạy lệnh:
