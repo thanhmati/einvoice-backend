@@ -1,5 +1,5 @@
 
-# 🔐 Cơ chế validate JWT
+# 🔐 Verify JWT trong NestJS sử dụng JWKS (Keycloak)
 
 ## 1️⃣ JWT là gì
 
