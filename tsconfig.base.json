@@ -20,6 +20,7 @@
       "@common/constants/*": ["libs/constants/src/lib/*"],
       "@common/decorators/*": ["libs/decorators/src/lib/*"],
       "@common/entities/*": ["libs/entities/src/lib/*"],
+      "@common/guards/*": ["libs/guards/src/lib/*"],
       "@common/interceptors/*": ["libs/interceptors/src/lib/*"],
       "@common/interfaces/*": ["libs/interfaces/src/lib/*"],
       "@common/middlewares/*": ["libs/middlewares/src/lib/*"],
