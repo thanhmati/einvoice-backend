@@ -7,7 +7,7 @@
     "nx:reset": "nx reset",
     "nx:run-many": "nx run-many",
     "dev": "pnpm nx:reset && pnpm nx:run-many -t serve",
-    "dev-lite": "pnpm dev --projects=bff,user-access,authorizer"
+    "dev-lite": "pnpm dev --projects=bff,user-access,authorizer,invoice"
   },
   "private": true,
   "dependencies": {
@@ -23,6 +23,8 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "jwks-rsa": "^3.2.0",
     "mongodb": "^6.19.0",
     "mongoose": "^8.18.1",
     "pg": "^8.16.3",
@@ -51,6 +53,7 @@
     "@swc/helpers": "~0.5.11",
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "~18.16.9",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
