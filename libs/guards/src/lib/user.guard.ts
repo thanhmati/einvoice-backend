@@ -7,6 +7,9 @@ import { TCP_SERVICES } from '@common/configuration/tcp.config';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { TCP_REQUEST_MESSSAGE } from '@common/constants/enum/tcp-request-message.enum';
 import { AuthorizeResponse } from '@common/interfaces/tcp/authorizer';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { createHash } from 'crypto';
 
 @Injectable()
 export class UserGuard implements CanActivate {
@@ -15,6 +18,7 @@ export class UserGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     @Inject(TCP_SERVICES.AUTHORIZER_SERVICE) private readonly authorizerClient: TcpClient,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
@@ -32,14 +36,26 @@ export class UserGuard implements CanActivate {
   private async verifyToken(req: any): Promise<boolean> {
     try {
       const token = getAccessToken(req);
+      const cacheKey = this.generateTokenCacheKey(token);
+
       const processId = req[MetadataKeys.PROCESS_ID];
+
+      const cacheData = await this.cacheManager.get<AuthorizeResponse>(cacheKey);
+
+      if (cacheData) {
+        setUserData(req, cacheData);
+        return true;
+      }
 
       const result = await this.verifyUserToken(token, processId);
       if (!result?.valid) {
         throw new UnauthorizedException('Token is invalid');
       }
 
+      this.logger.debug(`Set user data to cache for cache key: ${cacheKey}`);
+
       setUserData(req, result);
+      this.cacheManager.set(cacheKey, result, 30 * 60 * 1000);
 
       return true;
     } catch (error) {
@@ -57,5 +73,10 @@ export class UserGuard implements CanActivate {
         })
         .pipe(map((data) => data.data)),
     );
+  }
+
+  generateTokenCacheKey(token: string): string {
+    const hash = createHash('sha256').update(token).digest('hex');
+    return `user-token:${hash}`;
   }
 }
