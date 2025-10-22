@@ -1,4 +1,4 @@
-# 🧩 gRPC trong mô hình Microservices
+# 🧩 LESSON 1: gRPC trong mô hình Microservices
 
 ## 🎯 Mục tiêu học tập
 
@@ -26,8 +26,8 @@ Giả sử bạn có 3 service trong hệ thống eCommerce:
 
 ```mermaid
 flowchart LR
-  A[Order Service] --> B[User Service]
-  A --> C[Inventory Service]
+  OrderService[Order Service] --> UserService[User Service]
+  OrderService --> InventoryService[Inventory Service]
 ```
 
 Khi người dùng đặt hàng:
@@ -98,10 +98,11 @@ Ví dụ hệ thống gồm nhiều microservice:
 
 ```mermaid
 flowchart TD
-  A[API Gateway (REST)] --> B[User Service (gRPC)]
-  A --> C[Order Service (gRPC)]
-  C --> D[Inventory Service (gRPC)]
-  C --> E[Payment Service (gRPC)]
+  api_gateway["API Gateway (REST)"] --> user_service["User Service (gRPC)"]
+  api_gateway --> order_service["Order Service (gRPC)"]
+  order_service --> inventory_service["Inventory Service (gRPC)"]
+  order_service --> payment_service["Payment Service (gRPC)"]
+
 ```
 
 - Frontend chỉ nói chuyện với **API Gateway qua REST**.  
@@ -126,10 +127,10 @@ flowchart TD
 
 ```mermaid
 sequenceDiagram
-  participant Client as UserService (Client)
-  participant Server as AuthService (Server)
-  Client->>Server: gRPC Request (ValidateUser)
-  Server-->>Client: gRPC Response (isValid=true)
+  participant UserService
+  participant AuthService
+  UserService->>AuthService: gRPC Request (ValidateUser)
+  AuthService-->>UserService: gRPC Response (isValid=true)
 ```
 
 1. **Client** gọi hàm từ stub (được generate từ file `.proto`).  
@@ -151,10 +152,10 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-  A[Client] -->|Unary| B[Server]
-  A -->|Stream→| B
-  A <--|←Stream| B
-  A <--> |Bidirectional| B
+  Client[Client] -->|Unary| Server[Server]
+  Client -->|Client stream →| Server
+  Server -->|Server stream →| Client
+  Client <--> Server
 ```
 
 ---
