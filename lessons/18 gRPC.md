@@ -1,4 +1,4 @@
-# 🧩 LESSON 1: gRPC trong mô hình Microservices
+# 🧩 gRPC trong mô hình Microservices
 
 ## 🎯 Mục tiêu học tập
 
@@ -89,6 +89,9 @@ REST API đơn giản, dễ test, nhưng có nhiều **vấn đề khi scale h�
 | 🌍 Đa ngôn ngữ | Dễ kết nối service viết bằng Go, Python, Java, Node.js... |
 | 🚀 Streaming | Hỗ trợ 4 kiểu giao tiếp: Unary, Server stream, Client stream, Bidirectional. |
 | 🧱 Contract-first | Cấu trúc API rõ ràng và đồng bộ giữa các team. |
+
+<img width="600" height="323" alt="image" src="https://github.com/user-attachments/assets/501483f4-e6b3-4b34-8334-8ba68c26b309" />
+
 
 ---
 
