@@ -19,6 +19,14 @@ module.exports = {
       outputHashing: 'none',
       generatePackageJson: true,
       sourceMaps: true,
+      assets: [
+        './src/assets',
+        {
+          glob: '**/*',
+          input: 'libs/interfaces/src/lib/proto/authorizer',
+          output: './proto',
+        },
+      ],
     }),
   ],
 };
