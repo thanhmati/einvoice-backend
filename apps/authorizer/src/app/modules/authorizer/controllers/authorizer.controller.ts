@@ -1,5 +1,5 @@
 import { TcpLoggingInterceptor } from '@common/interceptors/tcpLogging.interceptor';
-import { Controller, UseInterceptors } from '@nestjs/common';
+import { Controller, Logger, UseInterceptors } from '@nestjs/common';
 import { AuthorizerService } from '../services/authorizer.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { TCP_REQUEST_MESSSAGE } from '@common/constants/enum/tcp-request-message.enum';
