@@ -3,16 +3,58 @@ syntax = "proto3";
 
 package GRPC_AUTHORIZER_SERVICE;
 
-service HeroesService {
-  rpc FindOne (HeroById) returns (Hero) {}
+service AuthorizerService {
+  rpc verifyUserToken (VerifyUserTokenRequest) returns (VerifyUserTokenResponse);
 }
 
-message HeroById {
-  int32 id = 1;
+message VerifyUserTokenRequest {
+  string token = 1;
+  string processId = 2;
 }
 
-message Hero {
-  int32 id = 1;
-  string name = 2;
+message VerifyUserTokenResponse {
+  string code = 1;
+  AuthorizeResponse data = 2;
+  string error = 3;
 }
+
+message AuthorizeResponse {
+  bool valid = 1;
+  optional AuthorizedMetadata metadata = 2;
+}
+
+message JWTPayload {
+  string iss = 1;
+  string aud = 2;
+  int32 iat = 3;
+  int32 exp = 4;
+  string sub = 5;
+  string at_hash = 6;
+  string sid = 7;
+  string nonce = 8;
+  bool isExpired = 9;
+}
+
+message Role {
+  string name = 1;
+  string description = 2;
+  repeated string permissions = 3;
+}
+
+message User {
+  string _id = 1;
+  string id = 2;
+  string firstName = 3;
+  string lastName = 4;
+  string email = 5;
+  repeated Role roles = 6; 
+}
+
+message AuthorizedMetadata {
+  optional string userId = 1;
+  optional User user = 2;
+  repeated string permissions = 3;
+  optional JWTPayload jwt = 4;
+}
+
 
