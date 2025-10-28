@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CONFIGURATION, TConfiguration } from '../configuration';
+import { PdfModule } from './modules/pdf/pdf.module';
 
 @Module({
   imports: [
@@ -8,6 +9,7 @@ import { CONFIGURATION, TConfiguration } from '../configuration';
       isGlobal: true,
       load: [() => ({ ...CONFIGURATION })],
     }),
+    PdfModule,
   ],
   controllers: [],
   providers: [],
