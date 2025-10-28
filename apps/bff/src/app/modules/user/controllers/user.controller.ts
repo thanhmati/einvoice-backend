@@ -6,7 +6,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserRequestDto } from '@common/interfaces/gateway/user';
 import { ProcessId } from '@common/decorators/processId.decorator';
 import { CreateUserTcpRequest } from '@common/interfaces/tcp/user';
-import { TCP_REQUEST_MESSSAGE } from '@common/constants/enum/tcp-request-message.enum';
+import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
 import { map } from 'rxjs';
 import { Authorization } from '@common/decorators/authorizer.decorator';
 
@@ -25,7 +25,7 @@ export class UserController {
   @Authorization({ secured: false })
   create(@Body() body: CreateUserRequestDto, @ProcessId() processId: string) {
     return this.userAccessClient
-      .send<string, CreateUserTcpRequest>(TCP_REQUEST_MESSSAGE.USER.CREATE, {
+      .send<string, CreateUserTcpRequest>(TCP_REQUEST_MESSAGE.USER.CREATE, {
         data: body,
         processId,
       })
