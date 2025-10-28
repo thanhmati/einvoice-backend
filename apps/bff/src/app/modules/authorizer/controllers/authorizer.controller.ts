@@ -6,7 +6,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LoginRequestDto, LoginResponseDto } from '@common/interfaces/gateway/authorizer';
 import { ProcessId } from '@common/decorators/processId.decorator';
 import { LoginTcpRequest, LoginTcpResponse } from '@common/interfaces/tcp/authorizer';
-import { TCP_REQUEST_MESSSAGE } from '@common/constants/enum/tcp-request-message.enum';
+import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
 import { map } from 'rxjs';
 
 @ApiTags('Authorizer')
@@ -23,7 +23,7 @@ export class AuthorizerController {
   })
   login(@Body() body: LoginRequestDto, @ProcessId() processId: string) {
     return this.authorizerClient
-      .send<LoginTcpResponse, LoginTcpRequest>(TCP_REQUEST_MESSSAGE.AUTHORIZER.LOGIN, {
+      .send<LoginTcpResponse, LoginTcpRequest>(TCP_REQUEST_MESSAGE.AUTHORIZER.LOGIN, {
         data: body,
         processId,
       })
