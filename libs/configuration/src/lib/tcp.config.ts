@@ -8,6 +8,7 @@ export enum TCP_SERVICES {
   USER_ACCESS_SERVICE = 'TCP_USER_ACCESS_SERVICE',
   AUTHORIZER_SERVICE = 'TCP_AUTHORIZER_SERVICE',
   PDF_GENERATOR_SERVICE = 'TCP_PDF_GENERATOR_SERVICE',
+  MEDIA_SERVICE = 'TCP_MEDIA_SERVICE',
 }
 
 export class TcpConfiguration {
@@ -30,6 +31,10 @@ export class TcpConfiguration {
   @IsNotEmpty()
   @IsObject()
   TCP_PDF_GENERATOR_SERVICE: TcpClientOptions;
+
+  @IsNotEmpty()
+  @IsObject()
+  TCP_MEDIA_SERVICE: TcpClientOptions;
 
   constructor() {
     Object.entries(TCP_SERVICES).forEach(([key, serviceName]) => {
