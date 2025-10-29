@@ -55,6 +55,9 @@ importers:
       class-validator:
         specifier: ^0.14.2
         version: 0.14.2
+      cloudinary:
+        specifier: ^2.8.0
+        version: 2.8.0
       ejs:
         specifier: ^3.1.10
         version: 3.1.10
@@ -85,6 +88,9 @@ importers:
       rxjs:
         specifier: ^7.8.0
         version: 7.8.1
+      streamifier:
+        specifier: ^0.1.1
+        version: 0.1.1
       typeorm:
         specifier: ^0.3.26
         version: 0.3.26(babel-plugin-macros@3.1.0)(mongodb@6.19.0(socks@2.8.7))(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.1(@swc/core@1.5.29(@swc/helpers@0.5.17))(@types/node@18.16.20)(typescript@5.8.3))
@@ -3109,6 +3115,11 @@ packages:
     resolution:
       { integrity: sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg== }
     engines: { node: '>=0.8' }
+
+  cloudinary@2.8.0:
+    resolution:
+      { integrity: sha512-s7frvR0HnQXeJsQSIsbLa/I09IMb1lOnVLEDH5b5E53WTiCYgrNNOBGV/i/nLHwrcEOUkqjfSwP1+enXWNYmdw== }
+    engines: { node: '>=9' }
 
   cluster-key-slot@1.1.2:
     resolution:
@@ -6249,6 +6260,15 @@ packages:
     resolution:
       { integrity: sha512-oTUZM/NAZS8p7ANR3SHh30kXB+zK2r2BPcEn/awJIbOvq82WoMN4p62AWWp3Hhw50G0xMsw1mhIBLqHw64EcNQ== }
 
+  q@1.5.1:
+    resolution:
+      { integrity: sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw== }
+    engines: { node: '>=0.6.0', teleport: '>=0.2.0' }
+    deprecated: |-
+      You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+
+      (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
+
   qs@6.13.0:
     resolution:
       { integrity: sha512-+38qI9SOr8tfZ4QmJNplMUxqjbe7LKvvZgWdExBOmd+egZTtjLB67Gu0HRX3u/XOq7UU2Nx6nsjvS16Z9uwfpg== }
@@ -6869,6 +6889,11 @@ packages:
     resolution:
       { integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw== }
     engines: { node: '>= 0.8' }
+
+  streamifier@0.1.1:
+    resolution:
+      { integrity: sha512-zDgl+muIlWzXNsXeyUfOk9dChMjlpkq0DRsxujtYPgyJ676yQ8jEm6zzaaWHFDg5BNcLuif0eD2MTyJdZqXpdg== }
+    engines: { node: '>=0.10' }
 
   streamsearch@1.1.0:
     resolution:
@@ -10668,6 +10693,11 @@ snapshots:
 
   clone@1.0.4: {}
 
+  cloudinary@2.8.0:
+    dependencies:
+      lodash: 4.17.21
+      q: 1.5.1
+
   cluster-key-slot@1.1.2: {}
 
   co@4.6.0: {}
@@ -13415,6 +13445,8 @@ snapshots:
 
   pure-rand@7.0.1: {}
 
+  q@1.5.1: {}
+
   qs@6.13.0:
     dependencies:
       side-channel: 1.1.0
@@ -13941,6 +13973,8 @@ snapshots:
   statuses@2.0.1: {}
 
   statuses@2.0.2: {}
+
+  streamifier@0.1.1: {}
 
   streamsearch@1.1.0: {}
 
