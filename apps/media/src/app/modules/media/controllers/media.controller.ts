@@ -14,7 +14,7 @@ export class MediaController {
 
   @MessagePattern(TCP_REQUEST_MESSAGE.MEDIA.UPLOAD_FILE)
   async uploadFile(@RequestParams() params: UploadFileTcpReq): Promise<Response<string>> {
-    const result = this.mediaService.uploadFile(params);
+    const result = await this.mediaService.uploadFile(params);
     return Response.success<string>(result);
   }
 }
