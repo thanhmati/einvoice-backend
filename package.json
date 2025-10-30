@@ -6,7 +6,7 @@
     "prepare": "husky",
     "nx:reset": "nx reset",
     "nx:run-many": "nx run-many",
-    "dev": "pnpm nx:reset && pnpm nx:run-many -t serve",
+    "dev": "node init && pnpm nx:reset && pnpm nx:run-many -t serve",
     "dev-lite": "pnpm dev --projects=bff,user-access,authorizer,invoice,pdf-generator,media"
   },
   "private": true,
@@ -39,6 +39,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
     "streamifier": "^0.1.1",
+    "stripe": "^19.2.0",
     "typeorm": "^0.3.26",
     "uuid": "^11.1.0"
   },
