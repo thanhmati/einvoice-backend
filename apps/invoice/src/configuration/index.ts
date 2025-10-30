@@ -4,6 +4,7 @@ import { ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { TcpConfiguration } from '@common/configuration/tcp.config';
 import { MongoConfiguration } from '@common/configuration/mongo.config';
+import { StripeConfiguration } from '@common/configuration/stripe.config';
 
 class Configuration extends BaseConfiguration {
   @ValidateNested()
@@ -17,6 +18,10 @@ class Configuration extends BaseConfiguration {
   @ValidateNested()
   @Type(() => MongoConfiguration)
   MONGO_CONFIG = new MongoConfiguration();
+
+  @ValidateNested()
+  @Type(() => StripeConfiguration)
+  STRIPE_CONFIG = new StripeConfiguration();
 }
 
 export const CONFIGURATION = new Configuration();
