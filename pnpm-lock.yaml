@@ -91,6 +91,9 @@ importers:
       streamifier:
         specifier: ^0.1.1
         version: 0.1.1
+      stripe:
+        specifier: ^19.2.0
+        version: 19.2.0(@types/node@18.16.20)
       typeorm:
         specifier: ^0.3.26
         version: 0.3.26(babel-plugin-macros@3.1.0)(mongodb@6.19.0(socks@2.8.7))(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.1(@swc/core@1.5.29(@swc/helpers@0.5.17))(@types/node@18.16.20)(typescript@5.8.3))
@@ -6966,6 +6969,16 @@ packages:
     resolution:
       { integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig== }
     engines: { node: '>=8' }
+
+  stripe@19.2.0:
+    resolution:
+      { integrity: sha512-strzN8luMGMC1LEleGKg7pJGXFx0kSS4y/uSjK8yPQV9SUBMtJVAp/v8XMQLRnMbXaSaWLrIaHcMlKcsizdRDQ== }
+    engines: { node: '>=16' }
+    peerDependencies:
+      '@types/node': '>=16'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
 
   strtok3@10.3.4:
     resolution:
@@ -14035,6 +14048,12 @@ snapshots:
   strip-final-newline@2.0.0: {}
 
   strip-json-comments@3.1.1: {}
+
+  stripe@19.2.0(@types/node@18.16.20):
+    dependencies:
+      qs: 6.14.0
+    optionalDependencies:
+      '@types/node': 18.16.20
 
   strtok3@10.3.4:
     dependencies:
