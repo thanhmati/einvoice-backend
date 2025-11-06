@@ -73,4 +73,8 @@ export class InvoiceService {
         .pipe(map((data) => data.data)),
     );
   }
+
+  updateInvoicePaid(invoiceId: string) {
+    return this.invoiceRepository.updateById(invoiceId, { status: INVOICE_STATUS.PAID });
+  }
 }

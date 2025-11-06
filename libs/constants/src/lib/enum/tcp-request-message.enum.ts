@@ -4,6 +4,7 @@ enum INVOICE {
   UPDATE_BY_ID = 'invoice.update_by_id',
   DELETE_BY_ID = 'invoice.delete_by_id',
   SEND = 'invoice.send',
+  UPDATE_INVOICE_PAID = 'invoice.update_invoice_paid',
 }
 
 enum PRODUCT {
