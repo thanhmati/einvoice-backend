@@ -7,6 +7,7 @@ import { RequestParams } from '@common/decorators/request-param.decorator';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
 import { CreateInvoiceTcpRequest, InvoiceTcpResponse, SendInvoiceTcpReq } from '@common/interfaces/tcp/invoice';
 import { ProcessId } from '@common/decorators/processId.decorator';
+import { HTTP_MESSAGE } from '@common/constants/enum/http-message.enum';
 
 @Controller()
 @UseInterceptors(TcpLoggingInterceptor)
@@ -27,5 +28,11 @@ export class InvoiceController {
   ): Promise<Response<string>> {
     const result = await this.invoiceService.sendById(params, processID);
     return Response.success<string>(result);
+  }
+
+  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.UPDATE_INVOICE_PAID)
+  async updateInvoicePaid(@RequestParams() invoiceId: string): Promise<Response<string>> {
+    await this.invoiceService.updateInvoicePaid(invoiceId);
+    return Response.success<string>(HTTP_MESSAGE.UPDATED);
   }
 }

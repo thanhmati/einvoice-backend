@@ -5,6 +5,7 @@ import { Type } from 'class-transformer';
 import { TcpConfiguration } from '@common/configuration/tcp.config';
 import { RedisConfiguration } from '@common/configuration/redis.config';
 import { GrpcConfiguration } from '@common/configuration/grpc.config';
+import { StripeConfiguration } from '@common/configuration/stripe.config';
 
 class Configuration extends BaseConfiguration {
   @ValidateNested()
@@ -22,6 +23,10 @@ class Configuration extends BaseConfiguration {
   @ValidateNested()
   @Type(() => GrpcConfiguration)
   GRPC_SERV = new GrpcConfiguration();
+
+  @ValidateNested()
+  @Type(() => StripeConfiguration)
+  STRIPE_CONFIG = new StripeConfiguration();
 }
 
 export const CONFIGURATION = new Configuration();
