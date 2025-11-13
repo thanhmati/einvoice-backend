@@ -8,6 +8,7 @@ import { InvoiceRepository } from './repositories/invoice.repository';
 import { ClientsModule } from '@nestjs/microservices';
 import { TCP_SERVICES, TcpProvider } from '@common/configuration/tcp.config';
 import { PaymentModule } from '../payment/payment.module';
+import { InvoiceQueueController } from './controllers/invoice-queue.controller';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { PaymentModule } from '../payment/payment.module';
     ]),
     PaymentModule,
   ],
-  controllers: [InvoiceController],
+  controllers: [InvoiceController, InvoiceQueueController],
   providers: [InvoiceService, InvoiceRepository],
 })
 export class InvoiceModule {}
