@@ -23,6 +23,7 @@
       "@common/guards/*": ["libs/guards/src/lib/*"],
       "@common/interceptors/*": ["libs/interceptors/src/lib/*"],
       "@common/interfaces/*": ["libs/interfaces/src/lib/*"],
+      "@common/kafka/*": ["libs/kafka/src/lib/*"],
       "@common/middlewares/*": ["libs/middlewares/src/lib/*"],
       "@common/schemas/*": ["libs/schemas/src/lib/*"],
       "@common/utils/*": ["libs/utils/src/lib/*"]

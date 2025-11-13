@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Logger, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Logger, Param, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateInvoiceRequestDto, InvoiceResponseDto } from '@common/interfaces/gateway/invoice';
 import { ResponseDto } from '@common/interfaces/gateway/response.interface';
@@ -13,11 +13,16 @@ import { UserData } from '@common/decorators/userData.decorator';
 import { AuthorizedMetadata } from '@common/interfaces/tcp/authorizer';
 import { Permissions } from '@common/decorators/permission.decorator';
 import { PERMISSION } from '@common/constants/enum/role.enum';
+import { KafkaService } from '@common/kafka/kafka.service';
+import { QUEUE_TOPICS } from '@common/constants/enum/queue.enum';
 
 @ApiTags('Invoice')
 @Controller('invoice')
 export class InvoiceController {
-  constructor(@Inject(TCP_SERVICES.INVOICE_SERVICE) private readonly invoiceClient: TcpClient) {}
+  constructor(
+    @Inject(TCP_SERVICES.INVOICE_SERVICE) private readonly invoiceClient: TcpClient,
+    private readonly kafkaService: KafkaService,
+  ) {}
 
   @Post()
   @ApiOkResponse({ type: ResponseDto<InvoiceResponseDto> })
@@ -53,5 +58,14 @@ export class InvoiceController {
         processId,
       })
       .pipe(map((data) => new ResponseDto(data)));
+  }
+
+  @Post('test-queue')
+  testQueue() {
+    this.kafkaService.emit(QUEUE_TOPICS.INVOICE_SENT, {
+      invoiceId: '1',
+      userId: '1',
+    });
+    return new ResponseDto({ data: 'OK' });
   }
 }
