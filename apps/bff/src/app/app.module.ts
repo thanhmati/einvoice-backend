@@ -15,6 +15,8 @@ import { TCP_SERVICES, TcpProvider } from '@common/configuration/tcp.config';
 import { PermissionGuard } from '@common/guards/permission.guard';
 import { RedisProvider } from '@common/configuration/redis.config';
 import { GRPC_SERVICES, GrpcProvider } from '@common/configuration/grpc.config';
+import { KafkaModule } from '@common/kafka/kafka.module';
+import { QUEUE_SERVICES } from '@common/constants/enum/queue.enum';
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { GRPC_SERVICES, GrpcProvider } from '@common/configuration/grpc.config';
     ClientsModule.registerAsync([TcpProvider(TCP_SERVICES.AUTHORIZER_SERVICE)]),
     RedisProvider,
     ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)]),
+    KafkaModule.register(QUEUE_SERVICES.BFF),
   ],
   controllers: [],
   providers: [
