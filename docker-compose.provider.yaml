@@ -89,3 +89,24 @@ services:
       - redis
     volumes:
       - ./docker/docker_data/redisinsight_data:/data
+
+  kafka:
+    container_name: kafka_server
+    image: bitnamilegacy/kafka
+    networks:
+      - einvoice-nw
+    ports:
+      - 9092:9092 # internal Docker network listener (optionally)
+      - 29092:29092 # external listener, host local connect
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://:9093,EXTERNAL://0.0.0.0:29092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@localhost:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092,EXTERNAL://localhost:29092
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    volumes:
+      - ./docker/docker_data/kafka_data/bitnami_data:/bitnami/kafka
+    restart: unless-stopped
