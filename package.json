@@ -6,8 +6,8 @@
     "prepare": "husky",
     "nx:reset": "nx reset",
     "nx:run-many": "nx run-many",
-    "dev": "pnpm nx:reset && pnpm nx:run-many -t serve",
-    "dev-lite": "pnpm dev --projects=bff,user-access,authorizer,invoice,pdf-generator,media"
+    "dev": "node init && pnpm nx:reset && pnpm nx:run-many -t serve",
+    "dev-lite": "pnpm dev --projects=bff,user-access,authorizer,invoice,pdf-generator,media,mail"
   },
   "private": true,
   "dependencies": {
