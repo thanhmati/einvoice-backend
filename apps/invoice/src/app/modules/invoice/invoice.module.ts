@@ -5,7 +5,7 @@ import { InvoiceDestination } from '@common/schemas/invoice.schema';
 import { InvoiceController } from './controllers/invoice.controller';
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceRepository } from './repositories/invoice.repository';
-import { ClientsModule } from '@nestjs/microservices';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TCP_SERVICES, TcpProvider } from '@common/configuration/tcp.config';
 import { PaymentModule } from '../payment/payment.module';
 
@@ -18,6 +18,18 @@ import { PaymentModule } from '../payment/payment.module';
       TcpProvider(TCP_SERVICES.MEDIA_SERVICE),
     ]),
     PaymentModule,
+    ClientsModule.register([
+      {
+        name: 'INVOICE_SERVICE',
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            clientId: 'invoice-clientid',
+            brokers: ['localhost:9092'],
+          },
+        },
+      },
+    ]),
   ],
   controllers: [InvoiceController],
   providers: [InvoiceService, InvoiceRepository],
