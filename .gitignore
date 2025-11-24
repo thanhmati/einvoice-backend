@@ -18,12 +18,8 @@ node_modules
 *.sublime-workspace
 
 # IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
 
+temp_auto_push.bat
 # misc
 /.sass-cache
 /connect.lock
@@ -42,3 +38,7 @@ Thumbs.db
 .nx/workspace-data
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
+
+
+docker/**/docker_data.gitignore
+branch_structure.json
