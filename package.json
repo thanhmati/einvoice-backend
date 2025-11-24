@@ -6,12 +6,13 @@
     "prepare": "husky",
     "nx:reset": "nx reset",
     "nx:run-many": "nx run-many",
-    "dev": "pnpm nx:reset && pnpm nx:run-many -t serve",
+    "dev": "node init && pnpm nx:reset && pnpm nx:run-many -t serve",
     "dev-lite": "pnpm dev --projects=bff,user-access,authorizer,invoice"
   },
   "private": true,
   "dependencies": {
     "@keyv/redis": "^5.1.3",
+    "@nest-lab/throttler-storage-redis": "^1.1.0",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.2",
@@ -20,6 +21,7 @@
     "@nestjs/mongoose": "^11.0.3",
     "@nestjs/platform-express": "^11.0.0",
     "@nestjs/swagger": "^11.2.0",
+    "@nestjs/throttler": "^6.4.0",
     "@nestjs/typeorm": "^11.0.0",
     "axios": "^1.6.0",
     "cache-manager": "^7.2.4",
