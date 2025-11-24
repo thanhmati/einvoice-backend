@@ -14,6 +14,8 @@ import { ClientsModule } from '@nestjs/microservices';
 import { TCP_SERVICES, TcpProvider } from '@common/configuration/tcp.config';
 import { PermissionGuard } from '@common/guards/permission.guard';
 import { RedisProvider } from '@common/configuration/redis.config';
+import { ThrottlerProvider } from '@common/configuration/throttler.config';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -24,6 +26,7 @@ import { RedisProvider } from '@common/configuration/redis.config';
     AuthorizerModule,
     ClientsModule.registerAsync([TcpProvider(TCP_SERVICES.AUTHORIZER_SERVICE)]),
     RedisProvider,
+    ThrottlerProvider,
   ],
   controllers: [],
   providers: [
@@ -35,6 +38,10 @@ import { RedisProvider } from '@common/configuration/redis.config';
     {
       provide: APP_GUARD,
       useClass: PermissionGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })
