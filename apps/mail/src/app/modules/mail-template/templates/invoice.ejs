@@ -1,0 +1,26 @@
+<h2>Xin chào <%= clientName %>,</h2>
+
+<p>
+  Bạn nhận được hóa đơn từ <strong><%= senderName %></strong> với mã số hóa đơn <strong><%= invoiceCode %></strong>.
+</p>
+
+<p>Vui lòng xem chi tiết hóa đơn trong tập tin PDF đính kèm.</p>
+
+<% if (paymentLink) { %>
+  <p>
+    Để thuận tiện cho việc thanh toán, bạn có thể nhấn vào liên kết bên dưới để thanh toán trực tuyến:
+  </p>
+
+  <p>
+    <a href="<%= paymentLink %>" target="_blank" style="color: #2196F3; font-weight: bold;">
+      👉 Thanh toán ngay
+    </a>
+  </p>
+<% } %>
+
+<p>Nếu bạn có bất kỳ câu hỏi nào, xin vui lòng liên hệ lại với chúng tôi qua email hoặc số điện thoại hỗ trợ.</p>
+
+<p>
+  Trân trọng,<br />
+  <b><%= senderName %></b>
+</p>
