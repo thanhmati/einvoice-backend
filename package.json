@@ -6,7 +6,7 @@
     "prepare": "husky",
     "nx:reset": "nx reset",
     "nx:run-many": "nx run-many",
-    "dev": "pnpm nx:reset && pnpm nx:run-many -t serve",
+    "dev": "node init && pnpm nx:reset && pnpm nx:run-many -t serve",
     "dev-lite": "pnpm dev --projects=bff,user-access,authorizer,invoice,pdf-generator,media"
   },
   "private": true,
@@ -32,6 +32,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.2.0",
+    "kafkajs": "^2.2.4",
     "mongodb": "^6.19.0",
     "mongoose": "^8.18.1",
     "pg": "^8.16.3",
