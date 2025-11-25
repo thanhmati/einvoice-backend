@@ -33,7 +33,7 @@ services:
     networks:
       - einvoice-nw
     volumes:
-      - ./docker/docker_data/postgres_data:/var/lib/postgresql/data
+      - ./docker/docker_data/postgres_data:/var/lib/postgresql
 
   pgadmin:
     image: dpage/pgadmin4
