@@ -42,7 +42,7 @@ services:
 
   kafka:
     container_name: kafka_server
-    image: bitnami/kafka:latest
+    image: bitnamilegacy/kafka
     networks:
       - einvoice-nw
     ports:
@@ -86,7 +86,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./docker/docker_data/postgres_data:/var/lib/postgresql/data
+      - ./docker/docker_data/postgres_data:/var/lib/postgresql
     networks:
       - einvoice-nw
 
