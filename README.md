@@ -132,7 +132,8 @@ graph TB
 ```bash
 # 🚀 Complete production deployment
 git clone <repo-url> && cd <repo-name>
-pnpm install && pnpm build
+git checkout tutorial
+pnpm install && pnpm dev-local
 
 # 🎯 Access points:
 # • API Documentation: http://localhost:3300/api/v1/docs
