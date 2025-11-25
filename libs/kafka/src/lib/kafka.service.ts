@@ -9,7 +9,7 @@ export class KafkaService implements OnModuleInit {
     await this.client.connect();
   }
 
-  emit(topic: string, payload: any) {
+  emit<T>(topic: string, payload: T) {
     return this.client.emit(topic, payload);
   }
 }
