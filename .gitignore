@@ -44,3 +44,4 @@ Thumbs.db
 .github/instructions/nx.instructions.md
 
 docker/**/docker_data
+config.bat
