@@ -17,7 +17,7 @@ export class BaseSchema {
   updatedAt: Date;
 }
 
-export const createSchema = <TClass = any>(target: Type<TClass>) => {
+export const createSchema = <TClass extends BaseSchema>(target: Type<TClass>) => {
   const schema = SchemaFactory.createForClass(target);
 
   schema.set('toJSON', {
