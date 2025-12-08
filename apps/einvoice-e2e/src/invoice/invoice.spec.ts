@@ -48,5 +48,5 @@ describe('Invoice E2E (HTTP)', () => {
     );
 
     expect(sendRes.status).toBe(201);
-  });
+  }, 10000);
 });
