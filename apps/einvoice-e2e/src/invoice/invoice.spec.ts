@@ -1,16 +1,13 @@
 import axios from 'axios';
 import { CreateInvoiceRequestDto, InvoiceResponseDto } from '@common/interfaces/gateway/invoice';
-import { getAccessToken } from '@common/utils/e2e-test.util';
+import { getAccessToken } from '../support/auth.helper';
 
 describe('Invoice E2E (HTTP)', () => {
-  const baseURL = `${process.env.DOMAIN}/${process.env.GLOBAL_PREFIX}`; // BFF URL
   let accessToken: string;
-  let userEmail: string;
 
   beforeAll(async () => {
-    const authData = await getAccessToken(baseURL);
+    const authData = await getAccessToken();
     accessToken = authData.accessToken;
-    userEmail = authData.user.email;
   });
 
   it('should create an invoice and send it', async () => {
