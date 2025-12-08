@@ -11,7 +11,15 @@
         "jestConfig": "apps/invoice-e2e/jest.config.ts",
         "passWithNoTests": true
       },
-      "dependsOn": ["invoice:build", "invoice:serve"]
+      "dependsOn": [
+        "invoice:serve",
+        "bff:serve",
+        "authorizer:serve",
+        "user-access:serve",
+        "mail:serve",
+        "media:serve",
+        "pdf-generator:serve"
+      ]
     }
   }
 }
