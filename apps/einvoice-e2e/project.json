@@ -1,5 +1,5 @@
 {
-  "name": "invoice-e2e",
+  "name": "einvoice-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "implicitDependencies": ["invoice"],
@@ -8,10 +8,18 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{e2eProjectRoot}"],
       "options": {
-        "jestConfig": "apps/invoice-e2e/jest.config.ts",
+        "jestConfig": "apps/einvoice-e2e/jest.config.ts",
         "passWithNoTests": true
       },
-      "dependsOn": ["invoice:build", "invoice:serve"]
+      "dependsOn": [
+        "invoice:serve",
+        "bff:serve",
+        "authorizer:serve",
+        "user-access:serve",
+        "mail:serve",
+        "media:serve",
+        "pdf-generator:serve"
+      ]
     }
   }
 }
