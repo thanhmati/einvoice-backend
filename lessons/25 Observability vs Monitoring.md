@@ -1,151 +1,77 @@
-# Lesson: Observability vs Monitoring
+# 🎬 Monitoring vs Observability trong Microservices
 
 ## 1. Tổng quan
 
-Observability và Monitoring là hai khái niệm cốt lõi trong kiến trúc
-microservices. Chúng liên quan với nhau nhưng phục vụ những mục tiêu
-khác nhau. Monitoring giúp bạn phát hiện vấn đề đã biết trước, trong khi
-Observability giúp bạn trả lời các câu hỏi mà bạn chưa từng nghĩ đến.
+Trong microservices, hệ thống gồm nhiều service nhỏ hoạt động độc lập. Để biết mọi thứ có đang ổn hay không và hiểu khi nào vấn đề xảy ra, chúng ta cần hai khái niệm quan trọng: **Monitoring** và **Observability**.
 
-------------------------------------------------------------------------
+<img width="720" height="376" alt="image" src="https://github.com/user-attachments/assets/312b6430-b377-40f8-87ba-74345b2c451e" />
 
-## 2. Định nghĩa
 
-### **Monitoring**
+---
 
-Monitoring là việc thu thập các chỉ số (metrics), logs và các dữ liệu đã
-được định nghĩa sẵn nhằm theo dõi xem hệ thống có hoạt động bình thường
-hay không.
+## 2. Monitoring
 
-**Ý chính:** Bạn biết mình muốn theo dõi điều gì.
+Monitoring tập trung vào việc trả lời câu hỏi:
+➡️ **“Hệ thống có đang hoạt động bình thường không?”**
 
-**Ví dụ:**
-Bạn đặt alert khi CPU > 80% trong 5 phút. Điều này nghĩa là bạn đã biết
-CPU có thể là bottleneck nên bạn theo dõi nó.
+Nó dựa trên các chỉ số định lượng:
 
-------------------------------------------------------------------------
+* CPU, Memory, Disk Usage
+* Latency
+* Error Rate
+* Throughput
 
-### **Observability**
+Monitoring giúp phát hiện sớm sự cố và kích hoạt cảnh báo.
 
-Observability là khả năng hiểu trạng thái bên trong của hệ thống dựa
-trên dữ liệu mà hệ thống phát ra, **kể cả khi bạn không biết trước phải
-theo dõi điều gì**.
+---
 
-**Ý chính:** Bạn có thể trả lời các câu hỏi chưa biết trước mà không cần
-thêm instrument code.
+## 3. Observability
 
-**Ví dụ:**
-Một request bị chậm bất thường. Nhờ distributed tracing, bạn tìm ra
-nguyên nhân nằm ở downstream service --- dù bạn chưa từng cấu hình alert
-cho tình huống đó.
+Observability giúp trả lời câu hỏi:
+➡️ **“Vì sao hệ thống gặp vấn đề?”**
 
-------------------------------------------------------------------------
+Nó dựa trên 3 trụ cột chính:
 
-## 3. Vì sao Observability quan trọng hơn trong Microservices
+* **Logs** — Theo dõi hoạt động chi tiết
+* **Metrics** — Quan sát các chỉ số hệ thống
+* **Traces** — Theo dõi hành trình của request giữa các service
 
-  Khía cạnh                       Monitoring                 Observability
-  ------------------------------- -------------------------- ----------------------------
-  Mục tiêu                        Phát hiện vấn đề đã biết   Điều tra vấn đề chưa biết
-  Dữ liệu                         Metrics, logs cố định      Metrics + Logs + Traces
-  Loại câu hỏi                    Dự đoán, cụ thể            Mở rộng, khám phá
-  Mức phù hợp với microservices   Hạn chế                    Tuyệt vời
-  Công cụ                         Prometheus, Grafana        OpenTelemetry, Jaeger, ELK
+Observability cho phép hiểu và phân tích sâu các lỗi, kể cả những lỗi chưa từng gặp.
 
-------------------------------------------------------------------------
+---
 
-## 4. Ví dụ đời thường để dễ hiểu
+## 4. So sánh nhanh
 
-### **Monitoring giống như bảng đồng hồ xe hơi**
+| Monitoring               | Observability                    |
+| ------------------------ | -------------------------------- |
+| Phát hiện vấn đề         | Hiểu và giải quyết vấn đề        |
+| Dựa trên metrics cố định | Dựa trên logs + metrics + traces |
+| Tập trung vào trạng thái | Tập trung vào nguyên nhân        |
 
-Bảng đồng hồ hiển thị: - Tốc độ - Mức xăng - Nhiệt độ động cơ
+---
 
-Đó là những chỉ số cố định. Nó chỉ cho bạn biết có vấn đề --- nhưng
-**không cho bạn biết lý do**.
+## 5. Các stack thường có trong Monitoring & Observability
 
-------------------------------------------------------------------------
+Dưới đây là danh sách các thành phần phổ biến:
 
-### **Observability giống như một thợ sửa xe**
+### **Monitoring Stack**
 
-Thợ sửa có thể: - Kiểm tra cảm biến - Quan sát đường khí nạp - Kiểm tra
-hành vi động cơ - Tìm lỗi ẩn mà bạn không biết
+* **Health Check** (Liveness / Readiness / Startup)
+* **Alerting system** (Prometheus Alertmanager)
+* **Metrics collection** (Prometheus, Datadog)
+* **Dashboard** (Grafana)
 
-Họ trả lời được những câu hỏi mà bạn không dự đoán trước.
+### **Observability Stack**
 
-------------------------------------------------------------------------
+* **Centralized Logging** (ELK Stack, Loki, CloudWatch)
+* **Distributed Tracing** (OpenTelemetry, Jaeger, Zipkin)
+* **Log Processing** (Fluentd, Logstash)
+* **Service Mesh Telemetry** (Istio, Linkerd)
 
-## 5. Ví dụ thực tế trong Microservices
+---
 
-### **Monitoring Example**
+## 6. Kết nối với Health Check
 
-Service: `payment-service`
+Health Check là một phần trong Monitoring, dùng để xác định service có hoạt động bình thường hay không. Nó là điểm mở đầu cần thiết trước khi đi sâu vào toàn bộ hệ thống giám sát.
 
-Theo dõi: - Request per second - Error rate - Response time
-
-Alert: - Error rate > 5% trong 1 phút
-
-Giúp bạn phát hiện lỗi đã biết.
-
-------------------------------------------------------------------------
-
-### **Observability Example**
-
-Một request mất 3 giây thay vì 200ms.
-
-Dùng distributed tracing: - `payment-service` → OK
-- `inventory-service` → OK
-- `discount-service` → delay 2.8s
-
-Bạn tìm được root cause dù không có alert cho `discount-service`.
-
-------------------------------------------------------------------------
-
-## 6. Khi nào dùng Monitoring, khi nào dùng Observability
-
-### **Monitoring dùng cho:**
-
--   Health checks
--   Uptime tracking
--   Alerts theo ngưỡng
--   Theo dõi SLO/SLI
-
-### **Observability dùng cho:**
-
--   Debug vấn đề phức tạp
--   Điều tra hành vi bất thường
--   Root cause analysis
--   Latency phân tán giữa nhiều service
-
-------------------------------------------------------------------------
-
-## 7. Tóm tắt
-
--   Monitoring giúp bạn biết **khi nào** có vấn đề.
--   Observability giúp bạn biết **tại sao** có vấn đề.
--   Cả hai đều quan trọng, nhưng Observability là yếu tố bắt buộc trong
-    kiến trúc microservices.
-
-------------------------------------------------------------------------
-
-## 8. Bộ công cụ gợi ý
-
-### Monitoring:
-
--   Prometheus
--   Grafana
--   CloudWatch
--   Datadog Metrics
-
-### Observability:
-
--   OpenTelemetry (chuẩn instrument)
--   Jaeger / Zipkin (tracing)
--   ELK stack (logs)
--   Datadog APM / New Relic
-
-------------------------------------------------------------------------
-
-## 9. Kết luận
-
-Trong microservices, lỗi là điều không thể tránh. Monitoring giúp bạn
-phát hiện nhanh, còn Observability giúp bạn đào sâu, hiểu rõ và khôi
-phục hệ thống nhanh nhất có thể.
+Trong các video tiếp theo, chúng ta sẽ bắt đầu với **Health Check**, trước khi tiến sang logging, metrics và tracing trong microservices.
