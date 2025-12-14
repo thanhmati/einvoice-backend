@@ -46,13 +46,10 @@ export class LoggerModule {
                         targets,
                       }
                     : undefined,
-                autoLogging: true,
+                autoLogging: false,
                 serializers: {
-                  req: (req: any) => ({
-                    id: req.id,
-                    method: req.method,
-                    url: req.url,
-                  }),
+                  req: () => undefined,
+                  res: () => undefined,
                 },
               },
             };
