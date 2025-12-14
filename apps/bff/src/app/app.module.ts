@@ -4,7 +4,7 @@ import { CONFIGURATION, TConfiguration } from '../configuration';
 import { LoggerModule } from '@common/logger';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ExceptionInterceptor } from '@common/interceptors/exception.interceptor';
-
+import { LoggerMiddleware } from '@common/middlewares/logger.middleware';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { ProductModule } from './modules/product/product.module';
 import { UserModule } from './modules/user/user.module';
@@ -54,4 +54,8 @@ import { HealthModule } from './modules/health/health.module';
 })
 export class AppModule {
   static CONFIGURATION: TConfiguration = CONFIGURATION;
+
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
 }
