@@ -3,25 +3,7 @@
 Trong bài này, chúng ta sẽ đi vào triển khai thực tế **PLG Stack** (Promtail, Loki, Grafana) để thu thập Logs từ Docker containers.
 
 ## 1. Kiến trúc luồng dữ liệu
-
-```mermaid
-flowchart LR
-    subgraph "Docker Host"
-        C1[Container 1]
-        C2[Container 2]
-        P[Promtail]
-    end
-
-    subgraph "Monitoring Infrastructure"
-        L[Loki]
-        G[Grafana]
-    end
-
-    C1 -- stdout/stderr --> P
-    C2 -- stdout/stderr --> P
-    P -- Push Logs --> L
-    G -- Query (LogQL) --> L
-```
+<img width="750" height="363" alt="image" src="https://github.com/user-attachments/assets/33e73287-02b9-441e-a03b-eecb390ac1c4" />
 
 1.  **Promtail** sẽ bind vào `docker.sock` hoặc đọc file log của Docker (`/var/lib/docker/containers/...`).
 2.  Nó tự động phát hiện (service discovery) các container đang chạy.
