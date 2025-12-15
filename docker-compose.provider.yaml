@@ -111,6 +111,19 @@ services:
       - ./docker/docker_data/kafka_data/bitnami_data:/bitnami/kafka
     restart: unless-stopped
 
+  prometheus:
+    image: prom/prometheus:v3.8.0
+    container_name: prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - einvoice-nw
+    restart: unless-stopped
+
   loki:
     image: grafana/loki:2.9.2
     container_name: loki
