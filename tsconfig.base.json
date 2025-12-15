@@ -27,7 +27,8 @@
       "@common/middlewares/*": ["libs/middlewares/src/lib/*"],
       "@common/schemas/*": ["libs/schemas/src/lib/*"],
       "@common/utils/*": ["libs/utils/src/lib/*"],
-      "@common/logger": ["libs/logger/src/index.ts"]
+      "@common/logger": ["libs/logger/src/index.ts"],
+      "@common/observability/*": ["libs/observability/src/lib/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
