@@ -1,4 +1,4 @@
-# 27 Centralize Logging trong Microservices
+# Centralize Logging trong Microservices
 
 ## 1. Vấn đề của Logging truyền thống
 
