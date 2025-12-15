@@ -1,5 +1,7 @@
 # Centralize Logging trong Microservices
 
+<img width="524" height="524" alt="image" src="https://github.com/user-attachments/assets/61c123ba-1897-49b3-a9c9-1c05f349a8ae" />
+
 ## 1. Vấn đề của Logging truyền thống
 
 Khi chuyển từ Monolithic sang Microservices, số lượng service tăng lên đáng kể. Mỗi service lại chạy trên một hoặc nhiều container/server khác nhau. Điều này dẫn đến các vấn đề nghiêm trọng với cách ghi log truyền thống (ghi ra file hoặc stdout console):
@@ -57,6 +59,8 @@ flowchart LR
 ## 4. Các giải pháp phổ biến
 
 ### ELK Stack (Elasticsearch - Logstash - Kibana)
+<img width="902" height="380" alt="image" src="https://github.com/user-attachments/assets/2df662c0-f49a-418f-833e-e131479364c4" />
+
 
 - **Ưu điểm:** Rất mạnh mẽ, phổ biến lâu đời, khả năng full-text search tuyệt vời.
 - **Nhược điểm:** Tốn tài nguyên (Java-based), cấu hình phức tạp, chi phí vận hành cao cho cluster Elasticsearch.
@@ -66,6 +70,8 @@ flowchart LR
 - Tương tự ELK nhưng thay Logstash bằng Fluentd (nhẹ hơn, viết bằng Ruby/C).
 
 ### PLG Stack (Promtail - Loki - Grafana)
+<img width="1276" height="408" alt="image" src="https://github.com/user-attachments/assets/19812c31-61ac-4191-9689-a4eaaecf8acd" />
+
 
 - **Promtail:** Agent thu thập log (tương tự như Prometheus node exporter).
 - **Loki:** Nơi lưu trữ log. Điểm khác biệt lớn nhất là Loki **không index toàn bộ text** của log, mà chỉ index **metadata (labels)**. Điều này giúp Loki cực kỳ nhẹ và rẻ.
