@@ -1,13 +1,18 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ProductService } from './product.service';
-import { CreateProductTcpReq } from '@common/interfaces/tcp/product';
-import { ERROR_CODE } from '@common/constants/enums/error-code.enum';
-import { BadRequestException } from '@nestjs/common';
 import { ProductRepository } from '../repositories/product.repository';
+import { Test, TestingModule } from '@nestjs/testing';
+import { CreateProductTcpRequest } from '@common/interfaces/tcp/product';
+import { BadRequestException } from '@nestjs/common';
 
 describe('ProductService', () => {
   let service: ProductService;
   let repository: ProductRepository;
+
+  const mockProductRepository = {
+    exists: jest.fn(),
+    create: jest.fn(),
+    findAll: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -15,18 +20,14 @@ describe('ProductService', () => {
         ProductService,
         {
           provide: ProductRepository,
-          useValue: {
-            exists: jest.fn(),
-            create: jest.fn(),
-            findAll: jest.fn(),
-            findById: jest.fn(),
-          },
+          useValue: mockProductRepository,
         },
       ],
     }).compile();
 
     service = module.get<ProductService>(ProductService);
     repository = module.get<ProductRepository>(ProductRepository);
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -34,41 +35,75 @@ describe('ProductService', () => {
   });
 
   describe('create', () => {
-    it('should throw BadRequestException if product already exists', async () => {
-      const data: CreateProductTcpReq = { sku: 'sku', name: 'name', price: 100, unit: 'kg', vatRate: 10 };
-      (repository.exists as jest.Mock).mockResolvedValue(true);
+    const createDto: CreateProductTcpRequest = {
+      sku: 'SKU-001',
+      name: 'Test Product',
+      description: 'Test Description',
+      price: 100,
+      unit: 'pcs',
+      vatRate: 10,
+    };
 
-      await expect(service.create(data)).rejects.toThrow(new BadRequestException(ERROR_CODE.PRODUCT_ALREADY_EXISTS));
+    it('should create a product successfully when it does not exist', async () => {
+      mockProductRepository.exists.mockResolvedValue(false);
+      mockProductRepository.create.mockResolvedValue({
+        id: 1,
+        ...createDto,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      const result = await service.create(createDto);
+
+      expect(repository.exists).toHaveBeenCalledWith(createDto.sku, createDto.name);
+      expect(repository.create).toHaveBeenCalledWith(createDto);
+      expect(result).toEqual({
+        id: 1,
+        ...createDto,
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+      });
     });
 
-    it('should create product if it does not exist', async () => {
-      const data: CreateProductTcpReq = { sku: 'sku', name: 'name', price: 100, unit: 'kg', vatRate: 10 };
-      (repository.exists as jest.Mock).mockResolvedValue(false);
-      (repository.create as jest.Mock).mockResolvedValue(data);
+    it('should throw BadRequestException when product already exists', async () => {
+      mockProductRepository.exists.mockResolvedValue(true);
 
-      const result = await service.create(data);
-      expect(result).toEqual(data);
+      await expect(service.create(createDto)).rejects.toThrow(BadRequestException);
+      expect(repository.exists).toHaveBeenCalledWith(createDto.sku, createDto.name);
+      expect(repository.create).not.toHaveBeenCalled();
     });
   });
 
-  describe('getAll', () => {
-    it('should return all products', async () => {
-      const products = [{ sku: 'sku', name: 'name' }];
-      (repository.findAll as jest.Mock).mockResolvedValue(products);
+  describe('getList', () => {
+    it('should return an array of products', async () => {
+      const mockProducts = [
+        {
+          id: 1,
+          sku: 'SKU-1',
+          name: 'P1',
+          price: 100,
+          unit: 'pcs',
+          vatRate: 10,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 2,
+          sku: 'SKU-2',
+          name: 'P2',
+          price: 200,
+          unit: 'box',
+          vatRate: 8,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+      mockProductRepository.findAll.mockResolvedValue(mockProducts);
 
-      const result = await service.getAll();
-      expect(result).toEqual(products);
-    });
-  });
+      const result = await service.getList();
 
-  describe('getById', () => {
-    it('should return product by id', async () => {
-      const id = 'id';
-      const product = { sku: 'sku', name: 'name' };
-      (repository.findById as jest.Mock).mockResolvedValue(product);
-
-      const result = await service.getById(id);
-      expect(result).toEqual(product);
+      expect(repository.findAll).toHaveBeenCalled();
+      expect(result).toEqual(mockProducts);
     });
   });
 });

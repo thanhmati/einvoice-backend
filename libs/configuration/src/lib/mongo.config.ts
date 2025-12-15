@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Connection } from 'mongoose';
@@ -14,13 +14,16 @@ export class MongoConfiguration {
   DB_NAME: string;
 
   @IsNumber()
-  POOL_SIZE: number;
+  @IsOptional()
+  POOL_SIZE?: number;
 
   @IsNumber()
-  CONNECT_TIMEOUT_MS: number;
+  @IsOptional()
+  CONNECT_TIMEOUT_MS?: number;
 
   @IsNumber()
-  SOCKET_TIMEOUT_MS: number;
+  @IsOptional()
+  SOCKET_TIMEOUT_MS?: number;
 
   constructor(data?: Partial<MongoConfiguration>) {
     this.URL = data?.URL || process.env['MONGODB_URI'] || '';
@@ -31,25 +34,23 @@ export class MongoConfiguration {
   }
 }
 
-const logger = new Logger('MongoDB');
-
 export const MongoProvider = MongooseModule.forRootAsync({
   imports: [ConfigModule],
-  useFactory: (configService: ConfigService) => ({
+  inject: [ConfigService],
+  useFactory: async (configService: ConfigService) => ({
     uri: configService.get('MONGO_CONFIG.URL'),
     dbName: configService.get('MONGO_CONFIG.DB_NAME'),
     maxPoolSize: configService.get('MONGO_CONFIG.POOL_SIZE'),
     connectTimeoutMS: configService.get('MONGO_CONFIG.CONNECT_TIMEOUT_MS'),
     socketTimeoutMS: configService.get('MONGO_CONFIG.SOCKET_TIMEOUT_MS'),
     onConnectionCreate: (connection: Connection) => {
-      connection.on('connected', () => logger.log(' 🟢   🟢   🟢   >>  connected'));
-      connection.on('open', () => logger.log(' 🟢   🟢   🟢   >>  open'));
-      connection.on('disconnected', () => logger.log(' 🪓   🪓   🪓   >>  disconnected'));
-      connection.on('reconnected', () => logger.log(' 🧡   🧡   🧡   >>  reconnected'));
-      connection.on('disconnecting', () => logger.log(' 🪓   🪓   🪓   >>  disconnecting'));
+      connection.on('connected', () => Logger.log(' 🟢   🟢   🟢   >>  connected'));
+      connection.on('open', () => Logger.log(' 🟢   🟢   🟢   >>  open'));
+      connection.on('disconnected', () => Logger.log(' 🪓   🪓   🪓   >>  disconnected'));
+      connection.on('reconnected', () => Logger.log(' 🧡   🧡   🧡   >>  reconnected'));
+      connection.on('disconnecting', () => Logger.log(' 🪓   🪓   🪓   >>  disconnecting'));
 
       return connection;
     },
   }),
-  inject: [ConfigService],
 });

@@ -9,13 +9,39 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "webpack-cli build",
-        "args": ["--node-env=production"]
+        "args": ["--node-env=production"],
+        "cwd": "apps/user-access"
       },
       "configurations": {
         "development": {
           "args": ["--node-env=development"]
         }
       }
+    },
+    "prune-lockfile": {
+      "dependsOn": ["build"],
+      "cache": true,
+      "executor": "@nx/js:prune-lockfile",
+      "outputs": [
+        "{workspaceRoot}/dist/apps/user-access/package.json",
+        "{workspaceRoot}/dist/apps/user-access/pnpm-lock.yaml"
+      ],
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "copy-workspace-modules": {
+      "dependsOn": ["build"],
+      "cache": true,
+      "outputs": ["{workspaceRoot}/dist/apps/user-access/workspace_modules"],
+      "executor": "@nx/js:copy-workspace-modules",
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "prune": {
+      "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
+      "executor": "nx:noop"
     },
     "serve": {
       "continuous": true,
@@ -43,14 +69,7 @@
     "seed": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node tools/seed.js apps/user-access/src/app/seeder migrate"
-      }
-    },
-    "docker-build": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["build"],
-      "options": {
-        "commands": ["docker build -f apps/user-access/Dockerfile . -t user-access:latest"]
+        "command": "node tools/seed.js apps/user-access/src/seeder migrate"
       }
     }
   }

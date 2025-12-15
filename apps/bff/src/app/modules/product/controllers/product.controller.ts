@@ -1,16 +1,13 @@
 import { TCP_SERVICES } from '@common/configuration/tcp.config';
+import { ResponseDto } from '@common/interfaces/gateway/response.interface';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateProductTcpReq, ProductTcpRes } from '@common/interfaces/tcp/product';
-import { TCP_REQUEST_MESSAGE } from '@common/constants/enums/tcp-request-message.enum';
-import { CreateProductRequestDto, ProductResponseDto } from '@common/interfaces/gateway/dto/product';
-import { ProcessID } from '@common/decorators/processID.decorator';
+import { CreateProductRequestDto, ProductResponseDto } from '@common/interfaces/gateway/product';
+import { ProcessId } from '@common/decorators/processId.decorator';
+import { CreateProductTcpRequest, ProductTcpResponse } from '@common/interfaces/tcp/product';
+import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
 import { map } from 'rxjs';
-import { ResponseDto } from '@common/interfaces/gateway/common/response.interface';
-import { Authorization } from '@common/decorators/authorizer.decorator';
-import { PERMISSION } from '@common/constants/role.constant';
-import { Permissions } from '@common/decorators/permission.decorator';
 
 @ApiTags('Product')
 @Controller('product')
@@ -18,55 +15,23 @@ export class ProductController {
   constructor(@Inject(TCP_SERVICES.PRODUCT_SERVICE) private readonly productClient: TcpClient) {}
 
   @Post()
-  @ApiOkResponse({
-    type: ResponseDto<string>,
-  })
-  @ApiOperation({
-    summary: 'Create new a product',
-  })
-  @Authorization({ secured: true })
-  @Permissions(PERMISSION.PRODUCT_CREATE)
-  create(@Body() body: CreateProductRequestDto, @ProcessID() processID: string) {
+  @ApiOkResponse({ type: ResponseDto<ProductResponseDto> })
+  @ApiOperation({ summary: 'Create a new product' })
+  create(@Body() body: CreateProductRequestDto, @ProcessId() processId: string) {
     return this.productClient
-      .send<string, CreateProductTcpReq>(TCP_REQUEST_MESSAGE.PRODUCT.CREATE, {
+      .send<ProductTcpResponse, CreateProductTcpRequest>(TCP_REQUEST_MESSAGE.PRODUCT.CREATE, {
         data: body,
-        processID,
+        processId,
       })
       .pipe(map((data) => new ResponseDto(data)));
   }
 
   @Get()
-  @ApiOkResponse({
-    type: ResponseDto<ProductResponseDto[]>,
-  })
-  @ApiOperation({
-    summary: 'Get all products',
-  })
-  @Authorization({ secured: true })
-  @Permissions(PERMISSION.PRODUCT_GET_ALL)
-  getAll(@ProcessID() processID: string) {
+  @ApiOkResponse({ type: ResponseDto<ProductResponseDto[]> })
+  @ApiOperation({ summary: 'Get list products' })
+  getList(@ProcessId() processId: string) {
     return this.productClient
-      .send<ProductTcpRes[]>(TCP_REQUEST_MESSAGE.PRODUCT.GET_ALL, {
-        processID,
-      })
-      .pipe(map((data) => new ResponseDto(data)));
-  }
-
-  @Get(':id')
-  @ApiOkResponse({
-    type: ResponseDto<ProductResponseDto>,
-  })
-  @ApiOperation({
-    summary: 'Get a product by id',
-  })
-  @Authorization({ secured: true })
-  @Permissions(PERMISSION.PRODUCT_GET_BY_ID)
-  getById(@Param('id') id: string, @ProcessID() processID: string) {
-    return this.productClient
-      .send<ProductTcpRes, number>(TCP_REQUEST_MESSAGE.PRODUCT.GET_BY_ID, {
-        data: Number(id),
-        processID,
-      })
+      .send<ProductTcpResponse[]>(TCP_REQUEST_MESSAGE.PRODUCT.GET_LIST, { processId })
       .pipe(map((data) => new ResponseDto(data)));
   }
 }

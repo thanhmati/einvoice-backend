@@ -6,12 +6,6 @@ service UserAccessService {
   rpc getByUserId (UserById) returns (UserResponse);
 }
 
-message UserResponse {
-  string code = 1;
-  User data = 2;
-  string error = 3;
-}
-
 message Role {
   string name = 1;
   string description = 2;
@@ -27,8 +21,13 @@ message User {
   repeated Role roles = 6; 
 }
 
-message UserById {
-  string userId = 1;
-  string processID = 2;
+message UserResponse {
+  string code = 1;
+  User data = 2;
+  string error = 3;
 }
 
+message UserById {
+  string userId = 1;
+  string processId = 2;
+}

@@ -1,1 +1,4 @@
-export * from './media.request.type';
+export type UploadFileTcpReq = {
+  fileBase64: string;
+  fileName: string;
+};

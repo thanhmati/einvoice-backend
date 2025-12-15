@@ -1,6 +1,6 @@
 export type MailAttachment = {
   filename: string;
-  content: Buffer | string;
+  content?: Buffer | string;
   contentType?: string;
   path?: string; // nếu gửi file từ URL hoặc path local
 };
@@ -8,7 +8,7 @@ export type MailAttachment = {
 export interface SendMailOptions {
   to: string; // Người nhận
   subject: string; // Tiêu đề email
-  html: string; // Nội dung HTML
+  html?: string; // Nội dung HTML
   text?: string; // Plain text fallback (tuỳ chọn)
   senderName?: string; // Tên hiển thị của người gửi
   senderEmail?: string; // Email người gửi

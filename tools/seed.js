@@ -67,7 +67,7 @@ async function bootstrap() {
 
   try {
     await client.connect();
-    const db = client.db();
+    const db = client.db(process.env.MONGODB_DB_NAME || 'einvoice-app');
 
     const files = fs.readdirSync(absoluteDir).filter((f) => f.endsWith('.json'));
 

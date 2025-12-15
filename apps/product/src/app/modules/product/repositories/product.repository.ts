@@ -1,25 +1,15 @@
+import { Product } from '@common/entities/product.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Product } from '@common/schemas/product.entity';
 
 @Injectable()
 export class ProductRepository {
-  constructor(
-    @InjectRepository(Product)
-    private readonly repo: Repository<Product>,
-  ) {}
+  constructor(@InjectRepository(Product) private readonly repo: Repository<Product>) {}
 
   async create(data: Partial<Product>): Promise<Product> {
     const entity = this.repo.create(data);
     return this.repo.save(entity);
-  }
-
-  async exists(sku: string, name: string): Promise<boolean> {
-    const result = await this.repo.findOne({
-      where: [{ sku }, { name }],
-    });
-    return !!result;
   }
 
   async findAll(): Promise<Product[]> {
@@ -37,5 +27,12 @@ export class ProductRepository {
 
   async remove(id: number): Promise<void> {
     await this.repo.delete(id);
+  }
+
+  async exists(sku: string, name: string): Promise<boolean> {
+    const result = await this.repo.findOne({
+      where: [{ sku }, { name }],
+    });
+    return !!result;
   }
 }

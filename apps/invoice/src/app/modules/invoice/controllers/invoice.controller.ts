@@ -1,62 +1,44 @@
 import { Controller, UseInterceptors } from '@nestjs/common';
-import { TcpLoggingInterceptor } from '@common/interceptors/tcpLogging.interceptor';
-import { MessagePattern } from '@nestjs/microservices';
-import { TCP_REQUEST_MESSAGE } from '@common/constants/enums/tcp-request-message.enum';
-import { RequestParams } from '@common/decorators/request-params.decorator';
-import {
-  CreateInvoiceTcpReq,
-  GetDetailInvoiceTcpRes,
-  PaginateInvoiceTcpReq,
-  PaginateInvoiceTcpRes,
-  SendInvoiceTcpReq,
-  UpdateInvoiceTcpReq,
-} from '@common/interfaces/tcp/invoice';
-import { Response } from '@common/interfaces/tcp/common/response.interface';
-import { HTTP_MESSAGE } from '@common/constants/enums/http-message.enum';
 import { InvoiceService } from '../services/invoice.service';
-import { ProcessID } from '@common/decorators/processID.decorator';
+import { MessagePattern } from '@nestjs/microservices';
+import { TcpLoggingInterceptor } from '@common/interceptors/tcpLogging.interceptor';
+import { Response } from '@common/interfaces/tcp/common/response.interface';
+import { RequestParams } from '@common/decorators/request-param.decorator';
+import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
+import { CreateInvoiceTcpRequest, InvoiceTcpResponse, SendInvoiceTcpReq } from '@common/interfaces/tcp/invoice';
+import { ProcessId } from '@common/decorators/processId.decorator';
+import { HTTP_MESSAGE } from '@common/constants/enum/http-message.enum';
 
-@UseInterceptors(TcpLoggingInterceptor)
 @Controller()
+@UseInterceptors(TcpLoggingInterceptor)
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}
 
   @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.CREATE)
-  async create(@RequestParams() params: CreateInvoiceTcpReq): Promise<Response<string>> {
-    await this.invoiceService.create(params);
-    return Response.success<string>(HTTP_MESSAGE.CREATED);
-  }
+  async create(@RequestParams() params: CreateInvoiceTcpRequest): Promise<Response<InvoiceTcpResponse>> {
+    const result = await this.invoiceService.create(params);
 
-  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.PAGINATE)
-  async paginate(@RequestParams() params: PaginateInvoiceTcpReq): Promise<Response<PaginateInvoiceTcpRes>> {
-    const result = await this.invoiceService.paginate(params);
-    return Response.success<PaginateInvoiceTcpRes>(result);
-  }
-
-  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.GET_BY_ID)
-  async getById(@RequestParams() id: string): Promise<Response<GetDetailInvoiceTcpRes>> {
-    const result = await this.invoiceService.getById(id);
-    return Response.success<GetDetailInvoiceTcpRes>(result);
-  }
-
-  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.UPDATE)
-  async updateById(@RequestParams() params: UpdateInvoiceTcpReq): Promise<Response<string>> {
-    await this.invoiceService.updateById(params);
-    return Response.success<string>(HTTP_MESSAGE.UPDATED);
-  }
-
-  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.DELETE)
-  async deleteById(@RequestParams() id: string): Promise<Response<string>> {
-    await this.invoiceService.deleteById(id);
-    return Response.success<string>(HTTP_MESSAGE.DELETED);
+    return Response.success<InvoiceTcpResponse>(result);
   }
 
   @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.SEND)
   async sendById(
     @RequestParams() params: SendInvoiceTcpReq,
-    @ProcessID() processID: string,
+    @ProcessId() processID: string,
   ): Promise<Response<string>> {
     await this.invoiceService.sendById(params, processID);
-    return Response.success<string>(HTTP_MESSAGE.SENT);
+    return Response.success<string>(HTTP_MESSAGE.OK);
+  }
+
+  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.UPDATE_INVOICE_PAID)
+  async updateInvoicePaid(@RequestParams() invoiceId: string): Promise<Response<string>> {
+    await this.invoiceService.updateInvoicePaid(invoiceId);
+    return Response.success<string>(HTTP_MESSAGE.UPDATED);
+  }
+
+  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.GET_BY_ID)
+  async getInvoiceById(@RequestParams() invoiceId: string) {
+    const invoice = await this.invoiceService.getById(invoiceId);
+    return Response.success<InvoiceTcpResponse>(invoice);
   }
 }
