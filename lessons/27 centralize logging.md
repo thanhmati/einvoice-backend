@@ -32,8 +32,8 @@ flowchart LR
     end
 
     subgraph "Centralized System"
-        L[Log Storage\n(Loki / Elasticsearch)]
-        V[Visualization\n(Grafana / Kibana)]
+        L["Log Storage (Loki / Elasticsearch)"]
+        V["Visualization (Grafana / Kibana)"]
     end
 
     S1 --> A1
