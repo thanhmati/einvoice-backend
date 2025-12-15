@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CONFIGURATION, TConfiguration } from '../configuration';
 import { LoggerModule } from '@common/logger';
+import { MetricsModule } from '@common/observability/metrics';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ExceptionInterceptor } from '@common/interceptors/exception.interceptor';
 import { LoggerMiddleware } from '@common/middlewares/logger.middleware';
@@ -34,6 +35,7 @@ import { HealthModule } from './modules/health/health.module';
     WebhookModule,
     HealthModule,
     LoggerModule.forRoot('bff'),
+    MetricsModule,
   ],
   controllers: [],
   providers: [
