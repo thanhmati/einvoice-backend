@@ -2,7 +2,22 @@
 
 Trong bài này, chúng ta sẽ đi vào triển khai thực tế **PLG Stack** (Promtail, Loki, Grafana) để thu thập Logs từ Docker containers.
 
-## 1. Kiến trúc luồng dữ liệu
+## 1. Tại sao chọn PLG Stack thay vì ELK?
+
+Khi nói đến Centralized Logging, **ELK Stack** (Elasticsearch, Logstash, Kibana) là cái tên kinh điển. Tuy nhiên, trong môi trường Cloud Native và Microservices hiện đại, **PLG Stack** đang dần chiếm ưu thế nhờ các lý do sau:
+
+| Tiêu chí         | ELK Stack (Elasticsearch)                                                                              | PLG Stack (Loki)                                                                                           |
+| :--------------- | :----------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------- |
+| **Cơ chế Index** | Đánh index **toàn bộ nội dung** (Inverted Index). Giúp tìm text cực nhanh nhưng tốn dung lượng và RAM. | Chỉ đánh index **Metadata (Labels)** (User, App, Status...). Nội dung log được nén và lưu trữ dạng chunks. |
+| **Tài nguyên**   | Rất nặng (Java-based). Cần nhiều RAM và CPU để duy trì cluster.                                        | Rất nhẹ (Go-based). Tốn ít tài nguyên hơn đáng kể (thường chỉ bằng 1/10 so với ELK).                       |
+| **Chi phí**      | Đắt đỏ do yêu cầu phần cứng cao và lưu trữ lớn.                                                        | Rẻ hơn nhiều, đặc biệt khi lưu trữ trên S3/GCS.                                                            |
+| **Ngữ cảnh**     | Mạnh về Full-text search & Analytics phức tạp.                                                         | Tối ưu cho việc "Grep" logs (tương tự `grep` trên terminal) và tích hợp với Metrics (Prometheus).          |
+| **Tích hợp**     | Dùng Kibana (riêng biệt với Grafana nếu bạn dùng Grafana cho metrics).                                 | Tích hợp sẵn trong Grafana -> **Unified Observability** (Logs + Metrics chung 1 dashboard).                |
+
+**Kết luận:** Với nhu cầu logging cho Microservices thông thường (debug lỗi, trace request), **PLG Stack** là lựa chọn "ngon-bổ-rẻ" và phù hợp hơn.
+
+## 2. Kiến trúc luồng dữ liệu
+
 <img width="750" height="363" alt="image" src="https://github.com/user-attachments/assets/33e73287-02b9-441e-a03b-eecb390ac1c4" />
 
 1.  **Promtail** sẽ bind vào `docker.sock` hoặc đọc file log của Docker (`/var/lib/docker/containers/...`).
@@ -10,7 +25,7 @@ Trong bài này, chúng ta sẽ đi vào triển khai thực tế **PLG Stack** 
 3.  Log được gửi tới **Loki**.
 4.  Người dùng vào **Grafana** để query dữ liệu từ Loki.
 
-## 2. Cấu hình Docker Compose
+## 3. Cấu hình Docker Compose
 
 Chúng ta sẽ thêm 3 service chính vào file `docker-compose.provider.yaml` của project.
 
@@ -53,7 +68,7 @@ grafana:
 
 > **Lưu ý:** `promtail` cần quyền truy cập vào `/var/run/docker.sock` của máy host để có thể tự động lấy log từ các container khác.
 
-## 3. Cấu hình Promtail (`docker/promtail-config.yaml`)
+## 4. Cấu hình Promtail (`docker/promtail-config.yaml`)
 
 Đây là nơi cấu hình "ma thuật" xảy ra. Promtail cần biết làm sao để lấy log từ Docker.
 
@@ -85,7 +100,7 @@ scrape_configs:
 - `docker_sd_configs`: Sử dụng Service Discovery của Docker để tự động tìm container.
 - `relabel_configs`: Đây là bước quan trọng để làm sạch label. Mặc định Docker label sẽ khá dài dòng, đoạn này giúp chúng ta lấy tên container (ví dụ `einvoice-app`) và gán vào label `container`.
 
-## 4. Kiểm tra trên Grafana
+## 5. Kiểm tra trên Grafana
 
 Sau khi chạy `docker-compose up -d`, hãy làm theo các bước sau:
 
