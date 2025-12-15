@@ -4,6 +4,9 @@ Trong bài này, chúng ta sẽ đi vào triển khai thực tế **PLG Stack** 
 
 ## 1. Tại sao chọn PLG Stack thay vì ELK?
 
+<img width="900" height="428" alt="image" src="https://github.com/user-attachments/assets/bbed5359-a197-46ee-a629-289b1b75a539" />
+
+
 Khi nói đến Centralized Logging, **ELK Stack** (Elasticsearch, Logstash, Kibana) là cái tên kinh điển. Tuy nhiên, trong môi trường Cloud Native và Microservices hiện đại, **PLG Stack** đang dần chiếm ưu thế nhờ các lý do sau:
 
 | Tiêu chí         | ELK Stack (Elasticsearch)                                                                              | PLG Stack (Loki)                                                                                           |
