@@ -1,0 +1,14 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'nestjs-app'
+    metrics_path: /api/v1/metrics
+    static_configs:
+      # Scrape all local microservices running on host machine
+      - targets: ['host.docker.internal:3300'] # BFF
+
