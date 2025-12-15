@@ -1,2 +1,2 @@
-export * from './product.request.type';
-export * from './product.response.type';
+export * from './product-request.interface';
+export * from './product-response.interface';

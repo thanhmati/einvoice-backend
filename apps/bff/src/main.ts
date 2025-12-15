@@ -6,37 +6,24 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
-import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-declare const module: any;
 
 async function bootstrap() {
   try {
-    const isDev = AppModule.CONFIGURATION.IS_DEV;
-    const globalPrefix = AppModule.CONFIGURATION.GLOBAL_PREFIX;
-    const port = AppModule.CONFIGURATION.APP_CONFIG.PORT || 3300;
-
-    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-      logger: isDev ? ['error', 'warn', 'log', 'debug', 'verbose'] : ['error', 'warn', 'log'],
+    const app = await NestFactory.create(AppModule, {
       rawBody: true,
     });
+    const globalPrefix = AppModule.CONFIGURATION.GLOBAL_PREFIX;
+    app.setGlobalPrefix(globalPrefix);
+    app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
     app.enableCors({
       origin: '*',
     });
 
-    if (module.hot) {
-      module.hot.accept();
-      module.hot.dispose(() => app.close());
-    }
-
-    app.useBodyParser('json', { limit: '20mb' });
-    app.setGlobalPrefix(globalPrefix);
-    app.useGlobalPipes(new ValidationPipe({ transform: true }));
-
     const config = new DocumentBuilder()
-      .setTitle('E-bff API')
-      .setDescription('The E-bff API description')
+      .setTitle('Einvoice-bff API')
+      .setDescription('The Einvoice-bff API description')
       .setVersion('1.0.0')
       .addBearerAuth({
         description: 'Default JWT Authorization',
@@ -49,12 +36,9 @@ async function bootstrap() {
       .build();
 
     const documentFactory = () => SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup(`${globalPrefix}/docs`, app, documentFactory, {
-      swaggerOptions: {
-        filter: true,
-      },
-    });
+    SwaggerModule.setup(`${globalPrefix}/docs`, app, documentFactory);
 
+    const port = AppModule.CONFIGURATION.APP_CONFIG.PORT;
     await app.listen(port);
     Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`);
     Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}/docs`);

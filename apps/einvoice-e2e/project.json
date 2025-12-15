@@ -1,0 +1,25 @@
+{
+  "name": "einvoice-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "implicitDependencies": ["invoice"],
+  "targets": {
+    "e2e": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{e2eProjectRoot}"],
+      "options": {
+        "jestConfig": "apps/einvoice-e2e/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "dependsOn": [
+        "invoice:serve",
+        "bff:serve",
+        "authorizer:serve",
+        "user-access:serve",
+        "mail:serve",
+        "media:serve",
+        "pdf-generator:serve"
+      ]
+    }
+  }
+}

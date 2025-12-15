@@ -1,4 +1,4 @@
-import { HTTP_MESSAGE } from '@common/constants/enums/http-message.enum';
+import { HTTP_MESSAGE } from '@common/constants/enum/http-message.enum';
 import { HttpStatus } from '@nestjs/common';
 
 export class Response<T> {
@@ -14,7 +14,7 @@ export class Response<T> {
     this.statusCode = data.statusCode ?? HttpStatus.OK;
   }
 
-  static successData<T>(data?: T) {
+  static success<T>(data?: T) {
     return new Response<T>({
       code: HTTP_MESSAGE.OK,
       error: '',

@@ -1,108 +1,106 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      padding: 40px;
-      color: #333;
-    }
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        font-family: 'Segoe UI', sans-serif;
+        padding: 40px;
+        color: #333;
+      }
 
-    .header {
-      border-bottom: 3px solid #4CAF50;
-      margin-bottom: 30px;
-    }
+      .header {
+        border-bottom: 3px solid #4caf50;
+        margin-bottom: 30px;
+      }
 
-    .header h1 {
-      color: #4CAF50;
-      margin: 0;
-    }
+      .header h1 {
+        color: #4caf50;
+        margin: 0;
+      }
 
-    .meta, .totals {
-      margin-top: 20px;
-    }
+      .meta,
+      .totals {
+        margin-top: 20px;
+      }
 
-    .meta div, .totals div {
-      margin-bottom: 5px;
-    }
+      .meta div,
+      .totals div {
+        margin-bottom: 5px;
+      }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 30px;
-    }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 30px;
+      }
 
-    th {
-      background-color: #4CAF50;
-      color: white;
-      padding: 10px;
-      text-align: left;
-    }
+      th {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        text-align: left;
+      }
 
-    td {
-      border: 1px solid #ccc;
-      padding: 8px;
-    }
+      td {
+        border: 1px solid #ccc;
+        padding: 8px;
+      }
 
-    .right {
-      text-align: right;
-    }
+      .right {
+        text-align: right;
+      }
 
-    .status {
-      margin-top: 20px;
-      padding: 10px;
-      background-color: #eee;
-      border-left: 5px solid #4CAF50;
-      font-weight: bold;
-    }
+      .status {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #eee;
+        border-left: 5px solid #4caf50;
+        font-weight: bold;
+      }
 
-    .footer {
-      margin-top: 40px;
-      font-size: 12px;
-      text-align: center;
-      color: #888;
-    }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <h1>Invoice</h1>
-    <div><strong>Client:</strong> <%= client.name %></div>
-    <div><strong>Email:</strong> <%= client.email %></div>
-  </div>
+      .footer {
+        margin-top: 40px;
+        font-size: 12px;
+        text-align: center;
+        color: #888;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Invoice</h1>
+      <div><strong>Client:</strong> <%= client.name %></div>
+      <div><strong>Email:</strong> <%= client.email %></div>
+    </div>
 
-  <div class="status">
-    Status: <%= status %>
-  </div>
+    <div class="status">Status: <%= status %></div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Item</th>
-        <th>Quantity</th>
-        <th class="right">Price</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% items.forEach(item => { %>
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th class="right">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% items.forEach(item => { %>
         <tr>
           <td><%= item.name %></td>
           <td><%= item.quantity %></td>
           <td class="right">$<%= item.unitPrice.toFixed(2) %></td>
         </tr>
-      <% }) %>
-    </tbody>
-  </table>
+        <% }) %>
+      </tbody>
+    </table>
 
-  <div class="totals right">
-    <div><strong>Subtotal:</strong> $<%= subtotal.toFixed(2) %></div>
-    <div><strong>VAT:</strong> $<%= vatAmount.toFixed(2) %></div>
-    <div><strong>Total:</strong> <strong>$<%= totalAmount.toFixed(2) %></strong></div>
-  </div>
+    <div class="totals right">
+      <div><strong>Subtotal:</strong> $<%= subtotal.toFixed(2) %></div>
+      <div><strong>VAT:</strong> $<%= vatAmount.toFixed(2) %></div>
+      <div><strong>Total:</strong> <strong>$<%= totalAmount.toFixed(2) %></strong></div>
+    </div>
 
-  <div class="footer">
-    Thank you for your business!
-  </div>
-</body>
+    <div class="footer">Thank you for your business!</div>
+  </body>
 </html>

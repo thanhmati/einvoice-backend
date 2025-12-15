@@ -1,16 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v2 as cloudinary } from 'cloudinary';
 import streamifier from 'streamifier';
+
 @Injectable()
 export class CloudinaryService {
   private readonly cloudinary = cloudinary;
 
-  constructor(private readonly config: ConfigService) {
+  constructor(private readonly configService: ConfigService) {
     this.cloudinary.config({
-      cloud_name: this.config.get('CLOUDINARY_CONFIG.CLOUD_NAME'),
-      api_key: this.config.get('CLOUDINARY_CONFIG.API_KEY'),
-      api_secret: this.config.get('CLOUDINARY_CONFIG.API_SECRET'),
+      cloud_name: this.configService.get('CLOUDINARY_CONFIG.CLOUD_NAME'),
+      api_key: this.configService.get('CLOUDINARY_CONFIG.API_KEY'),
+      api_secret: this.configService.get('CLOUDINARY_CONFIG.API_SECRET'),
     });
   }
 
@@ -24,10 +25,10 @@ export class CloudinaryService {
         },
         (error, result) => {
           if (error) {
-            console.error('Upload error:', error);
+            Logger.error('Upload error:', error);
             return reject(error);
           }
-          console.log('Upload successful:', result);
+          Logger.log('Upload successful:', result);
           return resolve(result.secure_url);
         },
       );

@@ -6,7 +6,7 @@ import { join } from 'path';
 export class MailTemplateService {
   private templateDir = join(__dirname, 'templates');
 
-  async render(templateName: string, data: any, ): Promise<string> {
+  async render(templateName: string, data: any): Promise<string> {
     const content = await renderFile(join(this.templateDir, `${templateName}.ejs`), data);
 
     const html = await renderFile(join(this.templateDir, 'layout.ejs'), {

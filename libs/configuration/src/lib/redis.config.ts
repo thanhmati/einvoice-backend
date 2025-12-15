@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { CacheModule } from '@nestjs/cache-manager';
-import { createKeyv } from '@keyv/redis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { createKeyv } from '@keyv/redis';
 
 export class RedisConfiguration {
   @IsString()
@@ -25,11 +25,12 @@ export const RedisProvider = CacheModule.registerAsync({
   imports: [ConfigModule],
   inject: [ConfigService],
   useFactory: async (configService: ConfigService) => {
+    const host = configService.get('REDIS_CONFIG.HOST');
+    const port = configService.get('REDIS_CONFIG.PORT');
+    const ttl = configService.get('REDIS_CONFIG.TTL');
     return {
-      stores: [
-        createKeyv(`redis://${configService.get('REDIS_CONFIG.HOST')}:${configService.get('REDIS_CONFIG.PORT')}`),
-      ],
-      ttl: configService.get('REDIS_CONFIG.TTL'),
+      stores: [createKeyv(`redis://${host}:${port}`)],
+      ttl,
     };
   },
 });

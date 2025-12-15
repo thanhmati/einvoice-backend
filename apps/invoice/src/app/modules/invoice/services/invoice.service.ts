@@ -1,25 +1,19 @@
-import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InvoiceRepository } from '../repositories/invoice.repository';
-import {
-  CreateInvoiceTcpReq,
-  InvoiceTcpResponse,
-  PaginateInvoiceTcpReq,
-  SendInvoiceTcpReq,
-  UpdateInvoiceTcpReq,
-} from '@common/interfaces/tcp/invoice';
+import { CreateInvoiceTcpRequest, SendInvoiceTcpReq } from '@common/interfaces/tcp/invoice';
 import { createCheckoutSessionMapping, invoiceRequestMapping } from '../mappers';
-import { ERROR_CODE } from '@common/constants/enums/error-code.enum';
-import { INVOICE_STATUS } from '@common/constants/invoice.constant';
+import { INVOICE_STATUS } from '@common/constants/enum/invoice.enum';
+import { ERROR_CODE } from '@common/constants/enum/error-code.enum';
 import { TCP_SERVICES } from '@common/configuration/tcp.config';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
-import { TCP_REQUEST_MESSAGE } from '@common/constants/enums/tcp-request-message.enum';
+import { Invoice } from '@common/schemas/invoice.schema';
 import { firstValueFrom, map } from 'rxjs';
-import { UploadFileTcpReq } from '@common/interfaces/tcp/media';
-import { KafkaClient } from '@common/queue/modules/kafka/services/kafka-client.service';
-import { InvoiceSentPayload } from '@common/interfaces/queue/invoice';
-import { KAFKA_TOPICS } from '@common/constants/kafka.constant';
+import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
 import { ObjectId } from 'mongodb';
+import { UploadFileTcpReq } from '@common/interfaces/tcp/media';
 import { PaymentService } from '../../payment/services/payment.service';
+import { KafkaService } from '@common/kafka/kafka.service';
+import { InvoiceSentPayload } from '@common/interfaces/queue/invoice';
 
 @Injectable()
 export class InvoiceService {
@@ -27,106 +21,70 @@ export class InvoiceService {
     private readonly invoiceRepository: InvoiceRepository,
     @Inject(TCP_SERVICES.PDF_GENERATOR_SERVICE) private readonly pdfGeneratorClient: TcpClient,
     @Inject(TCP_SERVICES.MEDIA_SERVICE) private readonly mediaClient: TcpClient,
-    private readonly KafkaClient: KafkaClient,
-    @Inject(forwardRef(() => PaymentService)) private readonly paymentService: PaymentService,
+    private readonly paymentService: PaymentService,
+    private readonly kafkaClient: KafkaService,
   ) {}
 
-  create(params: CreateInvoiceTcpReq) {
+  create(params: CreateInvoiceTcpRequest) {
     const input = invoiceRequestMapping(params);
 
     return this.invoiceRepository.create(input);
   }
 
-  paginate(params: PaginateInvoiceTcpReq) {
-    return this.invoiceRepository.paginate(params);
-  }
-
-  async getById(id: string) {
-    const invoice = await this.invoiceRepository.getById(id);
-
-    if (!invoice) {
-      throw new NotFoundException(ERROR_CODE.INVOICE_NOT_FOUND);
-    }
-
-    return invoice;
-  }
-
-  async updateById(params: UpdateInvoiceTcpReq) {
-    const { id, ...data } = params;
-
-    const invoice = await this.getById(id);
-
-    if (invoice.status !== INVOICE_STATUS.CREATED) {
-      throw new BadRequestException(ERROR_CODE.INVOICE_CAN_NOT_BE_UPDATED);
-    }
-
-    const input = invoiceRequestMapping(data);
-
-    return this.invoiceRepository.updateById(id, input);
-  }
-
-  async deleteById(id: string) {
-    const invoice = await this.getById(id);
-
-    if (invoice.status !== INVOICE_STATUS.CREATED) {
-      throw new BadRequestException(ERROR_CODE.INVOICE_CAN_NOT_BE_DELETED);
-    }
-
-    return this.invoiceRepository.deleteById(id);
-  }
-
-  async sendById(params: SendInvoiceTcpReq, processID: string) {
+  async sendById(params: SendInvoiceTcpReq, processId: string) {
     const { invoiceId, userId } = params;
 
-    const invoice = await this.getById(invoiceId);
+    const invoice = await this.invoiceRepository.getById(invoiceId);
 
     if (invoice.status !== INVOICE_STATUS.CREATED) {
       throw new BadRequestException(ERROR_CODE.INVOICE_CAN_NOT_BE_SENT);
     }
 
-    const pdfBase64 = await this.generatorInvoicePdf({ ...invoice.toObject(), status: INVOICE_STATUS.SENT }, invoiceId);
-    const pdfUrl = await this.uploadFile({ fileBase64: pdfBase64, fileName: `invoice-${invoiceId}` }, processID);
-    const checkoutSession = await this.paymentService.createCheckoutSession(createCheckoutSessionMapping(invoice));
+    const pdfBase64 = await this.generatorInvoicePdf(invoice, processId);
 
-    const invoiceSent = await this.invoiceRepository.updateById(invoiceId, {
+    const fileUrl = await this.uploadFile({ fileBase64: pdfBase64, fileName: `invoice-${invoiceId}` }, processId);
+
+    const checkoutData = await this.paymentService.createCheckoutSession(createCheckoutSessionMapping(invoice));
+
+    await this.invoiceRepository.updateById(invoiceId, {
       status: INVOICE_STATUS.SENT,
-      fileUrl: pdfUrl,
       supervisorId: new ObjectId(userId),
+      fileUrl,
     });
 
-    this.KafkaClient.send<InvoiceSentPayload>(KAFKA_TOPICS.INVOICE.SENT, {
+    this.kafkaClient.emit<InvoiceSentPayload>('invoice-sent', {
       id: invoiceId,
-      paymentLink: checkoutSession.url,
+      paymentLink: checkoutData.url,
     });
-
-    return invoiceSent;
   }
 
-  generatorInvoicePdf(data: InvoiceTcpResponse, processID: string) {
+  generatorInvoicePdf(data: Invoice, processId: string) {
     return firstValueFrom(
       this.pdfGeneratorClient
-        .send<string, InvoiceTcpResponse>(TCP_REQUEST_MESSAGE.PDF_GENERATOR.CREATE_INVOICE_PDF, {
+        .send<string, Invoice>(TCP_REQUEST_MESSAGE.PDF_GENERATOR.CREATE_INVOICE_PDF, {
           data,
-          processID,
+          processId,
         })
         .pipe(map((data) => data.data)),
     );
   }
 
-  uploadFile(data: UploadFileTcpReq, processID: string) {
+  uploadFile(data: UploadFileTcpReq, processId: string) {
     return firstValueFrom(
       this.mediaClient
         .send<string, UploadFileTcpReq>(TCP_REQUEST_MESSAGE.MEDIA.UPLOAD_FILE, {
           data,
-          processID,
+          processId,
         })
         .pipe(map((data) => data.data)),
     );
   }
 
-  paySuccess(invoiceId: string) {
-    return this.invoiceRepository.updateById(invoiceId, {
-      status: INVOICE_STATUS.PAID,
-    });
+  updateInvoicePaid(invoiceId: string) {
+    return this.invoiceRepository.updateById(invoiceId, { status: INVOICE_STATUS.PAID });
+  }
+
+  getById(id: string) {
+    return this.invoiceRepository.getById(id);
   }
 }
