@@ -1,9 +1,9 @@
-import { ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
 import { BaseConfiguration } from '@common/configuration/base.config';
 import { AppConfiguration } from '@common/configuration/app.config';
-import { CloudinaryConfiguration } from '@common/configuration/cloudinary.config';
+import { ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 import { TcpConfiguration } from '@common/configuration/tcp.config';
+import { CloudinaryConfiguration } from '@common/configuration/cloudinary.config';
 
 class Configuration extends BaseConfiguration {
   @ValidateNested()

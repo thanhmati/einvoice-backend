@@ -7,5 +7,6 @@ import { InvoiceController } from './controllers/invoice.controller';
   imports: [ClientsModule.registerAsync([TcpProvider(TCP_SERVICES.INVOICE_SERVICE)])],
   controllers: [InvoiceController],
   providers: [],
+  exports: [],
 })
 export class InvoiceModule {}

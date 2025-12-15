@@ -1,7 +1,8 @@
-export const DEFAULT_PAGE_SIZE = 10;
+export const PORT = 3000;
 
-export type SortDirectionType = 'asc' | 'desc' | '';
-export enum SortDirection {
-    ASC = 'asc',
-    DESC = 'desc',
+export enum MetadataKeys {
+  PROCESS_ID = 'processId',
+  START_TIME = 'startTime',
+  SECURED = 'secured',
+  USER_DATA = 'userData',
 }

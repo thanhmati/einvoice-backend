@@ -1,49 +1,57 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { LoggerMiddleware } from '@common/middlewares/logger.middleware';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { CONFIGURATION, TConfiguration } from '../configuration';
+import { LoggerMiddleware } from '@common/middlewares/logger.middleware';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ExceptionInterceptor } from '@common/interceptors/exception.interceptor';
-import { ConfigModule } from '@nestjs/config';
-import { ProductModule } from './modules/product/product.module';
+
 import { InvoiceModule } from './modules/invoice/invoice.module';
+import { ProductModule } from './modules/product/product.module';
 import { UserModule } from './modules/user/user.module';
-import { ClientsModule } from '@nestjs/microservices';
-import { GRPC_SERVICES, GrpcProvider } from '@common/configuration/grpc.config';
-import { ThrottlerProvider } from '@common/configuration/throttler.config';
-import { UserGuard } from '@common/guard/user.guard';
 import { AuthorizerModule } from './modules/authorizer/authorizer.module';
+import { UserGuard } from '@common/guards/user.guard';
+import { ClientsModule } from '@nestjs/microservices';
+import { TCP_SERVICES, TcpProvider } from '@common/configuration/tcp.config';
+import { PermissionGuard } from '@common/guards/permission.guard';
 import { RedisProvider } from '@common/configuration/redis.config';
-import { PaymentModule } from './modules/payment/payment.module';
+import { GRPC_SERVICES, GrpcProvider } from '@common/configuration/grpc.config';
+import { WebhookModule } from './modules/webhook/webhook.module';
+import { ThrottlerProvider } from '@common/configuration/throttler.config';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { PermissionGuard } from '@common/guard/permission.guard';
+import { HealthModule } from './modules/health/health.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [() => ({ ...CONFIGURATION })],
-    }),
-    RedisProvider,
-    ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)]),
-    ProductModule,
+    ConfigModule.forRoot({ isGlobal: true, load: [() => CONFIGURATION] }),
     InvoiceModule,
-    PaymentModule,
+    ProductModule,
     UserModule,
     AuthorizerModule,
+    ClientsModule.registerAsync([TcpProvider(TCP_SERVICES.AUTHORIZER_SERVICE)]),
+    RedisProvider,
     ThrottlerProvider,
+    ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)]),
+    WebhookModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [
+    { provide: APP_INTERCEPTOR, useClass: ExceptionInterceptor },
     {
-      provide: APP_INTERCEPTOR,
-      useClass: ExceptionInterceptor,
+      provide: APP_GUARD,
+      useClass: UserGuard,
     },
-    { provide: APP_GUARD, useClass: UserGuard },
-    { provide: APP_GUARD, useClass: PermissionGuard },
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
-export class AppModule implements NestModule {
+export class AppModule {
   static CONFIGURATION: TConfiguration = CONFIGURATION;
 
   configure(consumer: MiddlewareConsumer) {

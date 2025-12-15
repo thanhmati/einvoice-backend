@@ -21,15 +21,15 @@ export class GrpcConfiguration {
     this.GRPC_AUTHORIZER_SERVICE = GrpcConfiguration.setValue({
       key: GRPC_SERVICES.AUTHORIZER_SERVICE,
       protoPath: ['./proto/authorizer.proto'],
-      port: Number(process.env['GRPC_AUTHORIZER_SERVICE_PORT']) || 5100,
-      host: process.env['AUTHORIZER_SERVICE_HOST'] || '127.0.0.1',
+      host: process.env['AUTHORIZER_SERVICE_HOST'] || 'localhost',
+      port: Number(process.env['AUTHORIZER_SERVICE_PORT']) || 5100,
     });
 
     this.GRPC_USER_ACCESS_SERVICE = GrpcConfiguration.setValue({
       key: GRPC_SERVICES.USER_ACCESS_SERVICE,
       protoPath: ['./proto/user-access.proto'],
-      port: Number(process.env['GRPC_USER_ACCESS_SERVICE_PORT']) || 5100,
-      host: process.env['USER_ACCESS_SERVICE_HOST'] || '127.0.0.1',
+      host: process.env['USER_ACCESS_SERVICE_HOST'] || 'localhost',
+      port: Number(process.env['USER_ACCESS_SERVICE_PORT']) || 5100,
     });
   }
 
@@ -61,12 +61,10 @@ export class GrpcConfiguration {
 export const GrpcProvider = (serviceName: GRPC_SERVICES): ClientsProviderAsyncOptions => {
   return {
     imports: [ConfigModule],
-    name: serviceName,
-    useFactory: (configService: ConfigService) => {
-      return configService.get(`GRPC_SERV.${serviceName}`) as GrpcOptions & {
-        name: string;
-      };
-    },
     inject: [ConfigService],
+    useFactory: async (configService: ConfigService) => {
+      return configService.get(`GRPC_SERV.${serviceName}`) as GrpcOptions & { name: string };
+    },
+    name: serviceName,
   };
 };

@@ -1,2 +1,2 @@
-export * from './invoice.request.type';
-export * from './invoice.response.type'
+export * from './invoice-request.interface';
+export * from './invoice-response.interface';

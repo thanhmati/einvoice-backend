@@ -17,11 +17,11 @@ export class User extends BaseSchema {
   @Prop({ type: String })
   email: string;
 
-  @Prop({ type: [ObjectId], ref: 'Role' })
-  roles: ObjectId[];
-
   @Prop({ type: String })
   userId: string;
+
+  @Prop({ type: [ObjectId], ref: 'Role' })
+  roles: ObjectId[];
 }
 
 export const UserModelName = User.name;

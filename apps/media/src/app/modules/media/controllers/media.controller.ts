@@ -1,11 +1,11 @@
 import { Controller, UseInterceptors } from '@nestjs/common';
 import { TcpLoggingInterceptor } from '@common/interceptors/tcpLogging.interceptor';
 import { MessagePattern } from '@nestjs/microservices';
-import { TCP_REQUEST_MESSAGE } from '@common/constants/enums/tcp-request-message.enum';
-import { RequestParams } from '@common/decorators/request-params.decorator';
 import { UploadFileTcpReq } from '@common/interfaces/tcp/media';
-import { MediaService } from '../services/media.service';
 import { Response } from '@common/interfaces/tcp/common/response.interface';
+import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
+import { RequestParams } from '@common/decorators/request-param.decorator';
+import { MediaService } from '../services/media.service';
 
 @Controller()
 @UseInterceptors(TcpLoggingInterceptor)

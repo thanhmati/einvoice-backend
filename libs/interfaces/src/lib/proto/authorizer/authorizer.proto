@@ -1,16 +1,29 @@
+
 syntax = "proto3";
 
 package GRPC_AUTHORIZER_SERVICE;
 
 import "user-access.proto";
 
-service KeycloakService {
-  rpc verifyUserToken (UserTokenRequest) returns (UserTokenResponse);
+
+service AuthorizerService {
+  rpc verifyUserToken (VerifyUserTokenRequest) returns (VerifyUserTokenResponse);
 }
 
-message UserTokenRequest {
+message VerifyUserTokenRequest {
   string token = 1;
-  string processID = 2;
+  string processId = 2;
+}
+
+message VerifyUserTokenResponse {
+  string code = 1;
+  AuthorizeResponse data = 2;
+  string error = 3;
+}
+
+message AuthorizeResponse {
+  bool valid = 1;
+  optional AuthorizedMetadata metadata = 2;
 }
 
 message JWTPayload {
@@ -32,14 +45,4 @@ message AuthorizedMetadata {
   optional JWTPayload jwt = 4;
 }
 
-message AuthorizedResult {
-  bool valid = 1;
-  optional AuthorizedMetadata metadata = 2;
-}
-
-message UserTokenResponse {
-  string code = 1;
-  AuthorizedResult data = 2;
-  string error = 3;
-}
 

@@ -1,17 +1,13 @@
-import { parseToken } from './string.utils';
-import { AuthorizedResult } from '@common/interfaces/grpc/authorizer';
-import { MetadataKeys } from '@common/constants/decorators.constant';
+import { parseToken } from './string.util';
+import { AuthorizeResponse } from '@common/interfaces/tcp/authorizer';
+import { MetadataKeys } from '@common/constants/common.constant';
 
 export function getAccessToken(req: any, keepBearer = false): string {
-  const token = req.headers?.['authorization'] || req[MetadataKeys.ACCESS_TOKEN];
+  const token = req.headers?.['authorization'];
 
   return keepBearer ? token : parseToken(token);
 }
 
-export function getUserData(req: any): any {
-  return req[MetadataKeys.USER_DATA];
-}
-
-export function setUserData(req: any, userData?: AuthorizedResult): void {
+export function setUserData(req: any, userData?: AuthorizeResponse): void {
   req[MetadataKeys.USER_DATA] = userData;
 }
