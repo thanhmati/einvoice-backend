@@ -1,4 +1,4 @@
-# 28 Centralize Logging với Grafana + Promtail + Loki
+# Centralize Logging với Grafana + Promtail + Loki
 
 Trong bài này, chúng ta sẽ đi vào triển khai thực tế **PLG Stack** (Promtail, Loki, Grafana) để thu thập Logs từ Docker containers.
 
