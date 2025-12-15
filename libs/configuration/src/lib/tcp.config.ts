@@ -1,73 +1,62 @@
-import { IsNotEmpty, IsObject } from 'class-validator';
-import { ClientsProviderAsyncOptions, TcpClientOptions, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ClientsProviderAsyncOptions, TcpClientOptions, Transport } from '@nestjs/microservices';
+import { IsNotEmpty, IsObject } from 'class-validator';
 
 export enum TCP_SERVICES {
   INVOICE_SERVICE = 'TCP_INVOICE_SERVICE',
+  PRODUCT_SERVICE = 'TCP_PRODUCT_SERVICE',
+  USER_ACCESS_SERVICE = 'TCP_USER_ACCESS_SERVICE',
+  AUTHORIZER_SERVICE = 'TCP_AUTHORIZER_SERVICE',
   PDF_GENERATOR_SERVICE = 'TCP_PDF_GENERATOR_SERVICE',
   MEDIA_SERVICE = 'TCP_MEDIA_SERVICE',
-  MAIL_SERVICE = 'TCP_MAIL_SERVICE',
-  USER_SERVICE = 'TCP_USER_SERVICE',
-  AUTHORIZER_SERVICE = 'TCP_AUTHORIZER_SERVICE',
-  PRODUCT_SERVICE = 'TCP_PRODUCT_SERVICE',
 }
 
 export class TcpConfiguration {
-  @IsObject()
   @IsNotEmpty()
+  @IsObject()
   TCP_INVOICE_SERVICE: TcpClientOptions;
 
-  @IsObject()
   @IsNotEmpty()
-  TCP_PDF_GENERATOR_SERVICE: TcpClientOptions;
-
   @IsObject()
-  @IsNotEmpty()
-  TCP_MEDIA_SERVICE: TcpClientOptions;
-
-  @IsObject()
-  @IsNotEmpty()
-  TCP_MAIL_SERVICE: TcpClientOptions;
-
-  @IsObject()
-  @IsNotEmpty()
-  TCP_USER_SERVICE: TcpClientOptions;
-
-  @IsObject()
-  @IsNotEmpty()
-  TCP_AUTHORIZER_SERVICE: TcpClientOptions;
-
-  @IsObject()
-  @IsNotEmpty()
   TCP_PRODUCT_SERVICE: TcpClientOptions;
 
-  constructor() {
-    Object.entries(TCP_SERVICES).forEach(([key, service]) => {
-      const port = Number(process.env[`${service}_PORT`]);
-      const host = process.env[`${key}_HOST`];
+  @IsNotEmpty()
+  @IsObject()
+  TCP_USER_ACCESS_SERVICE: TcpClientOptions;
 
-      this[service] = TcpConfiguration.setValue(port, host);
+  @IsNotEmpty()
+  @IsObject()
+  TCP_AUTHORIZER_SERVICE: TcpClientOptions;
+
+  @IsNotEmpty()
+  @IsObject()
+  TCP_PDF_GENERATOR_SERVICE: TcpClientOptions;
+
+  @IsNotEmpty()
+  @IsObject()
+  TCP_MEDIA_SERVICE: TcpClientOptions;
+
+  constructor() {
+    Object.entries(TCP_SERVICES).forEach(([key, serviceName]) => {
+      const host = process.env[`${key}_HOST`] || 'localhost';
+      const port = Number(process.env[`${serviceName}_PORT`]) || 3200;
+
+      this[serviceName] = TcpConfiguration.setValue(port, host);
     });
   }
 
-  private static setValue(port?: number, host?: string): TcpClientOptions {
-    return {
-      transport: Transport.TCP,
-      options: {
-        port: port || 3200,
-        host: host || '127.0.0.1',
-      },
-    };
+  static setValue(port: number, host: string): TcpClientOptions {
+    return { transport: Transport.TCP, options: { host, port } };
   }
 }
 
 export function TcpProvider(serviceName: keyof TcpConfiguration): ClientsProviderAsyncOptions {
   return {
-    imports: [ConfigModule],
     name: serviceName,
+    imports: [ConfigModule],
+    inject: [ConfigService],
     useFactory: async (configService: ConfigService) => {
       return configService.get(`TCP_SERV.${serviceName}`) as TcpClientOptions;
     },
-    inject: [ConfigService],
   };
 }

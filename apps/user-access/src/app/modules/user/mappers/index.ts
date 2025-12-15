@@ -1,11 +1,1 @@
-import { CreateUserTcpReq } from '@common/interfaces/tcp/user';
-import { User } from '@common/schemas/user.schema';
-import { ObjectId } from 'mongodb';
-
-export const createUserRequestMapping = (data: CreateUserTcpReq, userId: string): Partial<User> => {
-  return {
-    ...data,
-    roles: data.roles?.map((id) => new ObjectId(id)),
-    userId,
-  };
-};
+export * from './user-request.mapper';

@@ -5,6 +5,6 @@ import { MailTemplateService } from './services/mail-template.service';
   imports: [],
   controllers: [],
   providers: [MailTemplateService],
-  exports:[MailTemplateService]
+  exports: [MailTemplateService],
 })
 export class MailTemplateModule {}

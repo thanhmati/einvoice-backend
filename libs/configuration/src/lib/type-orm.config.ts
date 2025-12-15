@@ -1,7 +1,7 @@
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { DatabaseType } from 'typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 export class TypeOrmConfiguration {
   @IsString()
@@ -9,7 +9,6 @@ export class TypeOrmConfiguration {
   HOST: string;
 
   @IsNumber()
-  @IsNotEmpty()
   PORT: number;
 
   @IsString()
@@ -27,6 +26,7 @@ export class TypeOrmConfiguration {
   @IsString()
   @IsNotEmpty()
   TYPE: DatabaseType;
+
   constructor(data?: Partial<TypeOrmConfiguration>) {
     this.HOST = data?.HOST || process.env['TYPEORM_HOST'] || 'localhost';
     this.PORT = data?.PORT || Number(process.env['TYPEORM_PORT']) || 5432;
@@ -40,16 +40,14 @@ export class TypeOrmConfiguration {
 export const TypeOrmProvider = TypeOrmModule.forRootAsync({
   imports: [ConfigModule],
   inject: [ConfigService],
-  useFactory: async (configService: ConfigService): Promise<TypeOrmModuleOptions> => {
-    const type = configService.get<string>('TYPEORM_CONFIG.TYPE') as DatabaseType;
-
+  useFactory: async (configService: ConfigService) => {
     return {
-      type,
-      host: configService.get<string>('TYPEORM_CONFIG.HOST') ?? 'localhost',
-      port: Number(configService.get<number>('TYPEORM_CONFIG.PORT') ?? 5432),
-      username: configService.get<string>('TYPEORM_CONFIG.USERNAME') ?? 'postgres',
-      password: configService.get<string>('TYPEORM_CONFIG.PASSWORD') ?? 'postgres',
-      database: configService.get<string>('TYPEORM_CONFIG.DATABASE') ?? 'postgres',
+      type: configService.get<string>('TYPEORM_CONFIG.TYPE') as DatabaseType,
+      host: configService.get<string>('TYPEORM_CONFIG.HOST'),
+      port: configService.get<number>('TYPEORM_CONFIG.PORT'),
+      username: configService.get<string>('TYPEORM_CONFIG.USERNAME'),
+      password: configService.get<string>('TYPEORM_CONFIG.PASSWORD'),
+      database: configService.get<string>('TYPEORM_CONFIG.DATABASE'),
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       synchronize: true,
       autoLoadEntities: true,

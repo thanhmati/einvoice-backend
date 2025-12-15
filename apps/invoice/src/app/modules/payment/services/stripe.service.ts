@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
-import { CreateCheckoutSessionRequest } from '@common/interfaces/common/stripe.interface';
+import { CreateCheckoutSessionRequest } from '@common/interfaces/common';
 
 @Injectable()
 export class StripeService {
@@ -9,14 +9,17 @@ export class StripeService {
 
   constructor(private configService: ConfigService) {
     this.stripe = new Stripe(configService.get('STRIPE_CONFIG.SECRET_KEY'), {
-      apiVersion: '2025-07-30.basil',
+      apiVersion: '2025-10-29.clover',
     });
   }
 
-  async createCheckoutSession(data: CreateCheckoutSessionRequest) {
+  async createCheckoutSession(params: CreateCheckoutSessionRequest) {
     const session = await this.stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: data.lineItems.map((item) => ({
+      payment_method_types: ['card', 'amazon_pay', 'alipay'],
+      mode: 'payment',
+      success_url: this.configService.get('STRIPE_CONFIG.SUCCESS_URL'),
+      cancel_url: this.configService.get('STRIPE_CONFIG.CANCEL_URL'),
+      line_items: params.lineItems.map((item) => ({
         price_data: {
           currency: 'usd',
           product_data: {
@@ -26,12 +29,9 @@ export class StripeService {
         },
         quantity: item.quantity,
       })),
-      mode: 'payment',
-      customer_email: data.clientEmail,
-      success_url: `${this.configService.get('STRIPE_CONFIG.SUCCESS_URL')}?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: this.configService.get('STRIPE_CONFIG.CANCEL_URL'),
+      customer_email: params.clientEmail,
       metadata: {
-        invoiceId: data.invoiceId,
+        invoiceId: params.invoiceId,
       },
     });
 
@@ -39,9 +39,5 @@ export class StripeService {
       url: session.url,
       sessionId: session.id,
     };
-  }
-
-  verifyWebhookSignature(body: Buffer, signature: string) {
-    return this.stripe.webhooks.constructEvent(body, signature, this.configService.get('STRIPE_CONFIG.WEBHOOK_SECRET'));
   }
 }

@@ -6,71 +6,16 @@ networks:
     name: einvoice-nw
 
 services:
-  grafana:
-    image: grafana/grafana
-    container_name: grafana
-    ports:
-      - 3000:3000
-    volumes:
-      - ./docker/docker_data/grafana-data:/var/lib/grafana
-
-    networks:
-      - einvoice-nw
-
-  loki:
-    image: grafana/loki
-    container_name: loki
-    ports:
-      - 3100:3100
-    volumes:
-      - ./docker/loki-config.yaml:/etc/loki/loki.yaml
-    networks:
-      - einvoice-nw
-
-  promtail:
-    image: grafana/promtail
-    container_name: promtail
-    volumes:
-      - ./docker/promtail-config.yaml:/etc/promtail/config.yml
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: -config.file=/etc/promtail/config.yml
-    depends_on:
-      - loki
-    networks:
-      - einvoice-nw
-
-  kafka:
-    container_name: kafka_server
-    image: bitnamilegacy/kafka
-    networks:
-      - einvoice-nw
-    ports:
-      - 9092:9092 # internal Docker network listener (optionally)
-      - 29092:29092 # external listener, host local connect
-    environment:
-      - KAFKA_CFG_NODE_ID=0
-      - KAFKA_CFG_PROCESS_ROLES=controller,broker
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://:9093,EXTERNAL://0.0.0.0:29092
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:29092
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-    volumes:
-      - ./docker/docker_data/kafka_data/bitnami_data:/bitnami/kafka
-    restart: unless-stopped
-
   mongodb:
     image: mongo
     container_name: mongodb
     ports:
-      - '27017:27017'
-    volumes:
-      - ./docker/docker_data/mongodb_data:/data/db
+      - 27017:27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - ./docker/docker_data/mongodb_data:/data/db
     restart: unless-stopped
     networks:
       - einvoice-nw
@@ -85,10 +30,10 @@ services:
       POSTGRES_DB: einvoice-app
     ports:
       - '5432:5432'
-    volumes:
-      - ./docker/docker_data/postgres_data:/var/lib/postgresql
     networks:
       - einvoice-nw
+    volumes:
+      - ./docker/docker_data/postgres_data:/var/lib/postgresql
 
   pgadmin:
     image: dpage/pgadmin4
@@ -144,3 +89,24 @@ services:
       - redis
     volumes:
       - ./docker/docker_data/redisinsight_data:/data
+
+  kafka:
+    container_name: kafka_server
+    image: bitnamilegacy/kafka
+    networks:
+      - einvoice-nw
+    ports:
+      - 9092:9092 # internal Docker network listener (optionally)
+      - 29092:29092 # external listener, host local connect
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://:9093,EXTERNAL://0.0.0.0:29092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@localhost:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092,EXTERNAL://localhost:29092
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    volumes:
+      - ./docker/docker_data/kafka_data/bitnami_data:/bitnami/kafka
+    restart: unless-stopped

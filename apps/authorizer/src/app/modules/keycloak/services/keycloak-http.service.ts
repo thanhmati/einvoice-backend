@@ -5,8 +5,7 @@ import {
   CreateKeyCloakUserRequest,
   ExchangeClientTokenResponse,
   ExchangeUserTokenResponse,
-} from '@common/interfaces/common/keycloak.interface';
-import { LoginTcpRequest } from '@common/interfaces/tcp/authorizer';
+} from '@common/interfaces/common';
 
 @Injectable()
 export class KeycloakHttpService {
@@ -76,7 +75,7 @@ export class KeycloakHttpService {
     return userId;
   }
 
-  async exchangeUserToken(params: LoginTcpRequest): Promise<ExchangeUserTokenResponse> {
+  async exchangeUserToken(params: { username: string; password: string }): Promise<ExchangeUserTokenResponse> {
     const body = new URLSearchParams();
     body.append('client_id', this.clientId);
     body.append('client_secret', this.clientSecret);

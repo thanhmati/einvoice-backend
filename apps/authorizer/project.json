@@ -9,13 +9,39 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "webpack-cli build",
-        "args": ["--node-env=production"]
+        "args": ["--node-env=production"],
+        "cwd": "apps/authorizer"
       },
       "configurations": {
         "development": {
           "args": ["--node-env=development"]
         }
       }
+    },
+    "prune-lockfile": {
+      "dependsOn": ["build"],
+      "cache": true,
+      "executor": "@nx/js:prune-lockfile",
+      "outputs": [
+        "{workspaceRoot}/dist/apps/authorizer/package.json",
+        "{workspaceRoot}/dist/apps/authorizer/pnpm-lock.yaml"
+      ],
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "copy-workspace-modules": {
+      "dependsOn": ["build"],
+      "cache": true,
+      "outputs": ["{workspaceRoot}/dist/apps/authorizer/workspace_modules"],
+      "executor": "@nx/js:copy-workspace-modules",
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "prune": {
+      "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
+      "executor": "nx:noop"
     },
     "serve": {
       "continuous": true,
@@ -35,11 +61,9 @@
         }
       }
     },
-    "docker-build": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["build"],
+    "test": {
       "options": {
-        "commands": ["docker build -f apps/authorizer/Dockerfile . -t authorizer:latest"]
+        "passWithNoTests": true
       }
     }
   }

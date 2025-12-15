@@ -14,6 +14,7 @@
     ],
     "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
   },
+  "nxCloudId": "68a1f4d7ef94690fb89c9898",
   "plugins": [
     {
       "plugin": "@nx/webpack/plugin",
@@ -22,7 +23,8 @@
         "serveTargetName": "serve",
         "previewTargetName": "preview",
         "buildDepsTargetName": "build-deps",
-        "watchDepsTargetName": "watch-deps"
+        "watchDepsTargetName": "watch-deps",
+        "serveStaticTargetName": "serve-static"
       }
     },
     {
@@ -36,12 +38,7 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": [
-        "apps/invoice-e2e/**/*",
-        "apps/pdf-generator-e2e/**/*",
-        "apps/media-e2e/**/*",
-        "apps/einvoice-backend-e2e/**/*"
-      ]
+      "exclude": ["apps/einvoice-e2e/**/*"]
     }
   ]
 }

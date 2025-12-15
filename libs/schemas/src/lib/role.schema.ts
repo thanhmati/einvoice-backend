@@ -1,7 +1,7 @@
 import { Prop, Schema } from '@nestjs/mongoose';
 import { BaseSchema, createSchema } from './base.schema';
-import { PERMISSION, ROLE } from '@common/constants/role.constant';
 import { Model } from 'mongoose';
+import { PERMISSION, ROLE } from '@common/constants/enum/role.enum';
 
 @Schema({
   timestamps: true,
