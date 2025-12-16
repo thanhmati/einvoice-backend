@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CONFIGURATION, TConfiguration } from '../configuration';
-import { LoggerModule } from '@common/logger';
+import { LoggerModule } from '@common/observability/logger';
 import { MetricsModule } from '@common/observability/metrics';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ExceptionInterceptor } from '@common/interceptors/exception.interceptor';

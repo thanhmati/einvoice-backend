@@ -6,7 +6,7 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
-import { Logger as PinoLogger } from '@common/logger';
+import { Logger as PinoLogger } from '@common/observability/logger';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
