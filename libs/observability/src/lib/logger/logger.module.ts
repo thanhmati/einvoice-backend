@@ -32,7 +32,7 @@ export class LoggerModule {
                 options: {
                   batching: true,
                   interval: 5,
-                  host: configService.get('LOKI_HOST') || 'http://localhost:3100',
+                  host: configService.get('LOKI_CONFIG.LOKI_HOST') || 'http://localhost:3100',
                   labels: { application: appName },
                 },
               });
