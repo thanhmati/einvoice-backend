@@ -6,6 +6,7 @@ import { TcpConfiguration } from '@common/configuration/tcp.config';
 import { RedisConfiguration } from '@common/configuration/redis.config';
 import { GrpcConfiguration } from '@common/configuration/grpc.config';
 import { StripeConfiguration } from '@common/configuration/stripe.config';
+import { LogiConfiguration } from '@common/configuration/loki.config';
 
 class Configuration extends BaseConfiguration {
   @ValidateNested()
@@ -27,6 +28,10 @@ class Configuration extends BaseConfiguration {
   @ValidateNested()
   @Type(() => StripeConfiguration)
   STRIPE_CONFIG = new StripeConfiguration();
+
+  @ValidateNested()
+  @Type(() => LogiConfiguration)
+  LOKI_CONFIG = new LogiConfiguration();
 }
 
 export const CONFIGURATION = new Configuration();
