@@ -23,7 +23,7 @@ async function bootstrap() {
     },
   });
 
-  const globalPrefix = 'api';
+  const globalPrefix = AppModule.CONFIGURATION.GLOBAL_PREFIX;
   app.setGlobalPrefix(globalPrefix);
   const port = process.env.INVOICE_PORT || 3000;
 
