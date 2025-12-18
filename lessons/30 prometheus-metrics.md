@@ -1,4 +1,4 @@
-# 📊 Giám Sát Metrics Với Prometheus Trong Microservices
+# 📊 Monitoring Metrics Với Prometheus Trong Microservices
 <img width="1116" height="594" alt="image" src="https://github.com/user-attachments/assets/f1662ed7-a7b3-4daa-82ba-f1c36dd8c2a6" />
 
 
