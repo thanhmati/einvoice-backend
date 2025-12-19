@@ -1,6 +1,6 @@
 # 📚 Tài Liệu Giảng Dạy: Khoá Học NestJS Microservices Thực Chiến: Từ Zero Đến Hero
 
-<img width="1536" height="1024" alt="Dragon and Microservices Interface Design" src="https://github.com/user-attachments/assets/66c3545f-d6f7-4aaf-8789-2be3ad64fa7f" />
+<img width="880" height="520" alt="course thumbnail" src="https://github.com/user-attachments/assets/7375ea7f-51a7-41d0-8266-a4cac757a5a4" />
 
 ## 🎯 Giới Thiệu Khóa Học
 
