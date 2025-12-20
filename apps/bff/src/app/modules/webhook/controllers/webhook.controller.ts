@@ -4,7 +4,7 @@ import { ResponseDto } from '@common/interfaces/gateway/response.interface';
 import { Response } from '@common/interfaces/tcp/common/response.interface';
 import { Controller, Headers, Post, RawBodyRequest, Req } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { StripeWebhookService } from '../services/stripe-webhook.service';
+import { StripeWebhookService } from './services/stripe-webhook.service';
 
 @ApiTags('Webhook')
 @Controller('webhook')

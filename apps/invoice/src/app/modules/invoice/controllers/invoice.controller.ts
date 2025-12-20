@@ -41,4 +41,10 @@ export class InvoiceController {
     const invoice = await this.invoiceService.getById(invoiceId);
     return Response.success<InvoiceTcpResponse>(invoice);
   }
+
+  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.UPDATE_INVOICE_PAID)
+  async updateInvoicePaid(@RequestParams() invoiceId: string): Promise<Response<string>> {
+    await this.invoiceService.updateInvoicePaid(invoiceId);
+    return Response.success<string>(HTTP_MESSAGE.UPDATED);
+  }
 }
