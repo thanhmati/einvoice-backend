@@ -9,7 +9,7 @@ export class StripeService {
 
   constructor(private configService: ConfigService) {
     this.stripe = new Stripe(configService.get('STRIPE_CONFIG.SECRET_KEY'), {
-      apiVersion: '2025-10-29.clover',
+      apiVersion: '2025-07-30.basil',
     });
   }
 

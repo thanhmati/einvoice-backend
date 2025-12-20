@@ -24,7 +24,7 @@ export class KafkaModule {
                 options: {
                   client: {
                     clientId: `${serviceName}-${hostname()}`,
-                    brokers: [configService.get<string>('KAFKA_CONFIG.URL') || 'localhost:9092'],
+                    brokers: ['localhost:9092'],
                   },
                 },
               };
