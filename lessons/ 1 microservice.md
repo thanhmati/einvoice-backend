@@ -1,6 +1,7 @@
 # 1. Microservice là gì? Khi nào KHÔNG nên dùng?
 
 Microservices đang là "trend", nhưng nó cũng là con dao hai lưỡi. Bài học này sẽ giúp bạn hiểu rõ bản chất của Microservices và **quan trọng hơn là khi nào NÊN TRÁNH NÓ**.
+
 <img width="2816" height="1536" alt="1" src="https://github.com/user-attachments/assets/bafc72a7-2bba-4379-a865-1fb31efa80f5" />
 
 ---
@@ -52,6 +53,7 @@ graph TD
 
 Đừng dùng Microservices chỉ vì Netflix hay Google dùng nó. **"You are not Google"**.
 Dưới đây là những trường hợp bạn nên **tránh xa** Microservices và chọn Monolith (hoặc Modular Monolith):
+
 <img width="2816" height="1536" alt="2" src="https://github.com/user-attachments/assets/bcfeef4c-ed52-4436-8089-48527b60bd84" />
 
 
@@ -68,6 +70,7 @@ Dưới đây là những trường hợp bạn nên **tránh xa** Microservices
 - **Lời khuyên:** Team nhỏ nên tập trung vào code logic trên 1 repo duy nhất.
 
 ### c. Khi Domain nghiệp vụ chưa rõ ràng
+
 <img width="2816" height="1536" alt="2" src="https://github.com/user-attachments/assets/0b48e8a2-3337-49e7-99c0-6cda1c30fd56" />
 
 
@@ -106,6 +109,7 @@ Dưới đây là những trường hợp bạn nên **tránh xa** Microservices
 Hầu hết các chuyên gia (Martin Fowler, Sam Newman) đều khuyên:
 
 > **"Don't start with Microservices. Start with a Modular Monolith."**
-![Uploading 2.png…]()
+
+<img width="2816" height="1536" alt="4" src="https://github.com/user-attachments/assets/3c633da4-f91f-4da5-abb6-0b1334578f12" />
 
 Hãy xây dựng một khối Monolith nhưng được tổ chức code tốt (chia module rõ ràng). Khi hệ thống lớn lên và một module nào đó bắt đầu gây đau đớn (ví dụ: module Report ngốn hết RAM của server), lúc đó hãy tách module đó ra thành Microservice riêng lẻ.
