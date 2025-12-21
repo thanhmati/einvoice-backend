@@ -71,7 +71,7 @@ Dưới đây là những trường hợp bạn nên **tránh xa** Microservices
 
 ### c. Khi Domain nghiệp vụ chưa rõ ràng
 
-<img width="2816" height="1536" alt="2" src="https://github.com/user-attachments/assets/0b48e8a2-3337-49e7-99c0-6cda1c30fd56" />
+<img width="2816" height="1536" alt="3" src="https://github.com/user-attachments/assets/0ee962b7-212e-4ff4-8416-061365e9e5f3" />
 
 
 - **Lý do:** Để chia tách service đúng, bạn phải hiểu cực rõ về **Bounded Context** (Ranh giới nghiệp vụ).
