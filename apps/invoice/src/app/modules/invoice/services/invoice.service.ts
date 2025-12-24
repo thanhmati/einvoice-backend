@@ -44,7 +44,7 @@ export class InvoiceService {
 
     const fileUrl = await this.uploadFile({ fileBase64: pdfBase64, fileName: `invoice-${invoiceId}` }, processId);
 
-    // const checkoutData = await this.paymentService.createCheckoutSession(createCheckoutSessionMapping(invoice));
+    const checkoutData = await this.paymentService.createCheckoutSession(createCheckoutSessionMapping(invoice));
 
     await this.invoiceRepository.updateById(invoiceId, {
       status: INVOICE_STATUS.SENT,
@@ -54,9 +54,13 @@ export class InvoiceService {
 
     this.kafkaClient.emit<InvoiceSentPayload>('invoice-sent', {
       id: invoiceId,
-      paymentLink: 'checkoutData.url',
-      // paymentLink: checkoutData.url,
+      paymentLink: checkoutData.url,
     });
+
+    return {
+      fileUrl,
+      paymentLink: checkoutData.url,
+    };
   }
 
   generatorInvoicePdf(data: Invoice, processId: string) {
