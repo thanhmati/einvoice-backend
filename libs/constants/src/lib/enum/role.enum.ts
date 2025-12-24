@@ -33,3 +33,7 @@ export enum PERMISSION {
   PRODUCT_UPDATE = 'product.update',
   PRODUCT_DELETE = 'product.delete',
 }
+
+export enum ROLE_ID {
+  ADMINISTRATOR = '68a3f2f1b3e811435a8ad004',
+}
