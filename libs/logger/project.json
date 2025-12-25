@@ -1,0 +1,8 @@
+{
+  "name": "logger",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/logger/src",
+  "projectType": "library",
+  "tags": ["scope:common"],
+  "targets": {}
+}
