@@ -11,6 +11,6 @@ export class LogiConfiguration {
 
   constructor() {
     this.HOST = process.env['LOKI_HOST'] || 'http://localhost:3100';
-    this.ENABLE_LOKI_PUSH = process.env['ENABLE_LOKI_PUSH'] === 'true';
+    this.ENABLE_LOKI_PUSH = process.env['ENABLE_LOKI_PUSH'] === 'true' || false;
   }
 }

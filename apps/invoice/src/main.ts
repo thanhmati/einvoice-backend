@@ -7,7 +7,7 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { Logger as PinoLogger } from '@common/logger';
+import { Logger as PinoLogger } from '@common/observability/logger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {

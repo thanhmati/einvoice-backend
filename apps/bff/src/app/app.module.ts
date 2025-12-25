@@ -19,6 +19,7 @@ import { WebhookModule } from './modules/webhook/webhook.module';
 import { ThrottlerProvider } from '@common/configuration/throttler.config';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { HealthModule } from './modules/health/health.module';
+import { LoggerModule } from '@common/observability/logger';
 
 @Module({
   imports: [

@@ -3,7 +3,7 @@ import { CONFIGURATION, TConfiguration } from '../configuration';
 import { ConfigModule } from '@nestjs/config';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { PaymentModule } from './modules/payment/payment.module';
-import { LoggerModule } from '@common/logger';
+import { LoggerModule } from '@common/observability/logger';
 
 @Module({
   imports: [

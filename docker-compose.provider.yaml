@@ -141,6 +141,8 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./docker/docker_data/grafana_data:/var/lib/grafana
     networks:
       - einvoice-nw
     depends_on:
