@@ -132,6 +132,20 @@ services:
     depends_on:
       - loki
 
+
+  prometheus:
+    image: prom/prometheus:v3.8.0
+    container_name: prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - einvoice-nw
+    restart: unless-stopped
+    
   grafana:
     image: grafana/grafana:10.2.0
     container_name: grafana
