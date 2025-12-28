@@ -12,20 +12,15 @@ export class TcpLoggingInterceptor implements NestInterceptor {
 
     const args = context.getArgs();
     const param = args[0];
-    const processId = param.processId;
 
-    Logger.log(
-      `TCP >> Start process '${processId}' >> method: '${handlerName}' at '${now}' >> param: ${JSON.stringify(param)}`,
-    );
+    Logger.log(`TCP >> Start process  >> method: '${handlerName}' at '${now}' >> param: ${JSON.stringify(param)}`);
 
     return next.handle().pipe(
-      tap(() =>
-        Logger.log(`TCP >> End process '${processId}' >> method: '${handlerName}' after: '${Date.now() - now}ms'`),
-      ),
+      tap(() => Logger.log(`TCP >> End process  >> method: '${handlerName}' after: '${Date.now() - now}ms'`)),
       catchError((error) => {
         const duration = Date.now() - now;
         Logger.error(
-          `TCP » Error process '${processId}': ${error.message} >> data: ${JSON.stringify(
+          `TCP » Error process  >> method: '${handlerName}': ${error.message} >> data: ${JSON.stringify(
             error,
           )}, after: '${duration}ms'`,
         );

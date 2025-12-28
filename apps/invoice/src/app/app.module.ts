@@ -4,6 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { LoggerModule } from '@common/observability/logger';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { TcpServerTracingInterceptor } from '@common/interceptors/tracing-server.interceptor';
 
 @Module({
   imports: [
@@ -13,7 +15,7 @@ import { LoggerModule } from '@common/observability/logger';
     LoggerModule.forRoot('invoice'),
   ],
   controllers: [],
-  providers: [],
+  providers: [{ provide: APP_INTERCEPTOR, useClass: TcpServerTracingInterceptor }],
 })
 export class AppModule {
   static CONFIGURATION: TConfiguration = CONFIGURATION;

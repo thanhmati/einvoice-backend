@@ -48,7 +48,7 @@ export class AuthorizerService {
     };
   }
 
-  async verifyUserToken(token: string, processId: string): Promise<AuthorizeResponse> {
+  async verifyUserToken(token: string): Promise<AuthorizeResponse> {
     const decoded = jwt.decode(token, { complete: true }) as Jwt;
     if (!decoded || !decoded.header || !decoded.header.kid) {
       throw new UnauthorizedException('Invalid token structure');
@@ -60,7 +60,7 @@ export class AuthorizerService {
       const payload = jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as JwtPayload;
       this.logger.debug({ payload });
 
-      const user = await this.userValidation(payload.sub, processId);
+      const user = await this.userValidation(payload.sub);
 
       return {
         valid: true,
@@ -77,10 +77,8 @@ export class AuthorizerService {
     }
   }
 
-  private async userValidation(userId: string, processId: string) {
-    const user = await firstValueFrom(
-      this.userAccessService.getByUserId({ processId, userId }).pipe(map((data) => data.data)),
-    );
+  private async userValidation(userId: string) {
+    const user = await firstValueFrom(this.userAccessService.getByUserId({ userId }).pipe(map((data) => data.data)));
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
