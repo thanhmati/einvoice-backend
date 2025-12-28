@@ -28,7 +28,6 @@ import { HealthModule } from './modules/health/health.module';
     ProductModule,
     UserModule,
     AuthorizerModule,
-    ClientsModule.registerAsync([TcpProvider(TCP_SERVICES.AUTHORIZER_SERVICE)]),
     RedisProvider,
     ThrottlerProvider,
     ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)]),
@@ -52,6 +51,7 @@ import { HealthModule } from './modules/health/health.module';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
+    TcpProvider(TCP_SERVICES.AUTHORIZER_SERVICE),
   ],
 })
 export class AppModule {

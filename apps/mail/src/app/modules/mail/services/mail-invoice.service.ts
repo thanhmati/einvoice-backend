@@ -36,9 +36,7 @@ export class MailInvoiceService {
   private getInvoiceById(id: string) {
     return firstValueFrom(
       this.invoiceClient
-        .send<InvoiceTcpResponse, string>(TCP_REQUEST_MESSAGE.INVOICE.GET_BY_ID, {
-          data: id,
-        })
+        .send<InvoiceTcpResponse, string>(TCP_REQUEST_MESSAGE.INVOICE.GET_BY_ID, id)
         .pipe(map((data) => data.data)),
     );
   }

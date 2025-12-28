@@ -4,7 +4,6 @@ import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserRequestDto } from '@common/interfaces/gateway/user';
-import { ProcessId } from '@common/decorators/processId.decorator';
 import { CreateUserTcpRequest } from '@common/interfaces/tcp/user';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
 import { map } from 'rxjs';
@@ -23,12 +22,9 @@ export class UserController {
     summary: 'Create a new user',
   })
   @Authorization({ secured: false })
-  create(@Body() body: CreateUserRequestDto, @ProcessId() processId: string) {
+  create(@Body() body: CreateUserRequestDto) {
     return this.userAccessClient
-      .send<string, CreateUserTcpRequest>(TCP_REQUEST_MESSAGE.USER.CREATE, {
-        data: body,
-        processId,
-      })
+      .send<string, CreateUserTcpRequest>(TCP_REQUEST_MESSAGE.USER.CREATE, body)
       .pipe(map((data) => new ResponseDto(data)));
   }
 }

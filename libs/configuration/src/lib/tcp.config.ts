@@ -1,6 +1,9 @@
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ClientsProviderAsyncOptions, TcpClientOptions, Transport } from '@nestjs/microservices';
+import { ConfigService } from '@nestjs/config';
+import { TcpClientOptions, Transport } from '@nestjs/microservices';
 import { IsNotEmpty, IsObject } from 'class-validator';
+import { ClientProxyFactory } from '@nestjs/microservices';
+import { createTracingClientProxy } from '@common/observability/tracing/tracing.util';
+import { Provider } from '@nestjs/common';
 
 export enum TCP_SERVICES {
   INVOICE_SERVICE = 'TCP_INVOICE_SERVICE',
@@ -50,13 +53,14 @@ export class TcpConfiguration {
   }
 }
 
-export function TcpProvider(serviceName: keyof TcpConfiguration): ClientsProviderAsyncOptions {
+export const TcpProvider = (serviceName: keyof TcpConfiguration): Provider => {
   return {
-    name: serviceName,
-    imports: [ConfigModule],
+    provide: serviceName,
     inject: [ConfigService],
-    useFactory: async (configService: ConfigService) => {
-      return configService.get(`TCP_SERV.${serviceName}`) as TcpClientOptions;
+    useFactory: (configService: ConfigService) => {
+      const option = configService.get(`TCP_SERV.${serviceName}`) as TcpClientOptions;
+      const client = ClientProxyFactory.create(option);
+      return createTracingClientProxy(client);
     },
   };
-}
+};

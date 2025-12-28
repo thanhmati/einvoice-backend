@@ -31,7 +31,7 @@ export class InvoiceService {
     return this.invoiceRepository.create(input);
   }
 
-  async sendById(params: SendInvoiceTcpReq, processId: string) {
+  async sendById(params: SendInvoiceTcpReq) {
     const { invoiceId, userId } = params;
 
     const invoice = await this.invoiceRepository.getById(invoiceId);
@@ -40,9 +40,9 @@ export class InvoiceService {
       throw new BadRequestException(ERROR_CODE.INVOICE_CAN_NOT_BE_SENT);
     }
 
-    const pdfBase64 = await this.generatorInvoicePdf(invoice, processId);
+    const pdfBase64 = await this.generatorInvoicePdf(invoice);
 
-    const fileUrl = await this.uploadFile({ fileBase64: pdfBase64, fileName: `invoice-${invoiceId}` }, processId);
+    const fileUrl = await this.uploadFile({ fileBase64: pdfBase64, fileName: `invoice-${invoiceId}` });
 
     const checkoutData = await this.paymentService.createCheckoutSession(createCheckoutSessionMapping(invoice));
 
@@ -58,24 +58,18 @@ export class InvoiceService {
     });
   }
 
-  generatorInvoicePdf(data: Invoice, processId: string) {
+  generatorInvoicePdf(data: Invoice) {
     return firstValueFrom(
       this.pdfGeneratorClient
-        .send<string, Invoice>(TCP_REQUEST_MESSAGE.PDF_GENERATOR.CREATE_INVOICE_PDF, {
-          data,
-          processId,
-        })
+        .send<string, Invoice>(TCP_REQUEST_MESSAGE.PDF_GENERATOR.CREATE_INVOICE_PDF, data)
         .pipe(map((data) => data.data)),
     );
   }
 
-  uploadFile(data: UploadFileTcpReq, processId: string) {
+  uploadFile(data: UploadFileTcpReq) {
     return firstValueFrom(
       this.mediaClient
-        .send<string, UploadFileTcpReq>(TCP_REQUEST_MESSAGE.MEDIA.UPLOAD_FILE, {
-          data,
-          processId,
-        })
+        .send<string, UploadFileTcpReq>(TCP_REQUEST_MESSAGE.MEDIA.UPLOAD_FILE, data)
         .pipe(map((data) => data.data)),
     );
   }

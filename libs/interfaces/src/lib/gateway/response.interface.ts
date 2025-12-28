@@ -9,9 +9,6 @@ export class ResponseDto<T> {
   @ApiProperty()
   data?: T;
 
-  @ApiProperty()
-  processID?: string;
-
   @ApiProperty({ type: Number })
   statusCode = HttpStatus.OK;
 
