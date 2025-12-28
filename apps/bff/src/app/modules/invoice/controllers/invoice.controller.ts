@@ -6,7 +6,6 @@ import { TCP_SERVICES } from '@common/configuration/tcp.config';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
 import { CreateInvoiceTcpRequest, InvoiceTcpResponse, SendInvoiceTcpReq } from '@common/interfaces/tcp/invoice';
-import { ProcessId } from '@common/decorators/processId.decorator';
 import { map } from 'rxjs';
 import { Authorization } from '@common/decorators/authorizer.decorator';
 import { UserData } from '@common/decorators/userData.decorator';
@@ -24,18 +23,11 @@ export class InvoiceController {
   @ApiOperation({ summary: 'Create a new invoice' })
   @Authorization({ secured: true })
   @Permissions([PERMISSION.INVOICE_CREATE, PERMISSION.INVOICE_GET_BY_ID])
-  create(
-    @Body() body: CreateInvoiceRequestDto,
-    @ProcessId() processId: string,
-    @UserData() userData: AuthorizedMetadata,
-  ) {
+  create(@Body() body: CreateInvoiceRequestDto, @UserData() userData: AuthorizedMetadata) {
     Logger.debug('User data', userData);
 
     return this.invoiceClient
-      .send<InvoiceTcpResponse, CreateInvoiceTcpRequest>(TCP_REQUEST_MESSAGE.INVOICE.CREATE, {
-        data: body,
-        processId,
-      })
+      .send<InvoiceTcpResponse, CreateInvoiceTcpRequest>(TCP_REQUEST_MESSAGE.INVOICE.CREATE, body)
       .pipe(map((data) => new ResponseDto(data)));
   }
 
@@ -46,12 +38,9 @@ export class InvoiceController {
   })
   @Authorization({ secured: true })
   @Permissions([PERMISSION.INVOICE_SEND])
-  send(@Param('id') id: string, @ProcessId() processId: string, @UserData() userData: AuthorizedMetadata) {
+  send(@Param('id') id: string, @UserData() userData: AuthorizedMetadata) {
     return this.invoiceClient
-      .send<string, SendInvoiceTcpReq>(TCP_REQUEST_MESSAGE.INVOICE.SEND, {
-        data: { invoiceId: id, userId: userData.userId },
-        processId,
-      })
+      .send<string, SendInvoiceTcpReq>(TCP_REQUEST_MESSAGE.INVOICE.SEND, { invoiceId: id, userId: userData.userId })
       .pipe(map((data) => new ResponseDto(data)));
   }
 }

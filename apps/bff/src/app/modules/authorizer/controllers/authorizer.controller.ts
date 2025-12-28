@@ -4,7 +4,6 @@ import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LoginRequestDto, LoginResponseDto } from '@common/interfaces/gateway/authorizer';
-import { ProcessId } from '@common/decorators/processId.decorator';
 import { LoginTcpRequest, LoginTcpResponse } from '@common/interfaces/tcp/authorizer';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
 import { map } from 'rxjs';
@@ -21,12 +20,9 @@ export class AuthorizerController {
   @ApiOperation({
     summary: 'Login with username and password',
   })
-  login(@Body() body: LoginRequestDto, @ProcessId() processId: string) {
+  login(@Body() body: LoginRequestDto) {
     return this.authorizerClient
-      .send<LoginTcpResponse, LoginTcpRequest>(TCP_REQUEST_MESSAGE.AUTHORIZER.LOGIN, {
-        data: body,
-        processId,
-      })
+      .send<LoginTcpResponse, LoginTcpRequest>(TCP_REQUEST_MESSAGE.AUTHORIZER.LOGIN, body)
       .pipe(map((data) => new ResponseDto(data)));
   }
 }
