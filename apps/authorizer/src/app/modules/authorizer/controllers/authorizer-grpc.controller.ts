@@ -10,7 +10,7 @@ export class AuthorizerGrpcController {
 
   @GrpcMethod('AuthorizerService', 'verifyUserToken')
   async verifyUserToken(params: VerifyUserTokenRequest): Promise<VerifyUserTokenResponse> {
-    const result = await this.authorizerService.verifyUserToken(params.token, params.processId);
+    const result = await this.authorizerService.verifyUserToken(params.token);
     return Response.success(result);
   }
 }

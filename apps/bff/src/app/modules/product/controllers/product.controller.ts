@@ -4,7 +4,6 @@ import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateProductRequestDto, ProductResponseDto } from '@common/interfaces/gateway/product';
-import { ProcessId } from '@common/decorators/processId.decorator';
 import { CreateProductTcpRequest, ProductTcpResponse } from '@common/interfaces/tcp/product';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
 import { map } from 'rxjs';
@@ -17,21 +16,18 @@ export class ProductController {
   @Post()
   @ApiOkResponse({ type: ResponseDto<ProductResponseDto> })
   @ApiOperation({ summary: 'Create a new product' })
-  create(@Body() body: CreateProductRequestDto, @ProcessId() processId: string) {
+  create(@Body() body: CreateProductRequestDto) {
     return this.productClient
-      .send<ProductTcpResponse, CreateProductTcpRequest>(TCP_REQUEST_MESSAGE.PRODUCT.CREATE, {
-        data: body,
-        processId,
-      })
+      .send<ProductTcpResponse, CreateProductTcpRequest>(TCP_REQUEST_MESSAGE.PRODUCT.CREATE, body)
       .pipe(map((data) => new ResponseDto(data)));
   }
 
   @Get()
   @ApiOkResponse({ type: ResponseDto<ProductResponseDto[]> })
   @ApiOperation({ summary: 'Get list products' })
-  getList(@ProcessId() processId: string) {
+  getList() {
     return this.productClient
-      .send<ProductTcpResponse[]>(TCP_REQUEST_MESSAGE.PRODUCT.GET_LIST, { processId })
+      .send<ProductTcpResponse[]>(TCP_REQUEST_MESSAGE.PRODUCT.GET_LIST)
       .pipe(map((data) => new ResponseDto(data)));
   }
 }

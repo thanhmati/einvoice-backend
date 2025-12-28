@@ -43,8 +43,6 @@ export class UserGuard implements CanActivate {
       const token = getAccessToken(req);
       const cacheKey = this.generateTokenCacheKey(token);
 
-      const processId = req[MetadataKeys.PROCESS_ID];
-
       const cacheData = await this.cacheManager.get<AuthorizeResponse>(cacheKey);
 
       if (cacheData) {
@@ -52,7 +50,7 @@ export class UserGuard implements CanActivate {
         return true;
       }
 
-      const response = await firstValueFrom(this.authorizerService.verifyUserToken({ processId, token }));
+      const response = await firstValueFrom(this.authorizerService.verifyUserToken({ token }));
 
       const { data: result } = response;
 

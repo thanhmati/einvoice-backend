@@ -13,14 +13,12 @@ export class ExceptionInterceptor implements NestInterceptor {
     const request: Request & { [MetadataKeys.PROCESS_ID]: string; [MetadataKeys.START_TIME]: number } =
       ctx.getRequest();
 
-    const processID = request[MetadataKeys.PROCESS_ID];
     const startTime = request[MetadataKeys.START_TIME];
 
     return next.handle().pipe(
       map((data: ResponseDto<unknown>) => {
         if (data instanceof ResponseDto) {
           const durationMs = Date.now() - startTime;
-          data.processID = processID;
           data.duration = `${durationMs} ms`;
           return data;
         }
@@ -44,7 +42,7 @@ export class ExceptionInterceptor implements NestInterceptor {
         }
 
         throw new HttpException(
-          new ResponseDto({ data, message, statusCode: code, duration: `${durationMs} ms`, processID }),
+          new ResponseDto({ data, message, statusCode: code, duration: `${durationMs} ms` }),
           code,
         );
       }),
