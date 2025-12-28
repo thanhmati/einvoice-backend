@@ -12,7 +12,6 @@ service AuthorizerService {
 
 message VerifyUserTokenRequest {
   string token = 1;
-  string processId = 2;
 }
 
 message VerifyUserTokenResponse {

@@ -3,7 +3,6 @@ import { VerifyUserTokenResponse } from './authorizer-response.dto';
 
 export type VerifyUserTokenRequest = {
   token: string;
-  processId: string;
 };
 
 export interface AuthorizerService {

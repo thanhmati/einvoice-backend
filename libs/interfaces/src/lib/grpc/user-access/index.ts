@@ -4,7 +4,6 @@ import { User } from '@common/schemas/user.schema';
 
 export interface UserById {
   userId: string;
-  processId: string;
 }
 
 export interface UserAccessService {

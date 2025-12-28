@@ -2,15 +2,15 @@ import { Controller, UseInterceptors } from '@nestjs/common';
 import { InvoiceService } from '../services/invoice.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { TcpLoggingInterceptor } from '@common/interceptors/tcpLogging.interceptor';
+import { TcpServerTracingInterceptor } from '@common/interceptors/tracing-server.interceptor';
 import { Response } from '@common/interfaces/tcp/common/response.interface';
 import { RequestParams } from '@common/decorators/request-param.decorator';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
 import { CreateInvoiceTcpRequest, InvoiceTcpResponse, SendInvoiceTcpReq } from '@common/interfaces/tcp/invoice';
-import { ProcessId } from '@common/decorators/processId.decorator';
 import { HTTP_MESSAGE } from '@common/constants/enum/http-message.enum';
 
 @Controller()
-@UseInterceptors(TcpLoggingInterceptor)
+@UseInterceptors(TcpServerTracingInterceptor, TcpLoggingInterceptor)
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}
 
@@ -22,11 +22,8 @@ export class InvoiceController {
   }
 
   @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.SEND)
-  async sendById(
-    @RequestParams() params: SendInvoiceTcpReq,
-    @ProcessId() processID: string,
-  ): Promise<Response<string>> {
-    await this.invoiceService.sendById(params, processID);
+  async sendById(@RequestParams() params: SendInvoiceTcpReq): Promise<Response<string>> {
+    await this.invoiceService.sendById(params);
     return Response.success<string>(HTTP_MESSAGE.OK);
   }
 
