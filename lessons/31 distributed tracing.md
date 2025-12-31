@@ -1,6 +1,9 @@
 # 🔍 Distributed Tracing trong Microservices 
 ---
 
+<img width="800" height="500" alt="Untitled" src="https://github.com/user-attachments/assets/5d6503e8-ab07-4d42-b626-dd47bc4c33f9" />
+
+
 ## 🎯 Mục tiêu bài học
 
 Sau lesson này, bạn sẽ:
