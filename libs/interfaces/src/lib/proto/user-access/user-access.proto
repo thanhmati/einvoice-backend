@@ -29,5 +29,4 @@ message UserResponse {
 
 message UserById {
   string userId = 1;
-  string processId = 2;
 }

@@ -20,8 +20,8 @@ export class StripeWebhookService {
     });
   }
 
-  async processWebhook(params: { signature: string; rawBody: Buffer; processId: string }) {
-    const { rawBody, signature, processId } = params;
+  async processWebhook(params: { signature: string; rawBody: Buffer }) {
+    const { rawBody, signature } = params;
 
     const event = this.verifyWebhookSignature(rawBody, signature);
     this.logger.debug('Received event: ', JSON.stringify(event, null, 2));
@@ -32,7 +32,7 @@ export class StripeWebhookService {
 
         if (session.metadata?.invoiceId) {
           this.logger.log(`Payment received for invoice ${session.metadata.invoiceId}`);
-          await this.updateInvoicePaid({ invoiceId: session.metadata.invoiceId, processId });
+          await this.updateInvoicePaid({ invoiceId: session.metadata.invoiceId });
         }
 
         break;
@@ -47,15 +47,12 @@ export class StripeWebhookService {
     return this.stripe.webhooks.constructEvent(body, signature, this.configService.get('STRIPE_CONFIG.WEBHOOK_SECRET'));
   }
 
-  updateInvoicePaid(params: { invoiceId: string; processId: string }) {
-    const { invoiceId, processId } = params;
+  updateInvoicePaid(params: { invoiceId: string }) {
+    const { invoiceId } = params;
 
     return firstValueFrom(
       this.invoiceClient
-        .send<string, string>(TCP_REQUEST_MESSAGE.INVOICE.UPDATE_INVOICE_PAID, {
-          data: invoiceId,
-          processId,
-        })
+        .send<string, string>(TCP_REQUEST_MESSAGE.INVOICE.UPDATE_INVOICE_PAID, invoiceId)
         .pipe(map((data) => data.data)),
     );
   }

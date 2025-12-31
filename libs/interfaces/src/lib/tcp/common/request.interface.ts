@@ -1,5 +1,4 @@
 export class Request<T> {
-  processId?: string;
   data?: T;
 
   constructor(data: Partial<Request<T>>) {
