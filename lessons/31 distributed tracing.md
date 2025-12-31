@@ -26,6 +26,12 @@ Trong Microservices:
   * Order Service
   * Payment Service
   * Inventory Service
+ 
+
+<img width="800" height="500" alt="image" src="https://github.com/user-attachments/assets/7d76ee86-e124-4686-ad71-53c579fa0bf1" />
+
+ 
+
 
 👉 Khi lỗi xảy ra, câu hỏi thực tế là:
 
@@ -63,6 +69,9 @@ Trong Microservices:
 ---
 
 ### 🔗 Trace – Span – Context (3 khái niệm sống còn)
+
+<img width="800" height="500" alt="image" src="https://github.com/user-attachments/assets/e3d00255-fb79-4f0c-870c-326f8f96e27e" />
+
 
 #### 1️⃣ Trace
 
@@ -103,6 +112,9 @@ Distributed tracing giải quyết 3 bài toán:
 ---
 
 ### 🔄 So sánh các cách tiếp cận
+
+<img width="800" height="400" alt="image" src="https://github.com/user-attachments/assets/580839da-0105-4c84-8ddf-22406bc3f6cd" />
+
 
 #### 🧱 Log-based debugging
 
@@ -153,6 +165,9 @@ Distributed tracing giải quyết 3 bài toán:
 3. Payment Service
 4. Inventory Service
 5. Notification Service
+
+<img width="800" height="400" alt="image" src="https://github.com/user-attachments/assets/ab611863-da4e-4a06-8697-d2d1b76d8e2c" />
+
 
 ---
 
