@@ -1,5 +1,8 @@
 # 🚀 Lesson: Implement Distributed Tracing với OpenTelemetry (OTel) + Grafana Tempo
 
+<img width="920" height="443" alt="image" src="https://github.com/user-attachments/assets/7b933d28-1e8e-4a5b-88d9-0dc2e254c2f2" />
+
+
 ---
 
 ## 🎯 Mục tiêu bài học
@@ -267,6 +270,9 @@ Trong Grafana, học viên có thể:
 * Xem **trace waterfall**
 * So sánh latency giữa các service
 * Click vào từng span để xem metadata
+
+<img width="800" height="500" alt="image" src="https://github.com/user-attachments/assets/4f7ce245-a203-47bc-9fc4-520d525c48c5" />
+
 
 ---
 
