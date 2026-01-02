@@ -29,7 +29,6 @@ import { MetricsModule } from '@common/observability/metrics';
     ProductModule,
     UserModule,
     AuthorizerModule,
-    ClientsModule.registerAsync([TcpProvider(TCP_SERVICES.AUTHORIZER_SERVICE)]),
     RedisProvider,
     ThrottlerProvider,
     ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)]),
@@ -40,6 +39,7 @@ import { MetricsModule } from '@common/observability/metrics';
   ],
   controllers: [],
   providers: [
+    TcpProvider(TCP_SERVICES.AUTHORIZER_SERVICE),
     { provide: APP_INTERCEPTOR, useClass: ExceptionInterceptor },
     {
       provide: APP_GUARD,
