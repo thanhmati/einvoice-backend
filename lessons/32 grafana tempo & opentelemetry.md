@@ -4,7 +4,6 @@
 
 Sau bài học này, bạn sẽ:
 
-* Hiểu **Distributed Tracing là gì** và tại sao nó quan trọng trong hệ thống phân tán
 * Phân biệt rõ **Grafana Tempo** và **OpenTelemetry (OTel)**
 * Biết cách **OTel + Tempo phối hợp với nhau** trong kiến trúc thực tế
 * Áp dụng tracing để **debug latency, bottleneck, lỗi** trong microservices
