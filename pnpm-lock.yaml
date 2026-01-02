@@ -58,15 +58,21 @@ importers:
       '@opentelemetry/auto-instrumentations-node':
         specifier: ^0.67.3
         version: 0.67.3(@opentelemetry/api@1.9.0)(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))
+      '@opentelemetry/context-async-hooks':
+        specifier: ^2.2.0
+        version: 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/exporter-trace-otlp-proto':
+        specifier: ^0.208.0
+        version: 0.208.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/instrumentation':
         specifier: ^0.208.0
         version: 0.208.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources':
         specifier: ^2.2.0
         version: 2.2.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/sdk-node':
-        specifier: ^0.208.0
-        version: 0.208.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/sdk-trace-node':
+        specifier: ^2.2.0
+        version: 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions':
         specifier: ^1.38.0
         version: 1.38.0
@@ -9812,7 +9818,7 @@ snapshots:
       '@babel/core': 7.28.3
       '@babel/helper-compilation-targets': 7.27.2
       '@babel/helper-plugin-utils': 7.27.1
-      debug: 4.4.1
+      debug: 4.4.3
       lodash.debounce: 4.0.8
       resolve: 1.22.10
     transitivePeerDependencies:
@@ -12705,7 +12711,7 @@ snapshots:
 
   '@tokenizer/inflate@0.2.7':
     dependencies:
-      debug: 4.4.1
+      debug: 4.4.3
       fflate: 0.8.2
       token-types: 6.1.1
     transitivePeerDependencies:
@@ -13004,7 +13010,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/tsconfig-utils': 8.39.1(typescript@5.8.3)
       '@typescript-eslint/types': 8.39.1
-      debug: 4.4.1
+      debug: 4.4.3
       typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
@@ -17340,7 +17346,7 @@ snapshots:
 
   spdy-transport@3.0.0:
     dependencies:
-      debug: 4.4.1
+      debug: 4.4.3
       detect-node: 2.1.0
       hpack.js: 2.1.6
       obuf: 1.1.2
@@ -17351,7 +17357,7 @@ snapshots:
 
   spdy@4.0.2:
     dependencies:
-      debug: 4.4.1
+      debug: 4.4.3
       handle-thing: 2.0.1
       http-deceiver: 1.2.7
       select-hose: 2.0.0
