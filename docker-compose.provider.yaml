@@ -160,3 +160,17 @@ services:
     networks:
       - einvoice-nw
     restart: unless-stopped
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: ['-config.file=/etc/tempo.yaml']
+    volumes:
+      - ./docker/tempo.yaml:/etc/tempo.yaml
+      - ./docker/docker_data/tempo_data:/var/tempo
+    ports:
+      - '3200:3200' # Tempo HTTP
+      - '4317:4317' # OTLP gRPC
+      - '4318:4318' # OTLP HTTP
+    networks:
+      - einvoice-nw
