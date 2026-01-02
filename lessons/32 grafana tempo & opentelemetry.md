@@ -1,267 +1,304 @@
-# 📡 Distributed Tracing với Grafana Tempo & OpenTelemetry (OTel)
+# 🚀 Lesson: Implement Distributed Tracing với OpenTelemetry (OTel) + Grafana Tempo
+
+---
 
 ## 🎯 Mục tiêu bài học
 
-Sau bài học này, bạn sẽ:
+Sau khi hoàn thành lesson này, học viên sẽ:
 
-* Phân biệt rõ **Grafana Tempo** và **OpenTelemetry (OTel)**
-* Biết cách **OTel + Tempo phối hợp với nhau** trong kiến trúc thực tế
-* Áp dụng tracing để **debug latency, bottleneck, lỗi** trong microservices
-
----
-
-## 🧠 Thuật ngữ cốt lõi (nhắc nhanh)
-
-| Thuật ngữ      | Ý nghĩa                           | Ví dụ thực tế                   |
-| -------------- | --------------------------------- | ------------------------------- |             
-| Trace          | Toàn bộ luồng xử lý của 1 request | User gọi API tạo đơn hàng       |
-| Span           | Một bước xử lý trong trace        | Gọi service thanh toán          |
-| Trace ID       | ID duy nhất cho toàn bộ request   | Dùng để truy vết end-to-end     |
-| Span ID        | ID của từng bước xử lý            | Xác định latency từng operation |
-| Parent / Child | Quan hệ giữa các span             | Service A gọi Service B         |
+* Hiểu **distributed tracing hoạt động như thế nào trong hệ thống microservices**
+* Nắm rõ vai trò của **OpenTelemetry (OTel)** và **Grafana Tempo**
+* Hiểu chi tiết các khái niệm cốt lõi: **Trace, Span, Context Propagation, Instrumentation**
+* Biết cách **triển khai distributed tracing end-to-end** cho backend services
+* Có thể **debug latency, bottleneck, lỗi hệ thống** dựa trên trace thực tế
 
 ---
 
-## 1️⃣ OpenTelemetry (OTel) là gì?
+## 1️⃣ Vì sao cần implement Distributed Tracing?
 
-### 🔍 Định nghĩa
+### 🔴 Vấn đề thực tế trong Microservices
 
-**OpenTelemetry** là **chuẩn mở + SDK + tooling** để:
-
-* Instrument application
-* Thu thập **Traces, Metrics, Logs**
-
-OTel **không phải là backend lưu trữ**.
-
-👉 OTel đóng vai trò **lớp sinh dữ liệu observability** (traces / metrics / logs)
-
-### 🧩 Thành phần chính
-
-#### 1. OTel SDK (trong app)
-
-* Tự động hoặc manual instrumentation
-* Gắn trace/span vào request
-
-#### 2. OTel Collector (tuỳ chọn nhưng rất quan trọng)
-
-* Nhận telemetry từ app
-* Transform / batch / filter
-* Export sang backend (Tempo, Jaeger, Datadog, ...)
+Giả sử một request từ client đi qua nhiều service:
 
 ```
-[App] → [OTel SDK] → [OTel Collector] → [Tracing Backend]
+Client → API Gateway → Auth Service → Order Service → Payment Service
 ```
 
-### 🌍 Ngôn ngữ hỗ trợ
+Khi request này bị chậm hoặc lỗi, các câu hỏi thường gặp là:
 
-* Java, Go, Node.js, Python, .NET, Rust…
+* ❓ Service nào gây chậm?
+* ❓ Chậm ở bước nào?
+* ❓ Request này đã đi qua những service nào?
+* ❓ Lỗi phát sinh trước hay sau khi gọi service khác?
 
-### 🎯 Điểm mạnh của OTel
+👉 **Logging truyền thống không trả lời được toàn bộ câu hỏi này**.
 
-* Vendor-neutral (không lock-in)
-* Chuẩn công nghiệp
-* Một lần instrument → đổi backend không cần sửa code
+### ✅ Distributed Tracing giải quyết điều gì?
+
+Distributed tracing giúp bạn:
+
+* Theo dõi **toàn bộ vòng đời của một request**
+* Biết chính xác **request đi qua đâu, mất bao lâu ở mỗi bước**
+* Debug **latency, timeout, retry, error** một cách trực quan
 
 ---
 
-## 2️⃣ Grafana Tempo là gì?
+## 2️⃣ Tổng quan kiến trúc OpenTelemetry + Grafana Tempo
 
-### 🔍 Định nghĩa
-
-**Grafana Tempo** là **distributed tracing backend**:
-
-* Lưu trữ trace
-* Truy vấn trace theo TraceID
-* Tối ưu cho **high-scale, low-cost**
-
-👉 Tempo **không làm instrumentation**
-
-### 🧠 Triết lý thiết kế
-
-* Không index toàn bộ trace (giảm chi phí)
-* Chỉ index metadata cần thiết
-* Phù hợp hệ thống lớn (hàng triệu trace/ngày)
-
-### 🧩 Kiến trúc đơn giản
+### 🧩 Các thành phần chính
 
 ```
-[OTel Collector] → [Tempo] → [Grafana UI]
-```
-
-### 📦 Storage backend
-
-* S3 / GCS / Azure Blob
-* Local filesystem (dev)
-
----
-
-## ✨ Vì sao cần implement Distributed Tracing với OTel + Tempo?
-
-### 1️⃣ Pain point trong hệ thống phân tán
-
-* Request đi qua nhiều service, nhiều network hop
-* Logs rời rạc, metrics chỉ phản ánh tổng quan
-
-👉 Khi có sự cố, rất khó trả lời: **chậm ở đâu – vì sao – service nào**
-
----
-
-### 2️⃣ Tracing giải quyết vấn đề gì?
-
-* Theo dõi **end-to-end request flow**
-* Đo latency chi tiết từng bước
-* Xác định chính xác root cause
-
----
-
-### 3️⃣ Vì sao chọn OpenTelemetry?
-
-* Chuẩn CNCF, vendor-neutral
-* Hỗ trợ đa ngôn ngữ
-* Instrument một lần, đổi backend linh hoạt
-
----
-
-### 4️⃣ Vì sao chọn Grafana Tempo?
-
-* High-scale, low-cost
-* Dùng object storage (S3/GCS)
-* Tích hợp native với Grafana
-
----
-
-### 5️⃣ Vì sao phải kết hợp OTel + Tempo?
-
-| Bài toán               | OTel | Tempo |
-| ---------------------- | ---- | ----- |
-| Instrument application | ✅    | ❌     |
-| Chuẩn hoá telemetry    | ✅    | ❌     |
-| Lưu trữ trace          | ❌    | ✅     |
-| Truy vấn & visualize   | ❌    | ✅     |
-
-👉 **OTel sinh trace – Tempo lưu & hiển thị trace**
-
----
-
-## 3️⃣ OTel vs Tempo – So sánh rõ ràng
-
-| Tiêu chí         | OpenTelemetry        | Grafana Tempo       |
-| ---------------- | -------------------- | ------------------- |
-| Vai trò          | Instrument & collect | Store & query trace |
-| Sinh trace       | ✅                    | ❌                   |
-| Lưu trữ          | ❌                    | ✅                   |
-| Chuẩn            | CNCF standard        | Grafana ecosystem   |
-| Vendor lock-in   | Không                | Thấp                |
-| Thay thế Jaeger? | ❌                    | ✅                   |
-
-👉 **Không phải chọn 1 trong 2** 👉 **Chuẩn kiến trúc đúng: OTel + Tempo**
-
----
-
-## 4️⃣ Kiến trúc chuẩn OTel + Tempo (Best Practice)
-
-### 🔄 Flow trace
-
-```
-Client Request
+Application (Service A, B, C)
+   ↓ (trace data)
+OpenTelemetry SDK / Auto Instrumentation
    ↓
-API Gateway
+OpenTelemetry Collector
    ↓
-Service A
+Grafana Tempo
    ↓
-Service B
-   ↓
-Service C
+Grafana UI (Trace Visualization)
 ```
 
-Tất cả service:
+### 🔍 Giải thích chi tiết từng thành phần
 
-* Dùng **OTel SDK**
-* Propagate Trace Context (W3C Trace Context)
+#### 🔹 OpenTelemetry (OTel) là gì?
 
-### 🏗 Kiến trúc tổng thể
+OpenTelemetry là **standard observability framework** để thu thập:
+
+* Traces
+* Metrics
+* Logs
+
+Trong lesson này, ta tập trung vào **Tracing**.
+
+OTel cung cấp:
+
+* **SDK** cho các ngôn ngữ (Node.js, Java, Go, Python...)
+* **Auto Instrumentation** (tự động tạo span cho HTTP, DB, RPC)
+* **Manual Instrumentation** (tự tạo span cho business logic)
+
+---
+
+#### 🔹 OpenTelemetry Collector là gì?
+
+Collector đóng vai trò **trung gian**:
+
+* Nhận trace từ application
+* Transform / filter / batch dữ liệu
+* Gửi trace đến backend (Tempo, Jaeger, Zipkin...)
+
+👉 Best practice: **application không gửi trace trực tiếp đến Tempo**.
+
+---
+
+#### 🔹 Grafana Tempo là gì?
+
+Grafana Tempo là **distributed tracing backend**:
+
+* Lưu trữ trace với chi phí thấp
+* Không cần index toàn bộ trace
+* Tối ưu cho việc **truy vấn trace theo TraceID**
+
+Tempo thường được kết hợp với:
+
+* Grafana (UI)
+* Loki (Logs)
+* Prometheus (Metrics)
+
+👉 Tạo nên mô hình **3 pillars of observability**.
+
+---
+
+## 3️⃣ Các khái niệm cốt lõi trong Distributed Tracing
+
+### 🧵 Trace là gì?
+
+* **Trace** đại diện cho **1 request end-to-end**
+* Mỗi trace có **Trace ID duy nhất**
+
+📌 Ví dụ:
 
 ```
-┌──────────┐
-│ Services │
-│ (OTel)  │
-└────┬─────┘
-     ↓
-┌──────────────┐
-│ OTel        │
-│ Collector   │
-└────┬─────────┘
-     ↓
-┌──────────────┐
-│ Tempo        │
-│ (Trace DB)  │
-└────┬─────────┘
-     ↓
-┌──────────────┐
-│ Grafana UI   │
-└──────────────┘
+TraceID: abc-123
+Client → Gateway → Order → Payment
 ```
 
 ---
 
-## 5️⃣ Khi nào dùng Tempo? Khi nào dùng OTel?
+### 🪜 Span là gì?
 
-### ❓ Chỉ dùng OTel được không?
+* **Span** đại diện cho **1 đơn vị công việc** trong trace
+* Mỗi span có:
 
-❌ Không — vì OTel **không lưu trace**
+| Thuộc tính       | Ý nghĩa            |
+| ---------------- | ------------------ |
+| Span ID          | ID của span        |
+| Parent Span ID   | Span cha           |
+| Start / End Time | Thời gian thực thi |
+| Attributes       | Metadata           |
+| Events           | Sự kiện trong span |
 
-### ❓ Chỉ dùng Tempo được không?
+📌 Ví dụ span tree:
 
-❌ Không — vì Tempo **không instrument app**
-
-### ✅ Dùng cả hai khi:
-
-* Microservices / Distributed system
-* Muốn quan sát end-to-end latency
-* Cần correlate **Logs – Metrics – Traces**
-
----
-
-## 6️⃣ Case thực tế
-
-### 🎯 Vấn đề
-
-* API response chậm 5s
-* CPU, Memory bình thường
-
-### 🔍 Dùng tracing phát hiện:
-
-* Service B gọi external API mất 4.5s
-* Retry logic gây delay nhân đôi
-
-👉 Fix đúng chỗ, không mò mẫm
+```
+HTTP POST /order
+ ├─ Auth Service (20ms)
+ ├─ Create Order (50ms)
+ │   └─ Save DB (30ms)
+ └─ Call Payment (120ms)
+```
 
 ---
 
-## 7️⃣ So sánh nhanh Tempo vs Jaeger
+### 🔗 Context Propagation là gì?
 
-| Tiêu chí            | Tempo          | Jaeger        |
-| ------------------- | -------------- | ------------- |
-| Scale               | Rất lớn        | Trung bình    |
-| Storage             | Object Storage | Elasticsearch |
-| Chi phí             | Thấp           | Cao           |
-| Grafana integration | Native         | Tốt           |
+Context propagation đảm bảo:
 
----
+* **TraceID và SpanID được truyền xuyên suốt giữa các service**
 
-## 8️⃣ Tổng kết
+📌 Thường được truyền qua HTTP headers:
 
-* **Distributed Tracing** là bắt buộc với hệ thống phân tán
-* **OpenTelemetry** = sinh dữ liệu observability
-* **Grafana Tempo** = nơi lưu & truy vấn trace
-* **OTel + Tempo** là combo chuẩn hiện nay
+```
+traceparent: 00-<trace-id>-<span-id>-01
+```
 
-> ✨ Nếu bạn debug microservices mà chưa dùng tracing → bạn đang “đi trong bóng tối”
+👉 Nếu thiếu context propagation → trace sẽ bị **đứt gãy**.
 
 ---
 
-## 🔜 Gợi ý bài tiếp theo
+### 🛠 Instrumentation là gì?
 
-* Instrument tracing cho NestJS với OTel
-* Correlate Logs – Metrics – Traces trong Grafana
-* Performance tuning dựa trên trace
+Instrumentation là quá trình **tạo span**.
+
+#### Auto Instrumentation
+
+* HTTP server/client
+* Database (MySQL, Postgres, MongoDB)
+* gRPC
+
+#### Manual Instrumentation
+
+Dùng khi:
+
+* Logic phức tạp
+* Business step quan trọng
+
+---
+
+## 4️⃣ Ví dụ thực tế: Order Service (Node.js)
+
+### 📦 Scenario
+
+```
+Client → Order Service → Payment Service
+```
+
+### 🔧 Cài đặt OpenTelemetry
+
+```bash
+npm install @opentelemetry/sdk-node
+npm install @opentelemetry/auto-instrumentations-node
+npm install @opentelemetry/exporter-trace-otlp-http
+```
+
+---
+
+### 🧠 Khởi tạo OTel SDK
+
+```ts
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+
+const sdk = new NodeSDK({
+  traceExporter: new OTLPTraceExporter({
+    url: 'http://otel-collector:4318/v1/traces',
+  }),
+  instrumentations: [getNodeAutoInstrumentations()],
+});
+
+sdk.start();
+```
+
+👉 Từ thời điểm này:
+
+* HTTP request
+* DB query
+
+sẽ **tự động được tạo span**.
+
+---
+
+### ✍️ Manual Span cho Business Logic
+
+```ts
+import { trace } from '@opentelemetry/api';
+
+const tracer = trace.getTracer('order-service');
+
+async function createOrder() {
+  return tracer.startActiveSpan('create-order', async (span) => {
+    // business logic
+    await saveOrderToDB();
+    span.end();
+  });
+}
+```
+
+👉 Khi xem trên Grafana:
+
+* Bạn sẽ thấy rõ từng bước xử lý trong Order Service
+
+---
+
+## 5️⃣ Luồng dữ liệu Trace end-to-end
+
+```
+Request → Span (Service A)
+        → Child Span (Service B)
+        → Child Span (Service C)
+        → OTel Collector
+        → Grafana Tempo
+        → Grafana UI
+```
+
+Trong Grafana, học viên có thể:
+
+* Xem **trace waterfall**
+* So sánh latency giữa các service
+* Click vào từng span để xem metadata
+
+---
+
+## 6️⃣ Best Practices khi dùng Tempo + OTel
+
+### ✅ Nên làm
+
+* Dùng **Auto Instrumentation trước**, manual sau
+* Đặt tên span **có ý nghĩa business**
+* Kết hợp trace + log + metric
+* Sampling hợp lý (head / tail sampling)
+
+### ❌ Tránh
+
+* Tạo quá nhiều span không cần thiết
+* Không truyền context giữa service
+* Gửi trace trực tiếp từ app → Tempo
+
+---
+
+## 7️⃣ Tổng kết
+
+* OpenTelemetry = **chuẩn observability**
+* Tempo = **trace backend nhẹ, scalable**
+* Distributed tracing = **vũ khí tối thượng để debug microservices**
+
+👉 Khi hệ thống càng phức tạp, **tracing càng trở nên bắt buộc**.
+
+---
+
+📌 Gợi ý bài tiếp theo:
+
+* Trace + Log correlation với Loki
+* Tail-based sampling với Tempo
+* Debug production incident bằng tracing
