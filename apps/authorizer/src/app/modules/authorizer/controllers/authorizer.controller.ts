@@ -7,9 +7,10 @@ import { RequestParams } from '@common/decorators/request-param.decorator';
 import { AuthorizeResponse, LoginTcpRequest, LoginTcpResponse } from '@common/interfaces/tcp/authorizer';
 import { Response } from '@common/interfaces/tcp/common/response.interface';
 import { ProcessId } from '@common/decorators/processId.decorator';
+import { TcpServerTracingInterceptor } from '@common/interceptors/tracing-server.interceptor';
 
 @Controller()
-@UseInterceptors(TcpLoggingInterceptor)
+@UseInterceptors(TcpLoggingInterceptor, TcpServerTracingInterceptor)
 export class AuthorizerController {
   constructor(private readonly authorizerService: AuthorizerService) {}
 
