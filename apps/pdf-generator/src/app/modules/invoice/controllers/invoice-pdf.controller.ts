@@ -6,9 +6,10 @@ import { RequestParams } from '@common/decorators/request-param.decorator';
 import { Invoice } from '@common/schemas/invoice.schema';
 import { Response } from '@common/interfaces/tcp/common/response.interface';
 import { InvoicePdfService } from '../services/invoice-pdf.service';
+import { TcpServerTracingInterceptor } from '@common/interceptors/tracing-server.interceptor';
 
 @Controller()
-@UseInterceptors(TcpLoggingInterceptor)
+@UseInterceptors(TcpLoggingInterceptor, TcpServerTracingInterceptor)
 export class InvoicePdfController {
   constructor(private readonly invoicePdfService: InvoicePdfService) {}
 
