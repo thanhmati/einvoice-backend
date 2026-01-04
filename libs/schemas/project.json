@@ -5,5 +5,11 @@
   "projectType": "library",
   "tags": [],
   "// targets": "to see all targets run: nx show project schemas --web",
-  "targets": {}
+  "targets": {
+    "test": {
+      "options": {
+        "passWithNoTests": true
+      }
+    }
+  }
 }
