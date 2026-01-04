@@ -6,7 +6,7 @@ WORKDIR /app
 COPY dist/apps/bff ./
 
 # Install pnpm for dependency installation
-RUN npm install -g pnpm
+RUN npm install -g pnpm@10.19.0
 
 # Install production dependencies
 # prune-lockfile generates package.json and pnpm-lock.yaml in dist
