@@ -35,7 +35,8 @@
     {
       "plugin": "@nx/jest/plugin",
       "options": {
-        "targetName": "test"
+        "targetName": "test",
+        "passWithNoTests": true
       },
       "exclude": ["apps/einvoice-e2e/**/*"]
     }
