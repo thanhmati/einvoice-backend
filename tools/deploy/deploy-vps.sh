@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 # Get affected projects (we need this to restart only affected services)
 AFFECTED_APPS=$(npx nx show projects --affected --type app --json | jq -r 'join(" ")')
@@ -26,7 +27,7 @@ ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
 REMOTE_DIR="~/app/einvoice" # Using home directory to avoid permission issues in /opt
 
 # Create directory if not exists
-ssh $SSH_USER@$SSH_HOST "mkdir -p $REMOTE_DIR"
+ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "mkdir -p $REMOTE_DIR"
 
 # Copy compose files and configuration
 echo "Copying compose files and config to remote..."
@@ -62,6 +63,6 @@ for APP in $AFFECTED_APPS; do
 done
 
 echo "Executing remote commands..."
-ssh $SSH_USER@$SSH_HOST "$commands"
+ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "$commands"
 
 echo "Deployment completed."
