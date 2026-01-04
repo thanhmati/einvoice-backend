@@ -23,7 +23,7 @@ ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
 # Since we pushed 'latest' and 'TAG', reliable deploy uses 'TAG' but for simple compose:
 # We might need to pass the TAG to the server.
 
-REMOTE_DIR="/opt/einvoice" # Example path
+REMOTE_DIR="~/app/einvoice" # Using home directory to avoid permission issues in /opt
 
 # Create directory if not exists
 ssh $SSH_USER@$SSH_HOST "mkdir -p $REMOTE_DIR"
