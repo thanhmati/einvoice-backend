@@ -1,0 +1,23 @@
+name: einvoice-services
+
+services:
+  bff:
+    image: ${DOCKER_REGISTRY}/bff:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    networks:
+      - einvoice-nw
+
+  # Add other services similarly...
+  # auth:
+  #   image: ${DOCKER_REGISTRY}/auth:${IMAGE_TAG:-latest}
+  #   ...
+
+networks:
+  einvoice-nw:
+    external: true
