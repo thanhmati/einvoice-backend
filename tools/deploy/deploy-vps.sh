@@ -46,6 +46,8 @@ fi
 # 1. Start/Ensure providers are up (idempotent)
 # 2. Deploy affected apps
 commands="
+export DOCKER_REGISTRY=$DOCKER_REGISTRY;
+export IMAGE_TAG=$IMAGE_TAG;
 cd $REMOTE_DIR || exit 1;
 echo 'Ensuring providers are up...';
 docker compose -f docker-compose.provider.yaml up -d;

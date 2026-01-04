@@ -103,3 +103,5 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
           ENV_FILE: ${{ secrets.ENV_FILE }}
+          DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+          IMAGE_TAG: ${{ github.sha }}
