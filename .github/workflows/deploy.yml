@@ -96,12 +96,52 @@ jobs:
         env:
           INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Deploy to VPS
-        run: ./tools/deploy/deploy-vps.sh
+      - name: Calculate Affected Apps
+        id: affected
+        run: |
+          AFFECTED=$(npx nx show projects --affected --type app --json | jq -r 'join(" ")')
+          echo "AFFECTED_APPS=$AFFECTED" >> $GITHUB_ENV
+          echo "Affected apps: $AFFECTED"
+
+      - name: Prepare Deployment Files
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Copy Files to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: 'docker-compose.provider.yaml,docker-compose.deploy.yml,docker,.env'
+          target: '~/app/einvoice'
+          rm: true
+
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        if: env.AFFECTED_APPS != ''
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          ENV_FILE: ${{ secrets.ENV_FILE }}
+          AFFECTED_APPS: ${{ env.AFFECTED_APPS }}
           DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
           IMAGE_TAG: ${{ github.sha }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: AFFECTED_APPS,DOCKER_REGISTRY,IMAGE_TAG
+          script: |
+            cd ~/app/einvoice
+
+            echo "Ensuring providers are up..."
+            docker compose -f docker-compose.provider.yaml up -d
+
+            echo "Deploying applications: $AFFECTED_APPS"
+            for APP in $AFFECTED_APPS; do
+              echo "Deploying $APP..."
+              # Pull and restart ONLY the affected app
+              docker compose -f docker-compose.deploy.yml pull $APP
+              docker compose -f docker-compose.deploy.yml up -d --no-deps $APP
+            done
+
+            # Cleanup .env if desired, but we usually keep it for debug or auto-restart
+            # rm .env
