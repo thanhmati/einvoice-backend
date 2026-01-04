@@ -16,7 +16,7 @@ echo "Deploying affected apps: $AFFECTED_APPS"
 mkdir -p ~/.ssh
 echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
 chmod 600 ~/.ssh/id_rsa
-ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+# ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
 
 # Generate deployment command
 # We iterate to construct the command or execute composed commands
