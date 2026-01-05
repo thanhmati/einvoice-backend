@@ -1,8 +1,0 @@
-{
-  "name": "bff",
-  "version": "0.0.1",
-  "private": true,
-  "dependencies": {
-    "@opentelemetry/exporter-trace-otlp-proto": "^0.208.0"
-  }
-}
