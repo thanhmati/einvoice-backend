@@ -133,15 +133,11 @@ jobs:
             cd ~/app/einvoice
 
             echo "Ensuring providers are up..."
-            docker compose -f docker-compose.provider.yaml up -d
+            docker compose -f docker-compose.provider.yaml up -d redis
 
-            echo "Deploying applications: $AFFECTED_APPS"
-            for APP in $AFFECTED_APPS; do
-              echo "Deploying $APP..."
-              # Pull and restart ONLY the affected app
-              docker compose -f docker-compose.deploy.yml pull $APP
-              docker compose -f docker-compose.deploy.yml up -d --no-deps $APP
-            done
+            echo "Deploying applications: bff"
+            docker compose -f docker-compose.deploy.yml pull bff
+            docker compose -f docker-compose.deploy.yml up -d --no-deps bff
 
             # Cleanup .env if desired, but we usually keep it for debug or auto-restart
             # rm .env
