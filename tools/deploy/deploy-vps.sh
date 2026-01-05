@@ -51,16 +51,22 @@ export DOCKER_REGISTRY=$DOCKER_REGISTRY;
 export IMAGE_TAG=$IMAGE_TAG;
 cd $REMOTE_DIR || exit 1;
 echo 'Ensuring providers are up...';
-docker compose -f docker-compose.provider.yaml up -d;
+docker compose -f docker-compose.provider.yaml up -d redis;
 "
 
-for APP in $AFFECTED_APPS; do
-  commands+="
-  echo 'Deploying $APP...';
-  docker compose -f docker-compose.deploy.yml pull $APP;
-  docker compose -f docker-compose.deploy.yml up -d --no-deps $APP;
-  "
-done
+commands+="
+echo 'Deploying bff...';
+docker compose -f docker-compose.deploy.yml pull bff;
+docker compose -f docker-compose.deploy.yml up -d --no-deps bff;
+"
+
+# for APP in $AFFECTED_APPS; do
+#   commands+="
+#   echo 'Deploying $APP...';
+#   docker compose -f docker-compose.deploy.yml pull $APP;
+#   docker compose -f docker-compose.deploy.yml up -d --no-deps $APP;
+#   "
+# done
 
 echo "Executing remote commands..."
 ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "$commands"

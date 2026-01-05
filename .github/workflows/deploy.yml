@@ -86,10 +86,8 @@ jobs:
       - name: Make scripts executable
         run: chmod +x tools/deploy/*.sh
 
-      - name: Build and Prune Affected
-        # 'prune' target runs build, prune-lockfile, and copy-workspace-modules
-        # ensuring dist contains everything needed for Docker
-        run: npx nx affected -t prune
+      - name: Build Affected
+        run: npx nx affected -t build
 
       - name: Build and Push Docker Images
         run: ./tools/deploy/build-images.sh
