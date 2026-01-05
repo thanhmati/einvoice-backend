@@ -103,7 +103,7 @@ jobs:
 
       - name: Prepare Deployment Files
         run: |
-          echo "${{ secrets.ENV_FILE }}" > .env
+          echo "${{ secrets.ENV_FILE }}" > .env.prod
 
       - name: Copy Files to VPS
         uses: appleboy/scp-action@v0.1.7
@@ -111,7 +111,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: 'docker-compose.provider.yaml,docker-compose.deploy.yml,docker,.env'
+          source: 'docker-compose.provider.yaml,docker-compose.deploy.yml,docker,.env.prod'
           target: '~/app/einvoice'
           rm: true
 
