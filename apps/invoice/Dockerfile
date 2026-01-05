@@ -11,5 +11,6 @@ RUN npm install -g pnpm@10.19.0
 # Install production dependencies
 # prune-lockfile generates package.json and pnpm-lock.yaml in dist
 RUN if [ -f package.json ]; then pnpm install --prod --frozen-lockfile; fi
+RUN pnpm install tslib
 
 CMD ["node", "main.js"]
