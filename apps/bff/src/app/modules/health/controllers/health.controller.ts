@@ -9,7 +9,7 @@ export class HealthController {
   constructor(private readonly health: HealthService) {}
 
   @Get('liveness')
-  @ApiOperation({ summary: 'Check liveness of BFF service' })
+  @ApiOperation({ summary: 'Check liveness' })
   @HealthCheck()
   checkLive() {
     return this.health.checkMemoryHeap();
