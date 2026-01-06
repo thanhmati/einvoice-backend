@@ -9,4 +9,8 @@ export class MediaService {
   uploadFile(params: UploadFileTcpReq) {
     return this.cloudinaryService.uploadFile(Buffer.from(params.fileBase64, 'base64'), params.fileName);
   }
+
+  destroyFile(publicId: string) {
+    return this.cloudinaryService.deleteFile(publicId);
+  }
 }

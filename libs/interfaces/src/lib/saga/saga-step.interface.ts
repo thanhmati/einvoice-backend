@@ -22,6 +22,7 @@ export interface InvoiceSendSagaContext extends SagaContext {
   // Step results
   pdfBase64?: string;
   fileUrl?: string;
+  filePublicId?: string;
   paymentLink?: string;
 }
 

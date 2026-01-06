@@ -5,7 +5,7 @@ import { TCP_SERVICES } from '@common/configuration/tcp.config';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
 import { firstValueFrom, map } from 'rxjs';
 import { Invoice } from '@common/schemas/invoice.schema';
-import { UploadFileTcpReq } from '@common/interfaces/tcp/media';
+import { UploadFileTcpReq, UploadFileTcpRes } from '@common/interfaces/tcp/media';
 import { PaymentService } from '../../payment/services/payment.service';
 import { createCheckoutSessionMapping } from '../mappers';
 import { InvoiceRepository } from '../repositories/invoice.repository';
@@ -64,9 +64,9 @@ export class InvoiceSendSagaSteps {
               throw new Error('PDF not found in context');
             }
 
-            const fileUrl = await firstValueFrom(
+            const result = await firstValueFrom(
               this.mediaClient
-                .send<string, UploadFileTcpReq>(TCP_REQUEST_MESSAGE.MEDIA.UPLOAD_FILE, {
+                .send<UploadFileTcpRes, UploadFileTcpReq>(TCP_REQUEST_MESSAGE.MEDIA.UPLOAD_FILE, {
                   data: {
                     fileBase64: context.pdfBase64,
                     fileName: `invoice-${context.invoiceId}`,
@@ -78,7 +78,7 @@ export class InvoiceSendSagaSteps {
 
             return {
               success: true,
-              data: { fileUrl },
+              data: { fileUrl: result.url, filePublicId: result.publicId },
             };
           } catch (error) {
             this.logger.error(`Failed to upload file: ${error.message}`);
@@ -90,10 +90,16 @@ export class InvoiceSendSagaSteps {
         },
         compensate: async (context: InvoiceSendSagaContext): Promise<void> => {
           try {
-            if (context.fileUrl) {
+            if (context.fileUrl && context.filePublicId) {
               this.logger.log(`Compensating file upload for invoice ${context.invoiceId}`);
-              // TODO: Implement file deletion from media service
-              // This would require adding a DELETE endpoint to the media service
+              await firstValueFrom(
+                this.mediaClient
+                  .send<string, string>(TCP_REQUEST_MESSAGE.MEDIA.DESTROY_FILE, {
+                    data: context.filePublicId,
+                    processId: context.processId,
+                  })
+                  .pipe(map((data) => data.data)),
+              );
               this.logger.warn(`File deletion not implemented yet. File URL: ${context.fileUrl}`);
             }
           } catch (error) {

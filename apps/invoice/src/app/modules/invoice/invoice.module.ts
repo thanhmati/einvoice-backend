@@ -16,7 +16,6 @@ import { InvoiceSendSagaSteps } from './sagas/invoice-send-saga-steps.service';
   imports: [
     MongoProvider,
     MongooseModule.forFeature([InvoiceDestination]),
-
     PaymentModule,
     KafkaModule.register(QUEUE_SERVICES.INVOICE),
     SagaOrchestrationModule.forRoot(),
