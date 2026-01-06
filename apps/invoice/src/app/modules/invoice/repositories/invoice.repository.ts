@@ -14,6 +14,10 @@ export class InvoiceRepository {
     });
   }
 
+  getAll() {
+    return this.invoiceModel.find().sort({ createdAt: -1 }).exec();
+  }
+
   getById(id: string) {
     return this.invoiceModel.findById(id);
   }
