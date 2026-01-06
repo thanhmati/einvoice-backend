@@ -42,4 +42,10 @@ export class InvoiceController {
     const invoice = await this.invoiceService.getById(invoiceId);
     return Response.success<InvoiceTcpResponse>(invoice);
   }
+
+  @MessagePattern(TCP_REQUEST_MESSAGE.INVOICE.GET_ALL)
+  async getAll() {
+    const invoices = await this.invoiceService.getAll();
+    return Response.success<InvoiceTcpResponse[]>(invoices);
+  }
 }

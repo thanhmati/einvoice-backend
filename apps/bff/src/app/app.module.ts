@@ -21,6 +21,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 import { HealthModule } from './modules/health/health.module';
 import { LoggerModule } from '@common/observability/logger';
 import { MetricsModule } from '@common/observability/metrics';
+import { RoleModule } from './modules/role/role.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { MetricsModule } from '@common/observability/metrics';
     ProductModule,
     UserModule,
     AuthorizerModule,
+    RoleModule,
     RedisProvider,
     ThrottlerProvider,
     ClientsModule.registerAsync([GrpcProvider(GRPC_SERVICES.AUTHORIZER_SERVICE)]),
