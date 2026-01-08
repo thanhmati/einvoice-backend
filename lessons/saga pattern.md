@@ -15,6 +15,9 @@
 
 **Saga Pattern** là một cách tiếp cận để xử lý **Distributed Transaction** bằng cách:
 
+<img width="779" height="465" alt="image" src="https://github.com/user-attachments/assets/6b718eee-4097-44a2-a5e6-c7c373f95d96" />
+
+
 * Chia một nghiệp vụ lớn thành nhiều **local transaction**
 * Mỗi local transaction **commit ngay** vào database của service tương ứng
 * Khi có lỗi xảy ra, hệ thống thực hiện **compensating transaction** để hoàn tác nghiệp vụ
