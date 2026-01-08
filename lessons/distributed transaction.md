@@ -128,29 +128,10 @@ sequenceDiagram
 
 ---
 
-## 5️⃣ Vì sao Distributed Transaction khó?
 
-### 5.1 🌐 Network không đáng tin
+## 5️⃣ Các hướng tiếp cận Distributed Transaction
 
-* Request có thể timeout
-* Response có thể bị mất
-
-➡️ Dễ gây **duplicate execution**
-
----
-
-### 5.2 ⚖️ CAP Theorem (trong microservices)
-
-* Không thể đồng thời đảm bảo **Consistency** và **Availability** khi có partition
-* Microservices luôn phải chấp nhận Partition
-
-➡️ Chấp nhận **Eventual Consistency**
-
----
-
-## 6️⃣ Các hướng tiếp cận Distributed Transaction
-
-## 6.1 ❌ Two-Phase Commit (2PC)
+## 5.1 ❌ Two-Phase Commit (2PC)
 
 ### Cách hoạt động
 
@@ -178,9 +159,9 @@ sequenceDiagram
 
 ---
 
-## 6.2 ✅ Saga Pattern (Phổ biến nhất)
+## 5.2 ✅ Saga Pattern (Phổ biến nhất)
 
-### 6.2.1 💡 Ý tưởng cốt lõi
+### 5.2.1 💡 Ý tưởng cốt lõi
 
 * Chia nghiệp vụ thành các **local transaction**
 * Mỗi bước commit ngay
@@ -188,7 +169,7 @@ sequenceDiagram
 
 ---
 
-### 6.2.2 🛒 Saga ví dụ: Order
+### 5.2.2 🛒 Saga ví dụ: Order
 
 ```mermaid
 sequenceDiagram
@@ -206,9 +187,9 @@ sequenceDiagram
 
 ---
 
-## 7️⃣ Hai mô hình Saga
+## 6️⃣ Hai mô hình Saga
 
-### 7.1 🎮 Saga Orchestration
+### 6.1 🎮 Saga Orchestration
 
 ```mermaid
 sequenceDiagram
@@ -227,7 +208,7 @@ sequenceDiagram
 
 ---
 
-### 7.2 🎧 Saga Choreography
+### 6.2 🎧 Saga Choreography
 
 ```mermaid
 sequenceDiagram
@@ -245,7 +226,7 @@ sequenceDiagram
 
 ---
 
-## 8️⃣ Các khái niệm quan trọng khi implement Saga
+## 7️⃣ Các khái niệm quan trọng khi implement Saga
 
 ### 🔁 Idempotency
 
@@ -268,7 +249,7 @@ sequenceDiagram
 
 ---
 
-## 9️⃣ 🧠 Kết luận
+## 8️⃣ 🧠 Kết luận
 
 * Transaction truyền thống dựa trên ACID
 * Microservices phá vỡ giả định đó
