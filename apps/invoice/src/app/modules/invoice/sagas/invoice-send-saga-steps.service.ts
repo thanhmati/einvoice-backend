@@ -1,4 +1,4 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import { Injectable, Inject, Logger, BadGatewayException } from '@nestjs/common';
 import { InvoiceSendSagaContext, SagaStep, SagaStepResult } from '@common/interfaces/saga/saga-step.interface';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { TCP_SERVICES } from '@common/configuration/tcp.config';
@@ -100,7 +100,7 @@ export class InvoiceSendSagaSteps {
                   })
                   .pipe(map((data) => data.data)),
               );
-              this.logger.warn(`File deletion not implemented yet. File URL: ${context.fileUrl}`);
+              this.logger.warn(`File deletion implemented. File URL: ${context.fileUrl}`);
             }
           } catch (error) {
             this.logger.error(`Failed to compensate file upload: ${error.message}`);
@@ -117,7 +117,7 @@ export class InvoiceSendSagaSteps {
 
             return {
               success: true,
-              data: { paymentLink: checkoutData.url },
+              data: { paymentLink: checkoutData.url, sessionId: checkoutData.sessionId },
             };
           } catch (error) {
             this.logger.error(`Failed to create payment session: ${error.message}`);
@@ -131,9 +131,8 @@ export class InvoiceSendSagaSteps {
           try {
             if (context.paymentLink) {
               this.logger.log(`Compensating payment creation for invoice ${context.invoiceId}`);
-              // TODO: Implement payment session expiration/cancellation
-              // This would require calling Stripe API to expire the checkout session
-              this.logger.warn(`Payment cancellation not implemented yet. Payment link: ${context.paymentLink}`);
+              await this.paymentService.expireCheckoutSession(context.sessionId);
+              this.logger.warn(`Payment cancellation implemented. Payment link: ${context.paymentLink}`);
             }
           } catch (error) {
             this.logger.error(`Failed to compensate payment creation: ${error.message}`);
