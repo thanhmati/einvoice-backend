@@ -24,6 +24,7 @@ export interface InvoiceSendSagaContext extends SagaContext {
   fileUrl?: string;
   filePublicId?: string;
   paymentLink?: string;
+  sessionId?: string;
 }
 
 export interface SagaStepExecution {
