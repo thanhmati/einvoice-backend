@@ -1,277 +1,285 @@
 # Distributed Transaction trong Microservices
 
-> 🎯 **Mục tiêu lesson**: Sau bài này, học viên có thể
->
-> * Hiểu rõ *vì sao Distributed Transaction tồn tại*
-> * Phân biệt các cách tiếp cận phổ biến
-> * Giải thích được **bằng ví dụ thực tế** khi trình bày hoặc đi phỏng vấn
+<img width="800" height="400" alt="image" src="https://github.com/user-attachments/assets/de0252d5-159f-4709-950e-dec61dfcbe44" />
+<br></br>
+
+## 🎯 Mục tiêu
+
+* Hiểu rõ **Transaction là gì** trong hệ thống phần mềm
+* Hiểu vì sao **Distributed Transaction** trở thành vấn đề trong microservices
+* Nắm các khái niệm cốt lõi (ACID, Eventual Consistency, Saga)
+* Có nền tảng để tiếp cận các giải pháp nâng cao
 
 ---
 
-## 1️⃣ Distributed Transaction là gì?
+## 1️⃣ Transaction là gì?
 
-### 📌 Định nghĩa ngắn gọn
+### 1.1 📌 Định nghĩa Transaction
 
-Distributed Transaction là **một nghiệp vụ gồm nhiều bước**, mỗi bước chạy ở **service + database khác nhau**, nhưng **kết quả cuối cùng phải đúng về mặt nghiệp vụ**.
+**Transaction** là một đơn vị công việc (unit of work) gồm **một hoặc nhiều thao tác**, được thực thi như **một thể thống nhất**:
+
+* ✅ Thành công → tất cả cùng được áp dụng
+* ❌ Thất bại → tất cả bị hủy bỏ
+
+**Ví dụ phổ biến**:
+
+* 💰 Chuyển tiền ngân hàng
+* 🛒 Đặt hàng và trừ tồn kho
 
 ---
 
-### 🧠 Monolith vs Microservices
+### 1.2 🧱 ACID – Nền tảng của Transaction
 
-#### 🏢 Monolith
+Transaction trong hệ quản trị CSDL truyền thống tuân theo **ACID**:
+
+* **A – Atomicity**: tất cả hoặc không có gì
+* **C – Consistency**: dữ liệu luôn hợp lệ
+* **I – Isolation**: các transaction không ảnh hưởng lẫn nhau
+* **D – Durability**: dữ liệu được lưu vĩnh viễn sau commit
+
+**Ví dụ (Monolith)**:
 
 ```
 BEGIN TRANSACTION
-  - Trừ tiền
-  - Tạo đơn hàng
-  - Giảm tồn kho
-COMMIT / ROLLBACK
+  Debit account
+  Credit account
+COMMIT
 ```
-
-✔️ Thất bại ở đâu → rollback tất cả
 
 ---
 
-#### 🌐 Microservices
+## 2️⃣ Transaction trong kiến trúc Monolith
 
+### 🏗 Đặc điểm
+
+* Toàn bộ logic trong **một ứng dụng**
+* Thường dùng **một database**
+* ACID transaction hoạt động hiệu quả
+
+### 🔄 Flow đơn giản
+
+```mermaid
+sequenceDiagram
+  participant App
+  participant DB
+
+  App->>DB: BEGIN
+  App->>DB: Update A
+  App->>DB: Update B
+  App->>DB: COMMIT
 ```
-Order Service      → Order DB
-Payment Service    → Payment DB
-Inventory Service  → Inventory DB
-```
-
-❌ Không thể `BEGIN TRANSACTION` cho 3 database khác nhau
-
-➡️ **Vấn đề xuất hiện**: Nếu trừ tiền thành công nhưng hết hàng thì sao?
 
 ---
 
-## 2️⃣ Vì sao Distributed Transaction là bài toán khó?
+## 3️⃣ Microservices thay đổi bài toán như thế nào?
 
-### ⚠️ Vấn đề 1: Network không đáng tin
+### 3.1 🧩 Đặc điểm của Microservices
 
-* Service A gọi Service B
-* Request timeout ≠ request thất bại
-* Có thể **B đã xử lý xong nhưng A không biết**
+* Mỗi service **sở hữu database riêng**
+* ❌ Không chia sẻ database
+* 🌐 Giao tiếp qua network
 
-➡️ Dễ gây **duplicate transaction**
+```mermaid
+flowchart LR
+  OrderService --> OrderDB
+  PaymentService --> PaymentDB
+  InventoryService --> InventoryDB
+```
 
 ---
 
-### ⚠️ Vấn đề 2: CAP Theorem
+### 3.2 ⚠️ Vấn đề cốt lõi
 
-Trong hệ phân tán, **bắt buộc phải chịu Partition (P)**
-→ chỉ chọn được **C hoặc A**
+❌ Không thể tạo transaction bao trùm nhiều database độc lập.
 
-Microservices thường chọn:
+**Tình huống thường gặp**:
 
-* ✅ Availability
-* ❌ Strong Consistency
+* Payment đã commit
+* Inventory thất bại
+* Không có cơ chế rollback tự động
+
+➡️ **ACID transaction không còn áp dụng trực tiếp**
+
+---
+
+## 4️⃣ Distributed Transaction là gì?
+
+### 4.1 📖 Định nghĩa
+
+**Distributed Transaction** là một nghiệp vụ gồm nhiều **local transaction**, chạy trên **nhiều service khác nhau**, nhưng vẫn cần đảm bảo tính đúng đắn ở mức nghiệp vụ.
+
+---
+
+### 4.2 🛒 Ví dụ nghiệp vụ đặt hàng
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Order
+  participant Payment
+  participant Inventory
+
+  User->>Order: Create order
+  Order->>Payment: Charge money
+  Payment->>Inventory: Reserve stock
+```
+
+❓ Câu hỏi: Nếu bước cuối thất bại thì sao?
+
+---
+
+## 5️⃣ Vì sao Distributed Transaction khó?
+
+### 5.1 🌐 Network không đáng tin
+
+* Request có thể timeout
+* Response có thể bị mất
+
+➡️ Dễ gây **duplicate execution**
+
+---
+
+### 5.2 ⚖️ CAP Theorem (trong microservices)
+
+* Không thể đồng thời đảm bảo **Consistency** và **Availability** khi có partition
+* Microservices luôn phải chấp nhận Partition
 
 ➡️ Chấp nhận **Eventual Consistency**
 
 ---
 
-## 3️⃣ Các cách tiếp cận Distributed Transaction
+## 6️⃣ Các hướng tiếp cận Distributed Transaction
 
-## 3.1 ❌ Two-Phase Commit (2PC) – Biết để tránh
+## 6.1 ❌ Two-Phase Commit (2PC)
 
-### 🧩 Cách hoạt động (minh họa)
+### Cách hoạt động
 
+```mermaid
+sequenceDiagram
+  participant C as Coordinator
+  participant A
+  participant B
+
+  C->>A: Prepare?
+  C->>B: Prepare?
+  A-->>C: OK
+  B-->>C: OK
+  C->>A: Commit
+  C->>B: Commit
 ```
-[Coordinator]
-   │ Prepare?
-   ├── Service A: OK
-   ├── Service B: OK
-   └── Service C: OK
-   │
-   └─ Commit tất cả
-```
 
-### ❗ Vấn đề thực tế
+### Nhược điểm
 
-* Coordinator chết → các service bị **treo lock**
-* Scale kém
-* Coupling cực chặt
+* ⛔ Blocking
+* 🔗 Tight coupling
+* 📉 Scale kém
 
-🚫 **Gần như không dùng trong microservices hiện đại**
+➡️ Không phù hợp cho microservices
 
 ---
 
-## 3.2 ✅ Saga Pattern – Giải pháp thực tế nhất
+## 6.2 ✅ Saga Pattern (Phổ biến nhất)
 
-### 📌 Ý tưởng cốt lõi
+### 6.2.1 💡 Ý tưởng cốt lõi
 
-> Thay vì rollback bằng DB transaction
-> → rollback bằng **nghiệp vụ ngược lại (compensation)**
-
----
-
-### 🛒 Ví dụ xuyên suốt: Đặt hàng E-commerce
-
-### Step-by-step Saga
-
-```
-1️⃣ Order Service
-   → create order (PENDING)
-
-2️⃣ Payment Service
-   → charge tiền
-
-3️⃣ Inventory Service
-   → reserve stock
-
-4️⃣ Order Service
-   → CONFIRMED
-```
+* Chia nghiệp vụ thành các **local transaction**
+* Mỗi bước commit ngay
+* Khi có lỗi → **compensating transaction**
 
 ---
 
-### 💥 Khi có lỗi xảy ra
+### 6.2.2 🛒 Saga ví dụ: Order
 
-📍 **Case: Inventory hết hàng**
+```mermaid
+sequenceDiagram
+  participant Order
+  participant Payment
+  participant Inventory
 
+  Order->>Payment: Charge
+  Payment->>Inventory: Reserve
+  Inventory-->>Payment: FAIL
+  Payment->>Order: Refund
 ```
-- Inventory FAIL
-- Saga trigger compensation:
-   → Payment Service: refund
-   → Order Service: CANCELLED
-```
 
-➡️ Không rollback DB, mà **rollback nghiệp vụ**
+⚠️ Compensation **không phải** rollback DB.
 
 ---
 
-## 4️⃣ Hai kiểu Saga: Orchestration vs Choreography
+## 7️⃣ Hai mô hình Saga
 
-## 4.1 Saga Orchestration
+### 7.1 🎮 Saga Orchestration
 
-### 🎮 Ví dụ trực quan
+```mermaid
+sequenceDiagram
+  participant Orchestrator
+  participant Order
+  participant Payment
+  participant Inventory
 
+  Orchestrator->>Order: Create
+  Orchestrator->>Payment: Charge
+  Orchestrator->>Inventory: Reserve
 ```
-[Saga Orchestrator]
-   → Order Service
-   → Payment Service
-   → Inventory Service
-```
 
-### 👍 Ưu điểm
-
-* Flow rõ ràng
-* Debug dễ
-* Phù hợp team nhỏ / trung bình
-
-### 👎 Nhược điểm
-
-* Orchestrator dễ phình to
+* Có service điều phối trung tâm
+* Dễ kiểm soát flow
 
 ---
 
-## 4.2 Saga Choreography (Event-driven)
+### 7.2 🎧 Saga Choreography
 
-### 🎧 Ví dụ bằng event
+```mermaid
+sequenceDiagram
+  participant Order
+  participant Payment
+  participant Inventory
 
+  Order-->>Payment: OrderCreated
+  Payment-->>Inventory: PaymentCompleted
 ```
-OrderCreated
-   ↓
-PaymentProcessed
-   ↓
-StockReserved
-```
 
-### 👍 Ưu điểm
-
+* Event-driven
 * Loose coupling
-* Scale tốt
-
-### 👎 Nhược điểm
-
-* Khó trace flow
-* Phải dùng distributed tracing
+* Khó theo dõi luồng nghiệp vụ
 
 ---
 
-## 5️⃣ So sánh nhanh
+## 8️⃣ Các khái niệm quan trọng khi implement Saga
 
-| Tiêu chí   | Orchestration | Choreography |
-| ---------- | ------------- | ------------ |
-| Điều khiển | Trung tâm     | Event        |
-| Debug      | Dễ            | Khó          |
-| Scale      | Tốt           | Rất tốt      |
-| Phù hợp    | Team nhỏ–vừa  | Hệ lớn       |
+### 🔁 Idempotency
+
+* Message có thể được xử lý nhiều lần
+* Không gây side-effect lặp
 
 ---
 
-## 6️⃣ Những "cái bẫy" khi implement Saga
+### 🔄 Compensation
 
-### ⚠️ Idempotency
-
-📌 Ví dụ lỗi:
-
-* Payment Service nhận lại cùng event 2 lần
-* Trừ tiền 2 lần ❌
-
-✅ Giải pháp:
-
-* Dùng `transactionId`
-* Check đã xử lý hay chưa
+* Không phải hành động nào cũng hoàn tác được
+* Phải chấp nhận trạng thái trung gian
 
 ---
 
-### ⚠️ Compensation ≠ Rollback
+### 🔢 Ordering
 
-📌 Ví dụ:
-
-* Đã gửi email
-* Không thể "unsend"
-
-➡️ Phải **chấp nhận inconsistency có kiểm soát**
+* Event có thể đến sai thứ tự
+* Cần state machine / versioning
 
 ---
 
-### ⚠️ Ordering & Duplicate Event
+## 9️⃣ 🧠 Kết luận
 
-📌 Ví dụ:
-
-* Event CONFIRMED đến trước PAYMENT
-
-✅ Giải pháp:
-
-* Kafka partition key
-* Version / state machine
+* Transaction truyền thống dựa trên ACID
+* Microservices phá vỡ giả định đó
+* Distributed Transaction là bài toán **thiết kế hệ thống**
+* Saga là giải pháp thực tế nhất
 
 ---
 
-## 7️⃣ Best Practices (Checklist cho production)
+## 📚 Gợi ý học tiếp
 
-✅ Saga + Event-driven
-✅ Idempotent consumer
-✅ Retry có giới hạn
-✅ Dead Letter Queue
-✅ Distributed Tracing (OpenTelemetry)
-❌ Không cross-database transaction
+* Saga implementation với Kafka + NestJS
+* Order State Machine
+* Observability cho Distributed Transaction
 
----
-
-## 8️⃣ Khi nào KHÔNG cần Distributed Transaction?
-
-* Business cho phép async
-* Sai lệch tạm thời không ảnh hưởng lớn
-* Có batch / reconciliation
-
-➡️ **Đừng over-engineer**
-
----
-
-## 9️⃣ Tổng kết
-
-> Distributed Transaction
-> ❌ Không phải để "giữ dữ liệu luôn đúng"
-> ✅ Mà để **hệ thống sống sót khi có lỗi**
-
----
-
-👉 Lesson tiếp theo gợi ý:
-
-* Saga với **Kafka + NestJS (code + diagram)**
-* Thiết kế **state machine cho Order Service**
