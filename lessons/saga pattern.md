@@ -43,6 +43,9 @@ Saga giải quyết bài toán:
 * Nhất quán ở **mức nghiệp vụ** (business consistency)
 * Chấp nhận **Eventual Consistency**
 
+<img width="800" height="500" alt="image" src="https://github.com/user-attachments/assets/87a268d6-aead-41bc-b0d9-a36d7f271737" />
+
+
 ---
 
 ## 3️⃣ So sánh: Transaction truyền thống vs Saga
