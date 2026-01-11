@@ -1,5 +1,5 @@
 import { Invoice } from '@common/schemas/invoice.schema';
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InvoiceSendSagaContext, SagaStep, SagaStepResult } from '@common/interfaces/saga/saga-step.interface';
 import { firstValueFrom, map } from 'rxjs';
 import { TCP_SERVICES } from '@common/configuration/tcp.config';
@@ -7,7 +7,7 @@ import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { PaymentService } from '../../payment/services/payment.service';
 import { InvoiceRepository } from '../repositories/invoice.repository';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
-import { UploadFileTcpReq } from '@common/interfaces/tcp/media';
+import { UploadFileTcpReq, UploadFileTcpRes } from '@common/interfaces/tcp/media';
 import { createCheckoutSessionMapping } from '../mappers';
 import { INVOICE_STATUS } from '@common/constants/enum/invoice.enum';
 import { ObjectId } from 'mongodb';
@@ -65,7 +65,7 @@ export class InvoiceSendSagaSteps {
 
             const result = await firstValueFrom(
               this.mediaClient
-                .send<string, UploadFileTcpReq>(TCP_REQUEST_MESSAGE.MEDIA.UPLOAD_FILE, {
+                .send<UploadFileTcpRes, UploadFileTcpReq>(TCP_REQUEST_MESSAGE.MEDIA.UPLOAD_FILE, {
                   data: {
                     fileBase64: context.pdfBase64,
                     fileName: `invoice-${context.invoiceId}`,
@@ -77,7 +77,7 @@ export class InvoiceSendSagaSteps {
 
             return {
               success: true,
-              data: { fileUrl: result },
+              data: { fileUrl: result.url, filePublicId: result.publicId },
             };
           } catch (error) {
             this.logger.error(`Failed to upload file: ${error.message}`);
@@ -85,6 +85,24 @@ export class InvoiceSendSagaSteps {
               success: false,
               error: error.message,
             };
+          }
+        },
+        compensate: async (context: InvoiceSendSagaContext): Promise<void> => {
+          try {
+            if (context.fileUrl && context.filePublicId) {
+              this.logger.log(`Compensating file upload for invoice ${context.invoiceId}`);
+              await firstValueFrom(
+                this.mediaClient
+                  .send<string, string>(TCP_REQUEST_MESSAGE.MEDIA.DESTROY_FILE, {
+                    data: context.filePublicId,
+                    processId: context.processId,
+                  })
+                  .pipe(map((data) => data.data)),
+              );
+              this.logger.warn(`File deletion implemented. File URL: ${context.fileUrl}`);
+            }
+          } catch (error) {
+            this.logger.error(`Failed to compensate file upload: ${error.message}`);
           }
         },
       },
@@ -106,6 +124,17 @@ export class InvoiceSendSagaSteps {
               success: false,
               error: error.message,
             };
+          }
+        },
+        compensate: async (context: InvoiceSendSagaContext): Promise<void> => {
+          try {
+            if (context.paymentLink) {
+              this.logger.log(`Compensating payment creation for invoice ${context.invoiceId}`);
+              await this.paymentService.expireCheckoutSession(context.sessionId);
+              this.logger.warn(`Payment cancellation implemented. Payment link: ${context.paymentLink}`);
+            }
+          } catch (error) {
+            this.logger.error(`Failed to compensate payment creation: ${error.message}`);
           }
         },
       },
@@ -131,6 +160,27 @@ export class InvoiceSendSagaSteps {
               error: error.message,
             };
           }
+        },
+        compensate: async (context: InvoiceSendSagaContext): Promise<void> => {
+          try {
+            this.logger.log(`Compensating invoice update for invoice ${context.invoiceId}`);
+
+            await this.invoiceRepository.updateById(context.invoiceId, {
+              status: INVOICE_STATUS.CREATED,
+              supervisorId: null,
+              fileUrl: null,
+            });
+
+            this.logger.log(`Invoice ${context.invoiceId} status reverted to CREATED`);
+          } catch (error) {
+            this.logger.error(`Failed to compensate invoice update: ${error.message}`);
+          }
+        },
+      },
+      {
+        name: 'DEMO_SAGA',
+        execute: async (context: InvoiceSendSagaContext): Promise<SagaStepResult> => {
+          throw new BadRequestException('Demo saga failure');
         },
       },
     ];
