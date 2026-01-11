@@ -11,4 +11,8 @@ export class PaymentService {
   createCheckoutSession(params: CreateCheckoutSessionRequest) {
     return this.stripeService.createCheckoutSession(params);
   }
+
+  expireCheckoutSession(sessionId: string) {
+    return this.stripeService.expireCheckoutSession(sessionId);
+  }
 }
