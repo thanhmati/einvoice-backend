@@ -23,3 +23,15 @@ export interface SagaStepExecution {
   error?: string;
   data?: any;
 }
+
+export interface InvoiceSendSagaContext extends SagaContext {
+  invoiceId: string;
+  userId: string;
+  processId: string;
+
+  // Step results
+  pdfBase64?: string;
+  fileUrl?: string;
+  paymentLink?: string;
+  sessionId?: string;
+}
