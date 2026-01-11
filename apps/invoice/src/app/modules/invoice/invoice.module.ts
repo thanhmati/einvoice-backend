@@ -9,14 +9,16 @@ import { TCP_SERVICES, TcpProvider } from '@common/configuration/tcp.config';
 import { PaymentModule } from '../payment/payment.module';
 import { KafkaModule } from '@common/kafka/kafka.module';
 import { QUEUE_SERVICES } from '@common/constants/enum/queue.enum';
+import { InvoiceSendSagaSteps } from './sagas/invoice-send-saga-steps.service';
+import { SagaOrchestrationModule } from '@common/saga-orchestration/saga-orchestration.module';
 
 @Module({
   imports: [
     MongoProvider,
     MongooseModule.forFeature([InvoiceDestination]),
-
     PaymentModule,
     KafkaModule.register(QUEUE_SERVICES.INVOICE),
+    SagaOrchestrationModule.forRoot(),
   ],
   controllers: [InvoiceController],
   providers: [
@@ -24,6 +26,7 @@ import { QUEUE_SERVICES } from '@common/constants/enum/queue.enum';
     InvoiceRepository,
     TcpProvider(TCP_SERVICES.PDF_GENERATOR_SERVICE),
     TcpProvider(TCP_SERVICES.MEDIA_SERVICE),
+    InvoiceSendSagaSteps,
   ],
 })
 export class InvoiceModule {}
