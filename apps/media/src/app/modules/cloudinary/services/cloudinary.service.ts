@@ -1,3 +1,4 @@
+import { UploadFileTcpRes } from '@common/interfaces/tcp/media';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v2 as cloudinary } from 'cloudinary';
@@ -5,6 +6,7 @@ import streamifier from 'streamifier';
 
 @Injectable()
 export class CloudinaryService {
+  private readonly logger = new Logger(CloudinaryService.name);
   private readonly cloudinary = cloudinary;
 
   constructor(private readonly configService: ConfigService) {
@@ -15,7 +17,7 @@ export class CloudinaryService {
     });
   }
 
-  async uploadFile(fileBuffer: Buffer, fileName: string): Promise<string> {
+  async uploadFile(fileBuffer: Buffer, fileName: string): Promise<UploadFileTcpRes> {
     return new Promise((resolve, reject) => {
       const uploadStream = this.cloudinary.uploader.upload_stream(
         {
@@ -29,11 +31,24 @@ export class CloudinaryService {
             return reject(error);
           }
           Logger.log('Upload successful:', result);
-          return resolve(result.secure_url);
+          return resolve({ url: result.secure_url, publicId: result.public_id });
         },
       );
 
       streamifier.createReadStream(fileBuffer).pipe(uploadStream);
+    });
+  }
+
+  async deleteFile(publicId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.cloudinary.uploader.destroy(publicId, (error, result) => {
+        if (error) {
+          this.logger.error('Delete error:', error);
+          return reject(error);
+        }
+        this.logger.log('Delete successful:', result);
+        return resolve();
+      });
     });
   }
 }
