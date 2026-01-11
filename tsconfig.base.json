@@ -26,6 +26,7 @@
       "@common/kafka/*": ["libs/kafka/src/lib/*"],
       "@common/middlewares/*": ["libs/middlewares/src/lib/*"],
       "@common/observability/*": ["libs/observability/src/lib/*"],
+      "@common/saga-orchestration/*": ["libs/saga-orchestration/src/lib/*"],
       "@common/schemas/*": ["libs/schemas/src/lib/*"],
       "@common/utils/*": ["libs/utils/src/lib/*"]
     }
