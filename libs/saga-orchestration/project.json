@@ -1,0 +1,9 @@
+{
+  "name": "saga-orchestration",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/saga-orchestration/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project saga-orchestration --web",
+  "targets": {}
+}
