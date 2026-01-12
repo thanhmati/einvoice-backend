@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TransportTargetOptions } from 'pino';
+require.resolve('pino-pretty');
+require.resolve('pino-loki');
 
 @Module({})
 export class LoggerModule {

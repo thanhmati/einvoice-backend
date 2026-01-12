@@ -1,0 +1,88 @@
+name: einvoice-services
+
+services:
+  bff:
+    image: ${DOCKER_REGISTRY}/bff:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - '3301:3300'
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+  authorizer:
+    image: ${DOCKER_REGISTRY}/authorizer:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+  invoice:
+    image: ${DOCKER_REGISTRY}/invoice:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+  mail:
+    image: ${DOCKER_REGISTRY}/mail:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+  media:
+    image: ${DOCKER_REGISTRY}/media:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+  pdf-generator:
+    image: ${DOCKER_REGISTRY}/pdf-generator:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+  product:
+    image: ${DOCKER_REGISTRY}/product:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+  user-access:
+    image: ${DOCKER_REGISTRY}/user-access:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+networks:
+  einvoice-nw:
+    external: true

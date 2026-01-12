@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { HealthCheck } from '@nestjs/terminus';
 import { HealthService } from '../services/health.service';
 
@@ -9,18 +9,21 @@ export class HealthController {
   constructor(private readonly health: HealthService) {}
 
   @Get('liveness')
+  @ApiOperation({ summary: 'Check liveness' })
   @HealthCheck()
   checkLive() {
     return this.health.checkMemoryHeap();
   }
 
   @Get('readiness')
+  @ApiOperation({ summary: 'Check readiness' })
   @HealthCheck()
   checkReady() {
     return this.health.checkReadiness();
   }
 
   @Get('startup')
+  @ApiOperation({ summary: 'Check startup' })
   @HealthCheck()
   checkStartup() {
     return this.health.checkStartup();
