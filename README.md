@@ -302,106 +302,6 @@ graph TB
 
 ---
 
-## 🎓 Nội Dung Học
-
-### 📚 Module 1: Fundamentals
-
-- [ ] Giới thiệu về Microservices Architecture
-- [ ] Monorepo với NX Workspace
-- [ ] NestJS Core Concepts
-- [ ] TypeScript Best Practices
-- [ ] Project Structure & Organization
-
-### 📚 Module 2: Building Microservices
-
-- [ ] Thiết kế REST API với NestJS
-- [ ] Swagger/OpenAPI Documentation
-- [ ] DTO Validation với Class Validator
-- [ ] Exception Handling & Error Transformation
-- [ ] Dependency Injection & Module System
-
-### 📚 Module 3: Inter-Service Communication
-
-- [ ] TCP Communication
-- [ ] gRPC Implementation
-- [ ] Message Queuing với Kafka
-- [ ] Event-Driven Architecture
-- [ ] Request/Response Pattern vs Event Pattern
-
-### 📚 Module 4: Data Persistence
-
-- [ ] PostgreSQL với TypeORM
-- [ ] MongoDB với Mongoose
-- [ ] Database Migrations
-- [ ] Repository Pattern
-- [ ] ACID vs BASE
-
-### 📚 Module 5: Saga Pattern & Distributed Transactions
-
-- [ ] Saga Orchestration Pattern
-- [ ] Compensation Mechanisms
-- [ ] Saga State Management
-- [ ] Error Handling trong Distributed Transactions
-- [ ] Idempotency
-
-### 📚 Module 6: Caching & Performance
-
-- [ ] Redis Caching Strategies
-- [ ] Cache-Aside Pattern
-- [ ] Rate Limiting
-- [ ] Query Optimization
-- [ ] Connection Pooling
-
-### 📚 Module 7: Authentication & Authorization
-
-- [ ] Keycloak Setup & Configuration
-- [ ] JWT Authentication Flow
-- [ ] Role-Based Access Control (RBAC)
-- [ ] Permission Guards
-- [ ] Token Management
-
-### 📚 Module 8: Observability
-
-- [ ] **Centralized Logging** với Loki & Promtail
-- [ ] **Metrics Collection** với Prometheus
-- [ ] **Distributed Tracing** với Tempo & OpenTelemetry
-- [ ] **Visualization** với Grafana Dashboards
-- [ ] **Alerting & Monitoring**
-
-### 📚 Module 9: Testing
-
-- [ ] Unit Testing với Jest
-- [ ] Integration Testing với Testcontainers
-- [ ] E2E Testing Strategies
-- [ ] Contract Testing
-- [ ] Testing Pyramid
-
-### 📚 Module 10: DevOps & Deployment
-
-- [ ] Docker & Docker Compose
-- [ ] Environment Configuration
-- [ ] CI/CD với GitHub Actions
-- [ ] VPS Deployment
-- [ ] Health Checks & Readiness Probes
-
-### 📚 Module 11: Advanced Topics
-
-- [ ] API Gateway Pattern (BFF)
-- [ ] Circuit Breaker Pattern
-- [ ] Bulkhead Pattern
-- [ ] Service Mesh (Optional)
-- [ ] Blue-Green Deployment
-
-### 📚 Module 12: Real-World Integration
-
-- [ ] Payment Gateway (Stripe)
-- [ ] Email Service (Nodemailer)
-- [ ] File Upload (Cloudinary)
-- [ ] PDF Generation (Puppeteer)
-- [ ] Webhook Handling
-
----
-
 ## 💡 Điểm Nổi Bật Của Khóa Học
 
 ### ✨ 1. Production-Ready Architecture
@@ -743,9 +643,9 @@ POST   /api/v1/users             # Create user
 
 Nếu bạn gặp vấn đề hoặc có câu hỏi:
 
-1. 📧 Email: [support email]
-2. 💬 Discord: [link]
-3. 📝 GitHub Issues: [link]
+1. 📧 Email: [dotanthanhvlog@gmail.com]
+2. 💬 Discord: [discord]
+3. 📝 GitHub Issues: [https://github.com/thanhmati/einvoice-backend/issues]
 
 ---
 
@@ -757,12 +657,12 @@ MIT License - Chi tiết xem file `LICENSE`
 
 ## 👨‍💻 Tác Giả
 
-**[Tên Giảng Viên]**
+**Đỗ Tấn Thành**
 
-- 🌐 Website: [website]
-- 📧 Email: [email]
-- 💼 LinkedIn: [linkedin]
-- 🐙 GitHub: [github]
+- 🌐 Website: [https://laptrinhfullstack.vercel.app/]
+- 📧 Email: [dotanthanhvlog@gmail.com]
+- 💼 LinkedIn: [https://www.linkedin.com/in/thanh270600/]
+- 🐙 GitHub: [https://github.com/thanhmati]
 
 ---
 
@@ -784,6 +684,6 @@ Cảm ơn các công nghệ và cộng đồng open-source đã làm cho khóa h
 
 **Hãy clone repository và bắt đầu học ngay hôm nay!**
 
-Made with ❤️ by [Tên Giảng Viên]
+Made with ❤️ by Đỗ Tấn Thành
 
 </div>
