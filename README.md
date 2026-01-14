@@ -442,6 +442,37 @@ Sau khi hoàn thành khóa học, bạn sẽ có khả năng:
 - 📌 (Tốt hơn) Hiểu biết về **Docker** basics
 
 ---
+## 📌 Tương tác với Giảng viên
+
+Khóa học không chỉ dừng lại ở video lý thuyết – bạn sẽ luôn có **sự đồng hành trực tiếp từ giảng viên** trong suốt quá trình học.
+
+### 💬 Hỏi – Đáp nhanh chóng
+
+- Đặt câu hỏi trực tiếp bên dưới mỗi bài học hoặc trong mục Q&A.
+- Nhận phản hồi nhanh chóng và giải thích rõ ràng từ khái niệm cơ bản đến kỹ thuật nâng cao.
+
+### 🛠 Hỗ trợ xử lý lỗi
+
+- Mô tả vấn đề và đính kèm code khi gặp lỗi.
+- Giảng viên sẽ hướng dẫn từng bước để khắc phục và giải thích nguyên nhân.
+
+### 🤝 Trao đổi cùng cộng đồng học viên
+
+- Tham gia **group riêng** để thảo luận, chia sẻ kinh nghiệm và học hỏi lẫn nhau.
+- Kết nối với các học viên khác đang làm trong ngành.
+
+### 🌐 Liên hệ & Kết nối
+
+Nếu bạn cần hỗ trợ hoặc muốn kết nối thêm ngoài khóa học, có thể liên hệ qua:
+
+- 📧 **Email:** [dotanthanhvlog@gmail.com](mailto:dotanthanhvlog@gmail.com)
+- 💼 **LinkedIn:** [https://www.linkedin.com/in/thanh270600/](https://www.linkedin.com/in/thanh270600/)
+- 🐙 **GitHub:** [https://github.com/thanhmati](https://github.com/thanhmati)
+- 📺 **YouTube:** [https://www.youtube.com/@laptrinhfullstack](https://www.youtube.com/@laptrinhfullstack)
+- 💬 **Facebook Group:** [https://www.facebook.com/groups/ltfullstack](https://www.facebook.com/groups/ltfullstack)
+- 📞 **Zalo** 0762216048
+
+---
 
 ## 📂 Cấu Trúc Dự Án
 
