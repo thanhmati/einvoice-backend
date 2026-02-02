@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+.nx
+.git
+tmp
+.DS_Store
+.env
+.env.*
+! .env.example

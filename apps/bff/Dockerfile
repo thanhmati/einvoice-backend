@@ -1,14 +1,24 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml nx.json .npmrc ./
+RUN npm install -g pnpm@10.19.0
+RUN pnpm install --frozen-lockfile
+
+COPY . .
+
+RUN pnpm nx run bff:prune
+
 FROM node:20-alpine
 
 WORKDIR /app
 
-COPY dist/apps/bff ./
-
-# Install pnpm for dependency installation
 RUN npm install -g pnpm@10.19.0
 
-# Install production dependencies
-RUN if [ -f package.json ]; then pnpm install --prod --frozen-lockfile; fi
+COPY --from=builder /app/dist/apps/bff ./
+
+RUN pnpm install --prod --frozen-lockfile
 RUN pnpm install tslib
 
 CMD ["node", "main.js"]
