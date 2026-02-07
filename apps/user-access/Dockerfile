@@ -8,7 +8,7 @@ RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN pnpm nx run user-access:prune
+RUN pnpm nx run user-access:build
 
 FROM node:20-alpine
 
@@ -17,8 +17,10 @@ WORKDIR /app
 RUN npm install -g pnpm@10.19.0
 
 COPY --from=builder /app/dist/apps/user-access ./
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/pnpm-lock.yaml ./
 
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 RUN pnpm install tslib
 
 CMD ["node", "main.js"]
