@@ -1,0 +1,90 @@
+name: einvoice-services-local
+
+services:
+  bff:
+    image: bff:local
+    restart: unless-stopped
+    ports:
+      - '3300:3300'
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+  authorizer:
+    image: authorizer:local
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+  invoice:
+    image: invoice:local
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+  mail:
+    image: mail:local
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - KAFKA_URL=kafka:9092
+    env_file:
+      - .env.prod
+
+    networks:
+      - einvoice-nw
+
+  media:
+    image: media:local
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+  pdf-generator:
+    image: pdf-generator:local
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+  product:
+    image: product:local
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+  user-access:
+    image: user-access:local
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+    networks:
+      - einvoice-nw
+
+networks:
+  einvoice-nw:
+    external: true

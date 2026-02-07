@@ -14,7 +14,13 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { QUEUE_GROUPS } from '@common/constants/enum/queue.enum';
 
 async function bootstrap() {
+  Logger.log(`[DEBUG] RAW ENV KAFKA_URL: ${process.env['KAFKA_URL']}`);
+  Logger.log(`[DEBUG] RAW ENV KAFKA_HOST: ${process.env['KAFKA_HOST']}`);
+  Logger.log(`[DEBUG] RAW ENV KAFKA_PORT: ${process.env['KAFKA_PORT']}`);
+
   const app = await NestFactory.create(AppModule);
+
+  Logger.debug('Config', AppModule.CONFIGURATION.KAFKA_CONFIG);
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.KAFKA,
