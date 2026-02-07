@@ -21,6 +21,5 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
 
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
-RUN pnpm install tslib
 
 CMD ["node", "main.js"]
