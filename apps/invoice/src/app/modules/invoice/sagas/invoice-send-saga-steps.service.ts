@@ -1,5 +1,5 @@
 import { Invoice } from '@common/schemas/invoice.schema';
-import { BadRequestException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InvoiceSendSagaContext, SagaStep, SagaStepResult } from '@common/interfaces/saga/saga-step.interface';
 import { firstValueFrom, map } from 'rxjs';
 import { TCP_SERVICES } from '@common/configuration/tcp.config';
@@ -175,12 +175,6 @@ export class InvoiceSendSagaSteps {
           } catch (error) {
             this.logger.error(`Failed to compensate invoice update: ${error.message}`);
           }
-        },
-      },
-      {
-        name: 'DEMO_SAGA',
-        execute: async (context: InvoiceSendSagaContext): Promise<SagaStepResult> => {
-          throw new BadRequestException('Demo saga failure');
         },
       },
     ];
