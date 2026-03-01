@@ -64,6 +64,10 @@ export class InvoiceService {
     return this.invoiceRepository.updateById(invoiceId, { status: INVOICE_STATUS.PAID });
   }
 
+  getAll() {
+    return this.invoiceRepository.getAll();
+  }
+
   getById(id: string) {
     return this.invoiceRepository.getById(id);
   }

@@ -5,6 +5,7 @@ enum INVOICE {
   DELETE_BY_ID = 'invoice.delete_by_id',
   SEND = 'invoice.send',
   UPDATE_INVOICE_PAID = 'invoice.update_invoice_paid',
+  GET_ALL = 'invoice.get_all',
 }
 
 enum PRODUCT {
@@ -36,6 +37,10 @@ enum MEDIA {
   DESTROY_FILE = 'media.destroy_file',
 }
 
+enum ROLE {
+  GET_ALL = 'role.get_all',
+}
+
 export const TCP_REQUEST_MESSAGE = {
   INVOICE,
   PRODUCT,
@@ -44,4 +49,5 @@ export const TCP_REQUEST_MESSAGE = {
   AUTHORIZER,
   PDF_GENERATOR,
   MEDIA,
+  ROLE,
 };
