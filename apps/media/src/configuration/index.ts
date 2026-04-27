@@ -4,6 +4,7 @@ import { ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { TcpConfiguration } from '@common/configuration/tcp.config';
 import { CloudinaryConfiguration } from '@common/configuration/cloudinary.config';
+import { createConfiguration } from '@common/configuration/configuration.helper';
 
 class Configuration extends BaseConfiguration {
   @ValidateNested()
@@ -19,8 +20,6 @@ class Configuration extends BaseConfiguration {
   CLOUDINARY_CONFIG = new CloudinaryConfiguration();
 }
 
-export const CONFIGURATION = new Configuration();
-
+const { CONFIGURATION } = createConfiguration(Configuration);
+export { CONFIGURATION };
 export type TConfiguration = typeof CONFIGURATION;
-
-CONFIGURATION.validate();
