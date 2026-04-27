@@ -1,11 +1,8 @@
-import { Module } from '@nestjs/common';
-import { TCP_SERVICES, TcpProvider } from '@common/configuration/tcp.config';
+import { TCP_SERVICES } from '@common/configuration/tcp.config';
+import { createTcpProxyModule } from '@common/utils/tcp-proxy-module.util';
 import { AuthorizerController } from './controllers/authorizer.controller';
 
-@Module({
-  imports: [],
-  controllers: [AuthorizerController],
-  providers: [TcpProvider(TCP_SERVICES.AUTHORIZER_SERVICE)],
-  exports: [],
-})
-export class AuthorizerModule {}
+export const AuthorizerModule = createTcpProxyModule(
+  AuthorizerController,
+  TCP_SERVICES.AUTHORIZER_SERVICE,
+);

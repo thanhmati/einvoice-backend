@@ -1,11 +1,8 @@
-import { Module } from '@nestjs/common';
-import { TCP_SERVICES, TcpProvider } from '@common/configuration/tcp.config';
+import { TCP_SERVICES } from '@common/configuration/tcp.config';
+import { createTcpProxyModule } from '@common/utils/tcp-proxy-module.util';
 import { UserController } from './controllers/user.controller';
 
-@Module({
-  imports: [],
-  controllers: [UserController],
-  providers: [TcpProvider(TCP_SERVICES.USER_ACCESS_SERVICE)],
-  exports: [],
-})
-export class UserModule {}
+export const UserModule = createTcpProxyModule(
+  UserController,
+  TCP_SERVICES.USER_ACCESS_SERVICE,
+);
