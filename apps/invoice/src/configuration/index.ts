@@ -7,6 +7,7 @@ import { MongoConfiguration } from '@common/configuration/mongo.config';
 import { StripeConfiguration } from '@common/configuration/stripe.config';
 import { KafkaConfiguration } from '@common/configuration/kafka.config';
 import { LogiConfiguration } from '@common/configuration/loki.config';
+import { createConfiguration } from '@common/configuration/configuration.helper';
 
 class Configuration extends BaseConfiguration {
   @ValidateNested()
@@ -34,8 +35,6 @@ class Configuration extends BaseConfiguration {
   LOKI_CONFIG = new LogiConfiguration();
 }
 
-export const CONFIGURATION = new Configuration();
-
+const { CONFIGURATION } = createConfiguration(Configuration);
+export { CONFIGURATION };
 export type TConfiguration = typeof CONFIGURATION;
-
-CONFIGURATION.validate();

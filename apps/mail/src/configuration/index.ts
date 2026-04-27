@@ -5,6 +5,7 @@ import { Type } from 'class-transformer';
 import { KafkaConfiguration } from '@common/configuration/kafka.config';
 import { MailConfiguration } from '@common/configuration/mail.config';
 import { TcpConfiguration } from '@common/configuration/tcp.config';
+import { createConfiguration } from '@common/configuration/configuration.helper';
 
 class Configuration extends BaseConfiguration {
   @ValidateNested()
@@ -24,8 +25,6 @@ class Configuration extends BaseConfiguration {
   TCP_SERV = new TcpConfiguration();
 }
 
-export const CONFIGURATION = new Configuration();
-
+const { CONFIGURATION } = createConfiguration(Configuration);
+export { CONFIGURATION };
 export type TConfiguration = typeof CONFIGURATION;
-
-CONFIGURATION.validate();
