@@ -1,11 +1,8 @@
-import { Module } from '@nestjs/common';
-import { TCP_SERVICES, TcpProvider } from '@common/configuration/tcp.config';
+import { TCP_SERVICES } from '@common/configuration/tcp.config';
+import { createTcpProxyModule } from '@common/utils/tcp-proxy-module.util';
 import { InvoiceController } from './controllers/invoice.controller';
 
-@Module({
-  imports: [],
-  controllers: [InvoiceController],
-  providers: [TcpProvider(TCP_SERVICES.INVOICE_SERVICE)],
-  exports: [],
-})
-export class InvoiceModule {}
+export const InvoiceModule = createTcpProxyModule(
+  InvoiceController,
+  TCP_SERVICES.INVOICE_SERVICE,
+);
