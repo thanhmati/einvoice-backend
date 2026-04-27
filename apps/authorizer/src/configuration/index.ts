@@ -5,6 +5,7 @@ import { Type } from 'class-transformer';
 import { TcpConfiguration } from '@common/configuration/tcp.config';
 import { KeycloakConfiguration } from '@common/configuration/keycloak.config';
 import { GrpcConfiguration } from '@common/configuration/grpc.config';
+import { createConfiguration } from '@common/configuration/configuration.helper';
 
 class Configuration extends BaseConfiguration {
   @ValidateNested()
@@ -24,8 +25,6 @@ class Configuration extends BaseConfiguration {
   GRPC_SERV = new GrpcConfiguration();
 }
 
-export const CONFIGURATION = new Configuration();
-
+const { CONFIGURATION } = createConfiguration(Configuration);
+export { CONFIGURATION };
 export type TConfiguration = typeof CONFIGURATION;
-
-CONFIGURATION.validate();
