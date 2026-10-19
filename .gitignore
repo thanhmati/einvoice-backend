@@ -18,11 +18,6 @@ node_modules
 *.sublime-workspace
 
 # IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
 
 # misc
 /.sass-cache
@@ -47,3 +42,5 @@ docker/**/docker_data
 temp_auto_push.bat
 temp_interactive_push.bat
 config.bat
+branch_structure.json
+.gitignore
